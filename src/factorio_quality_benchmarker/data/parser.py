@@ -129,6 +129,7 @@ def parse_prototypes(
     return parsed
 
 
+# Validation functions for metadata and raw data
 def validate_metadata_fields(metadata: dict) -> None:
     """
     Validates the metadata dictionary to ensure it contains the required fields. And checks if the required mods for the specified Factorio version are present in the active mods list.
@@ -157,6 +158,23 @@ def validate_metadata_fields(metadata: dict) -> None:
         )
 
 
+def validate_quality_and_recycler_present(raw_data: dict) -> None:
+    """
+    Validates that the Quality and Recycler mechanics are present in the raw data.
+    Raises a ValueError if either is missing.
+    """
+
+    if not raw_data.get("quality"):
+        raise ValueError(
+            "Quality mechanic is missing from the raw data. Please enable the quality mod in Factorio before generating the data dump."
+        )
+
+    if not raw_data.get("furnace", {}).get("recycler"):
+        raise ValueError(
+            "Recycler mechanic is missing from the raw data. Please enable the recycler mod in Factorio before generating the data dump."
+        )
+
+
 def perform_parsing() -> None:
     """
     The entrypoint for the parsing process. Reads the metadata and raw data files, validates the metadata, and then parses the raw data into structured JSON files.
@@ -170,10 +188,12 @@ def perform_parsing() -> None:
     )
 
     validate_metadata_fields(metadata)
-
     write_json_to_file(metadata, parser_output_path, "metadata.json")
 
     raw_data = read_json_from_file(
         raw_path / metadata["source_file"], "Raw data file not found."
     )
+
+    validate_quality_and_recycler_present(raw_data)
+
     parse_all_to_files(raw_data, parser_output_path)
