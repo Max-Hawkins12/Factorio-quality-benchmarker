@@ -1,0 +1,449 @@
+{
+    "assembling-machine-1": {
+        "name": "assembling-machine-1",
+        "crafting_categories": [
+            "crafting",
+            "advanced-crafting"
+        ],
+        "crafting_speed": 0.5,
+        "effect_receiver": {
+            "uses_module_effects": false,
+            "uses_beacon_effects": false,
+            "uses_surface_effects": true
+        },
+        "module_slots": null,
+        "allowed_effects": [
+            "speed",
+            "consumption",
+            "pollution"
+        ],
+        "selection_box": [
+            [
+                -1.5,
+                -1.5
+            ],
+            [
+                1.5,
+                1.5
+            ]
+        ],
+        "energy_usage": "75kW"
+    },
+    "assembling-machine-2": {
+        "name": "assembling-machine-2",
+        "crafting_categories": [
+            "crafting",
+            "advanced-crafting",
+            "crafting-with-fluid"
+        ],
+        "crafting_speed": 0.75,
+        "effect_receiver": null,
+        "module_slots": 2,
+        "allowed_effects": [
+            "consumption",
+            "speed",
+            "productivity",
+            "pollution",
+            "quality"
+        ],
+        "selection_box": [
+            [
+                -1.5,
+                -1.5
+            ],
+            [
+                1.5,
+                1.5
+            ]
+        ],
+        "energy_usage": "150kW"
+    },
+    "assembling-machine-3": {
+        "name": "assembling-machine-3",
+        "crafting_categories": [
+            "crafting",
+            "advanced-crafting",
+            "crafting-with-fluid"
+        ],
+        "crafting_speed": 1.25,
+        "effect_receiver": null,
+        "module_slots": 4,
+        "allowed_effects": [
+            "consumption",
+            "speed",
+            "productivity",
+            "pollution",
+            "quality"
+        ],
+        "selection_box": [
+            [
+                -1.5,
+                -1.5
+            ],
+            [
+                1.5,
+                1.5
+            ]
+        ],
+        "energy_usage": "375kW"
+    },
+    "oil-refinery": {
+        "name": "oil-refinery",
+        "crafting_categories": [
+            "oil-processing"
+        ],
+        "crafting_speed": 1,
+        "effect_receiver": null,
+        "module_slots": 3,
+        "allowed_effects": [
+            "consumption",
+            "speed",
+            "productivity",
+            "pollution"
+        ],
+        "selection_box": [
+            [
+                -2.5,
+                -2.5
+            ],
+            [
+                2.5,
+                2.5
+            ]
+        ],
+        "energy_usage": "420kW"
+    },
+    "chemical-plant": {
+        "name": "chemical-plant",
+        "crafting_categories": [
+            "chemistry"
+        ],
+        "crafting_speed": 1,
+        "effect_receiver": null,
+        "module_slots": 3,
+        "allowed_effects": [
+            "consumption",
+            "speed",
+            "productivity",
+            "pollution",
+            "quality"
+        ],
+        "selection_box": [
+            [
+                -1.5,
+                -1.5
+            ],
+            [
+                1.5,
+                1.5
+            ]
+        ],
+        "energy_usage": "210kW"
+    },
+    "centrifuge": {
+        "name": "centrifuge",
+        "crafting_categories": [
+            "centrifuging"
+        ],
+        "crafting_speed": 1,
+        "effect_receiver": null,
+        "module_slots": 2,
+        "allowed_effects": [
+            "consumption",
+            "speed",
+            "productivity",
+            "pollution",
+            "quality"
+        ],
+        "selection_box": [
+            [
+                -1.5,
+                -1.5
+            ],
+            [
+                1.5,
+                1.5
+            ]
+        ],
+        "energy_usage": "350kW"
+    },
+    "biochamber": {
+        "name": "biochamber",
+        "crafting_categories": [
+            "organic"
+        ],
+        "crafting_speed": 2,
+        "effect_receiver": {
+            "base_effect": {
+                "productivity": 0.5
+            }
+        },
+        "module_slots": 4,
+        "allowed_effects": [
+            "consumption",
+            "speed",
+            "productivity",
+            "pollution",
+            "quality"
+        ],
+        "selection_box": [
+            [
+                -1.5,
+                -1.5
+            ],
+            [
+                1.5,
+                1.5
+            ]
+        ],
+        "energy_usage": "500kW"
+    },
+    "crusher": {
+        "name": "crusher",
+        "crafting_categories": [
+            "crushing"
+        ],
+        "crafting_speed": 1,
+        "effect_receiver": null,
+        "module_slots": 2,
+        "allowed_effects": [
+            "consumption",
+            "speed",
+            "productivity",
+            "pollution",
+            "quality"
+        ],
+        "selection_box": [
+            [
+                -1,
+                -1.5
+            ],
+            [
+                1,
+                1.5
+            ]
+        ],
+        "energy_usage": "540kW"
+    },
+    "foundry": {
+        "name": "foundry",
+        "crafting_categories": [
+            "metallurgy"
+        ],
+        "crafting_speed": 4,
+        "effect_receiver": {
+            "base_effect": {
+                "productivity": 0.5
+            }
+        },
+        "module_slots": 4,
+        "allowed_effects": [
+            "consumption",
+            "speed",
+            "productivity",
+            "pollution",
+            "quality"
+        ],
+        "selection_box": [
+            [
+                -2.5,
+                -2.5
+            ],
+            [
+                2.5,
+                2.5
+            ]
+        ],
+        "energy_usage": "2500kW"
+    },
+    "captive-biter-spawner": {
+        "name": "captive-biter-spawner",
+        "crafting_categories": [
+            "captive-spawner-process"
+        ],
+        "crafting_speed": 1,
+        "effect_receiver": null,
+        "module_slots": 0,
+        "allowed_effects": {},
+        "selection_box": [
+            [
+                -2.5,
+                -2.5
+            ],
+            [
+                2.5,
+                2.5
+            ]
+        ],
+        "energy_usage": "100kW"
+    },
+    "electromagnetic-plant": {
+        "name": "electromagnetic-plant",
+        "crafting_categories": [
+            "electromagnetics"
+        ],
+        "crafting_speed": 2,
+        "effect_receiver": {
+            "base_effect": {
+                "productivity": 0.5
+            }
+        },
+        "module_slots": 5,
+        "allowed_effects": [
+            "consumption",
+            "speed",
+            "productivity",
+            "pollution",
+            "quality"
+        ],
+        "selection_box": [
+            [
+                -2,
+                -2
+            ],
+            [
+                2,
+                2
+            ]
+        ],
+        "energy_usage": "2000kW"
+    },
+    "cryogenic-plant": {
+        "name": "cryogenic-plant",
+        "crafting_categories": [
+            "cryogenics"
+        ],
+        "crafting_speed": 2,
+        "effect_receiver": null,
+        "module_slots": 8,
+        "allowed_effects": [
+            "consumption",
+            "speed",
+            "productivity",
+            "pollution",
+            "quality"
+        ],
+        "selection_box": [
+            [
+                -2.5,
+                -2.5
+            ],
+            [
+                2.5,
+                2.5
+            ]
+        ],
+        "energy_usage": "1500kW"
+    },
+    "stone-furnace": {
+        "name": "stone-furnace",
+        "crafting_categories": [
+            "smelting"
+        ],
+        "crafting_speed": 1,
+        "effect_receiver": {
+            "uses_module_effects": false,
+            "uses_beacon_effects": false,
+            "uses_surface_effects": true
+        },
+        "module_slots": null,
+        "allowed_effects": [
+            "speed",
+            "consumption",
+            "pollution"
+        ],
+        "selection_box": [
+            [
+                -0.8,
+                -1
+            ],
+            [
+                0.8,
+                1
+            ]
+        ],
+        "energy_usage": "90kW"
+    },
+    "electric-furnace": {
+        "name": "electric-furnace",
+        "crafting_categories": [
+            "smelting"
+        ],
+        "crafting_speed": 2,
+        "effect_receiver": null,
+        "module_slots": 2,
+        "allowed_effects": [
+            "consumption",
+            "speed",
+            "productivity",
+            "pollution",
+            "quality"
+        ],
+        "selection_box": [
+            [
+                -1.5,
+                -1.5
+            ],
+            [
+                1.5,
+                1.5
+            ]
+        ],
+        "energy_usage": "180kW"
+    },
+    "steel-furnace": {
+        "name": "steel-furnace",
+        "crafting_categories": [
+            "smelting"
+        ],
+        "crafting_speed": 2,
+        "effect_receiver": {
+            "uses_module_effects": false,
+            "uses_beacon_effects": false,
+            "uses_surface_effects": true
+        },
+        "module_slots": null,
+        "allowed_effects": [
+            "speed",
+            "consumption",
+            "pollution"
+        ],
+        "selection_box": [
+            [
+                -0.8,
+                -1
+            ],
+            [
+                0.8,
+                1
+            ]
+        ],
+        "energy_usage": "90kW"
+    },
+    "recycler": {
+        "name": "recycler",
+        "crafting_categories": [
+            "recycling"
+        ],
+        "crafting_speed": 0.5,
+        "effect_receiver": null,
+        "module_slots": 4,
+        "allowed_effects": [
+            "consumption",
+            "speed",
+            "pollution",
+            "quality"
+        ],
+        "selection_box": [
+            [
+                -0.9,
+                -1.85
+            ],
+            [
+                0.9,
+                1.85
+            ]
+        ],
+        "energy_usage": "180kW"
+    }
+}
