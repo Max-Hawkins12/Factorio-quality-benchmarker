@@ -1,10 +1,6 @@
 import json
 from pathlib import Path
 
-# Constants
-raw_path = Path("data/raw")
-parser_output_path = Path("data/parsed")
-
 """
 The system requires the recycler and quality mechanics to be present in the data dump to work. 
 In version 2.0, the Quality mod is required. In version 2.1, both the Quality and Recycler mods are required.
@@ -24,7 +20,7 @@ def read_json_from_file(file_path: Path, error_message: str) -> dict:
         raise FileNotFoundError(error_message + f" (File path: {file_path})")
 
 
-def write_json_to_file(data: dict, filename: str) -> None:
+def write_json_to_file(data: dict, parser_output_path: Path, filename: str) -> None:
     output_path: Path = parser_output_path / filename
     output_path.parent.mkdir(parents=True, exist_ok=True)
 
@@ -33,7 +29,7 @@ def write_json_to_file(data: dict, filename: str) -> None:
 
 
 # Helper functions for the parsing process
-def parse_all_to_files(raw_data: dict) -> None:
+def parse_all_to_files(raw_data: dict, parser_output_path: Path) -> None:
     """Parses all the required data from the raw data and writes it to the output files."""
 
     parse_jobs = {
@@ -109,7 +105,9 @@ def parse_all_to_files(raw_data: dict) -> None:
 
     for filename, (prototype_types, fields) in parse_jobs.items():
         write_json_to_file(
-            parse_prototypes(raw_data, prototype_types, fields), filename
+            parse_prototypes(raw_data, prototype_types, fields),
+            parser_output_path,
+            filename,
         )
 
 
@@ -146,10 +144,10 @@ def validate_metadata_fields(metadata: dict) -> None:
     version = ".".join(metadata["factorio_version"].split(".")[:2])
     active_mods = set(metadata["active_mods"])
 
-    required_mods_for_version = required_mods.get(version, set())
-
-    if required_mods_for_version is None:
+    if version not in required_mods:
         raise ValueError(f"Unsupported Factorio version: {version}.")
+
+    required_mods_for_version = required_mods[version]
 
     missing_mods = required_mods_for_version - active_mods
 
@@ -164,18 +162,18 @@ def perform_parsing() -> None:
     The entrypoint for the parsing process. Reads the metadata and raw data files, validates the metadata, and then parses the raw data into structured JSON files.
     """
 
+    raw_path = Path("data/raw")
+    parser_output_path = Path("data/parsed")
+
     metadata = read_json_from_file(
         raw_path / "metadata.json", "Metadata file not found."
     )
 
     validate_metadata_fields(metadata)
 
-    write_json_to_file(metadata, "metadata.json")
+    write_json_to_file(metadata, parser_output_path, "metadata.json")
 
     raw_data = read_json_from_file(
         raw_path / metadata["source_file"], "Raw data file not found."
     )
-    parse_all_to_files(raw_data)
-
-
-perform_parsing()
+    parse_all_to_files(raw_data, parser_output_path)
