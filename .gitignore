@@ -1,0 +1,22 @@
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+# Virtual environments
+.venv
+
+
+# Tooling caches
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+.vscode/
+
+# Raw imported Factorio data files are ignored, as they are large and not needed for the repository.
+data/raw/data-raw-dump.json
+data/raw/*.json
