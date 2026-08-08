@@ -166,12 +166,12 @@ def _validate_quality_and_recycler_present(raw_data: dict) -> None:
 
     if not raw_data.get("quality"):
         raise ValueError(
-            "Quality mechanic is missing from the raw data. Please enable the quality mod in Factorio before generating the data dump."
+            "Quality mechanic is missing from the raw data. Please enable the Quality mod in Factorio before generating the data dump."
         )
 
     if not raw_data.get("furnace", {}).get("recycler"):
         raise ValueError(
-            "Recycler mechanic is missing from the raw data. Please enable the recycler mod in Factorio before generating the data dump."
+            "Recycler mechanic is missing from the raw data. Please enable the Recycler mod in Factorio before generating the data dump."
         )
 
 
