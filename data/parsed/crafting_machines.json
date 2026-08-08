@@ -27,6 +27,7 @@
                 1.5
             ]
         ],
+        "next_upgrade": "assembling-machine-2",
         "energy_usage": "75kW"
     },
     "assembling-machine-2": {
@@ -56,6 +57,7 @@
                 1.5
             ]
         ],
+        "next_upgrade": "assembling-machine-3",
         "energy_usage": "150kW"
     },
     "assembling-machine-3": {
@@ -85,6 +87,7 @@
                 1.5
             ]
         ],
+        "next_upgrade": null,
         "energy_usage": "375kW"
     },
     "oil-refinery": {
@@ -111,6 +114,7 @@
                 2.5
             ]
         ],
+        "next_upgrade": null,
         "energy_usage": "420kW"
     },
     "chemical-plant": {
@@ -138,6 +142,7 @@
                 1.5
             ]
         ],
+        "next_upgrade": null,
         "energy_usage": "210kW"
     },
     "centrifuge": {
@@ -165,6 +170,7 @@
                 1.5
             ]
         ],
+        "next_upgrade": null,
         "energy_usage": "350kW"
     },
     "biochamber": {
@@ -196,6 +202,7 @@
                 1.5
             ]
         ],
+        "next_upgrade": null,
         "energy_usage": "500kW"
     },
     "crusher": {
@@ -223,6 +230,7 @@
                 1.5
             ]
         ],
+        "next_upgrade": null,
         "energy_usage": "540kW"
     },
     "foundry": {
@@ -254,6 +262,7 @@
                 2.5
             ]
         ],
+        "next_upgrade": null,
         "energy_usage": "2500kW"
     },
     "captive-biter-spawner": {
@@ -275,6 +284,7 @@
                 2.5
             ]
         ],
+        "next_upgrade": null,
         "energy_usage": "100kW"
     },
     "electromagnetic-plant": {
@@ -306,6 +316,7 @@
                 2
             ]
         ],
+        "next_upgrade": null,
         "energy_usage": "2000kW"
     },
     "cryogenic-plant": {
@@ -333,6 +344,7 @@
                 2.5
             ]
         ],
+        "next_upgrade": null,
         "energy_usage": "1500kW"
     },
     "stone-furnace": {
@@ -362,6 +374,7 @@
                 1
             ]
         ],
+        "next_upgrade": "steel-furnace",
         "energy_usage": "90kW"
     },
     "electric-furnace": {
@@ -389,6 +402,7 @@
                 1.5
             ]
         ],
+        "next_upgrade": null,
         "energy_usage": "180kW"
     },
     "steel-furnace": {
@@ -418,6 +432,7 @@
                 1
             ]
         ],
+        "next_upgrade": null,
         "energy_usage": "90kW"
     },
     "recycler": {
@@ -444,6 +459,7 @@
                 1.85
             ]
         ],
+        "next_upgrade": null,
         "energy_usage": "180kW"
     }
 }
