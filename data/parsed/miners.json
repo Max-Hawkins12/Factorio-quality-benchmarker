@@ -1,0 +1,88 @@
+{
+    "electric-mining-drill": {
+        "name": "electric-mining-drill",
+        "resource_categories": [
+            "basic-solid"
+        ],
+        "mining_speed": 0.5,
+        "module_slots": 3,
+        "allowed_effects": null,
+        "selection_box": [
+            [
+                -1.5,
+                -1.5
+            ],
+            [
+                1.5,
+                1.5
+            ]
+        ],
+        "energy_usage": "90kW"
+    },
+    "burner-mining-drill": {
+        "name": "burner-mining-drill",
+        "resource_categories": [
+            "basic-solid"
+        ],
+        "mining_speed": 0.25,
+        "module_slots": null,
+        "allowed_effects": {},
+        "selection_box": [
+            [
+                -1,
+                -1
+            ],
+            [
+                1,
+                1
+            ]
+        ],
+        "energy_usage": "150kW"
+    },
+    "pumpjack": {
+        "name": "pumpjack",
+        "resource_categories": [
+            "basic-fluid"
+        ],
+        "mining_speed": 1,
+        "module_slots": 2,
+        "allowed_effects": [
+            "consumption",
+            "speed",
+            "productivity",
+            "pollution"
+        ],
+        "selection_box": [
+            [
+                -1.5,
+                -1.5
+            ],
+            [
+                1.5,
+                1.5
+            ]
+        ],
+        "energy_usage": "90kW"
+    },
+    "big-mining-drill": {
+        "name": "big-mining-drill",
+        "resource_categories": [
+            "basic-solid",
+            "hard-solid"
+        ],
+        "mining_speed": 2.5,
+        "module_slots": 4,
+        "allowed_effects": null,
+        "selection_box": [
+            [
+                -2.5,
+                -2.5
+            ],
+            [
+                2.5,
+                2.5
+            ]
+        ],
+        "energy_usage": "300kW"
+    }
+}

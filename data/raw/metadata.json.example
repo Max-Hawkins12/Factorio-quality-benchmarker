@@ -1,0 +1,25 @@
+For Factorio 2.1
+
+{
+    "source_file": "data-raw-dump.json",
+    "factorio_version": "2.1.XX",
+    "active_mods": [
+        "Elevated Rails",
+        "Quality",
+        "Recycler",
+        "Space Age"
+    ]
+}
+
+For Factorio 2.0
+
+{
+    "source_file": "data-raw-dump.json",
+    "factorio_version": "2.0.XX",
+    "active_mods": [
+        "Elevated Rails",
+        "Quality",
+        "Space Age"
+    ]
+}
+

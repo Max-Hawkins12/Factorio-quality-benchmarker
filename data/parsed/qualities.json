@@ -1,0 +1,62 @@
+{
+    "quality-unknown": {
+        "name": "quality-unknown",
+        "level": 0,
+        "order": "z",
+        "next": null,
+        "next_probability": null,
+        "chain_probability": null,
+        "beacon_power_usage_multiplier": null,
+        "mining_drill_resource_drain_multiplier": null
+    },
+    "normal": {
+        "name": "normal",
+        "level": 0,
+        "order": "a",
+        "next": "uncommon",
+        "next_probability": 1,
+        "chain_probability": 0.1,
+        "beacon_power_usage_multiplier": null,
+        "mining_drill_resource_drain_multiplier": null
+    },
+    "uncommon": {
+        "name": "uncommon",
+        "level": 1,
+        "order": "b",
+        "next": "rare",
+        "next_probability": 1,
+        "chain_probability": 0.1,
+        "beacon_power_usage_multiplier": 0.8333333333333334,
+        "mining_drill_resource_drain_multiplier": 0.8333333333333334
+    },
+    "rare": {
+        "name": "rare",
+        "level": 2,
+        "order": "c",
+        "next": "epic",
+        "next_probability": 1,
+        "chain_probability": 0.1,
+        "beacon_power_usage_multiplier": 0.6666666666666666,
+        "mining_drill_resource_drain_multiplier": 0.6666666666666666
+    },
+    "epic": {
+        "name": "epic",
+        "level": 3,
+        "order": "d",
+        "next": "legendary",
+        "next_probability": 1,
+        "chain_probability": 0.1,
+        "beacon_power_usage_multiplier": 0.5,
+        "mining_drill_resource_drain_multiplier": 0.5
+    },
+    "legendary": {
+        "name": "legendary",
+        "level": 5,
+        "order": "e",
+        "next": null,
+        "next_probability": null,
+        "chain_probability": null,
+        "beacon_power_usage_multiplier": 0.16666666666666666,
+        "mining_drill_resource_drain_multiplier": 0.16666666666666666
+    }
+}
