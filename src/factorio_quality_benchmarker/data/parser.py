@@ -1,4 +1,5 @@
 import json
+import shutil
 from pathlib import Path
 
 """
@@ -198,6 +199,11 @@ def perform_parsing() -> None:
 
     raw_path = Path("data/raw")
     parser_output_path = Path("data/parsed")
+
+    if parser_output_path.exists():
+        shutil.rmtree(parser_output_path)
+
+    parser_output_path.mkdir(parents=True, exist_ok=True)
 
     metadata = _read_json_from_file(
         raw_path / "metadata.json", "Metadata file not found."
