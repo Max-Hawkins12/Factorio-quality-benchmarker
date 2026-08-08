@@ -28,6 +28,6 @@ This program has not been tested with any non-official mods. So modded data may 
 ### Running the Parser
 
 1. Copy `data-raw-dump.json` into `data/raw/`
-2. Create `data/raw/metadata.json` using `[metadata.json.example](./metadata.json.example)` as a template.
+2. Create `data/raw/metadata.json` using [`metadata.json.example`](./metadata.json.example) as a template.
 3.  From the project root, run:  
     `uv run factorio-quality-benchmarker parse`
