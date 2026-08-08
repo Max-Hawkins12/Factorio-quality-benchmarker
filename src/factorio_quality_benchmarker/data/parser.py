@@ -33,7 +33,8 @@ def _parse_data_into_files(raw_data: dict, parser_output_path: Path) -> None:
     """Parses all the required data from the raw data and writes it to the output files."""
 
     parse_jobs = {
-        "materials.json": (["item", "fluid"], ["name", "type"]),
+        "items.json": (["item"], ["name", "type"]),
+        "fluids.json": (["fluid"], ["name", "type"]),
         "recipes.json": (
             ["recipe"],
             [
@@ -48,7 +49,21 @@ def _parse_data_into_files(raw_data: dict, parser_output_path: Path) -> None:
             ],
         ),
         "crafting_machines.json": (
-            ["assembling-machine", "furnace"],
+            ["assembling-machine"],
+            [
+                "name",
+                "crafting_categories",
+                "crafting_speed",
+                "effect_receiver",
+                "module_slots",
+                "allowed_effects",
+                "selection_box",
+                "next_upgrade",
+                "energy_usage",
+            ],
+        ),
+        "furnaces.json": (
+            ["furnace"],
             [
                 "name",
                 "crafting_categories",

@@ -261,15 +261,19 @@ def minimal_raw_data():
 def test_parse_data_into_files_writes_expected_outputs(tmp_path, minimal_raw_data):
     parser._parse_data_into_files(minimal_raw_data, tmp_path)
 
-    materials = json.loads((tmp_path / "materials.json").read_text())
+    items = json.loads((tmp_path / "items.json").read_text())
+    fluids = json.loads((tmp_path / "fluids.json").read_text())
     recipes = json.loads((tmp_path / "recipes.json").read_text())
     crafting_machines = json.loads((tmp_path / "crafting_machines.json").read_text())
 
-    assert materials == {
+    assert items == {
         "iron-plate": {
             "name": "iron-plate",
             "type": "item",
         },
+    }
+
+    assert fluids == {
         "water": {
             "name": "water",
             "type": "fluid",
@@ -280,7 +284,7 @@ def test_parse_data_into_files_writes_expected_outputs(tmp_path, minimal_raw_dat
     assert recipes["iron-plate"]["energy_required"] == 3.2
 
     assert "assembling-machine-1" in crafting_machines
-    assert "recycler" in crafting_machines
+    assert not "recycler" in crafting_machines
 
 
 def test_perform_parsing_reads_and_writes_files(
@@ -305,7 +309,8 @@ def test_perform_parsing_reads_and_writes_files(
     parsed_path = tmp_path / "data" / "parsed"
 
     assert (parsed_path / "metadata.json").exists()
-    assert (parsed_path / "materials.json").exists()
+    assert (parsed_path / "items.json").exists()
+    assert (parsed_path / "fluids.json").exists()
     assert (parsed_path / "recipes.json").exists()
     assert (parsed_path / "crafting_machines.json").exists()
 

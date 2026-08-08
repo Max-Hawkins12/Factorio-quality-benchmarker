@@ -1,0 +1,134 @@
+{
+    "fluid-unknown": {
+        "name": "fluid-unknown",
+        "type": "fluid"
+    },
+    "parameter-0": {
+        "name": "parameter-0",
+        "type": "fluid"
+    },
+    "parameter-1": {
+        "name": "parameter-1",
+        "type": "fluid"
+    },
+    "parameter-2": {
+        "name": "parameter-2",
+        "type": "fluid"
+    },
+    "parameter-3": {
+        "name": "parameter-3",
+        "type": "fluid"
+    },
+    "parameter-4": {
+        "name": "parameter-4",
+        "type": "fluid"
+    },
+    "parameter-5": {
+        "name": "parameter-5",
+        "type": "fluid"
+    },
+    "parameter-6": {
+        "name": "parameter-6",
+        "type": "fluid"
+    },
+    "parameter-7": {
+        "name": "parameter-7",
+        "type": "fluid"
+    },
+    "parameter-8": {
+        "name": "parameter-8",
+        "type": "fluid"
+    },
+    "parameter-9": {
+        "name": "parameter-9",
+        "type": "fluid"
+    },
+    "water": {
+        "name": "water",
+        "type": "fluid"
+    },
+    "steam": {
+        "name": "steam",
+        "type": "fluid"
+    },
+    "sulfuric-acid": {
+        "name": "sulfuric-acid",
+        "type": "fluid"
+    },
+    "crude-oil": {
+        "name": "crude-oil",
+        "type": "fluid"
+    },
+    "heavy-oil": {
+        "name": "heavy-oil",
+        "type": "fluid"
+    },
+    "light-oil": {
+        "name": "light-oil",
+        "type": "fluid"
+    },
+    "petroleum-gas": {
+        "name": "petroleum-gas",
+        "type": "fluid"
+    },
+    "lubricant": {
+        "name": "lubricant",
+        "type": "fluid"
+    },
+    "ammoniacal-solution": {
+        "name": "ammoniacal-solution",
+        "type": "fluid"
+    },
+    "ammonia": {
+        "name": "ammonia",
+        "type": "fluid"
+    },
+    "fluorine": {
+        "name": "fluorine",
+        "type": "fluid"
+    },
+    "fluoroketone-cold": {
+        "name": "fluoroketone-cold",
+        "type": "fluid"
+    },
+    "fluoroketone-hot": {
+        "name": "fluoroketone-hot",
+        "type": "fluid"
+    },
+    "holmium-solution": {
+        "name": "holmium-solution",
+        "type": "fluid"
+    },
+    "electrolyte": {
+        "name": "electrolyte",
+        "type": "fluid"
+    },
+    "lithium-brine": {
+        "name": "lithium-brine",
+        "type": "fluid"
+    },
+    "lava": {
+        "name": "lava",
+        "type": "fluid"
+    },
+    "molten-iron": {
+        "name": "molten-iron",
+        "type": "fluid"
+    },
+    "molten-copper": {
+        "name": "molten-copper",
+        "type": "fluid"
+    },
+    "thruster-fuel": {
+        "name": "thruster-fuel",
+        "type": "fluid"
+    },
+    "thruster-oxidizer": {
+        "name": "thruster-oxidizer",
+        "type": "fluid"
+    },
+    "fusion-plasma": {
+        "name": "fusion-plasma",
+        "type": "fluid"
+    }
+}
