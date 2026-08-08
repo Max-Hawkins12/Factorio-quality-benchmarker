@@ -12,7 +12,7 @@ required_mods = {
 
 
 # Helper functions for reading and writing JSON files
-def read_json_from_file(file_path: Path, error_message: str) -> dict:
+def _read_json_from_file(file_path: Path, error_message: str) -> dict:
     try:
         with file_path.open("r") as f:
             return json.load(f)
@@ -20,8 +20,8 @@ def read_json_from_file(file_path: Path, error_message: str) -> dict:
         raise FileNotFoundError(error_message + f" (File path: {file_path})")
 
 
-def write_json_to_file(data: dict, parser_output_path: Path, filename: str) -> None:
-    output_path: Path = parser_output_path / filename
+def _write_json_to_file(data: dict, parser_output_path: Path, filename: str) -> None:
+    output_path = parser_output_path / filename
     output_path.parent.mkdir(parents=True, exist_ok=True)
 
     with output_path.open("w") as f:
@@ -29,7 +29,7 @@ def write_json_to_file(data: dict, parser_output_path: Path, filename: str) -> N
 
 
 # Helper functions for the parsing process
-def parse_all_to_files(raw_data: dict, parser_output_path: Path) -> None:
+def _parse_data_into_files(raw_data: dict, parser_output_path: Path) -> None:
     """Parses all the required data from the raw data and writes it to the output files."""
 
     parse_jobs = {
@@ -104,14 +104,14 @@ def parse_all_to_files(raw_data: dict, parser_output_path: Path) -> None:
     }
 
     for filename, (prototype_types, fields) in parse_jobs.items():
-        write_json_to_file(
-            parse_prototypes(raw_data, prototype_types, fields),
+        _write_json_to_file(
+            _parse_prototypes(raw_data, prototype_types, fields),
             parser_output_path,
             filename,
         )
 
 
-def parse_prototypes(
+def _parse_prototypes(
     raw_data: dict, prototype_types: list[str], fields: list[str]
 ) -> dict:
     """
@@ -130,7 +130,7 @@ def parse_prototypes(
 
 
 # Validation functions for metadata and raw data
-def validate_metadata_fields(metadata: dict) -> None:
+def _validate_metadata_fields(metadata: dict) -> None:
     """
     Validates the metadata dictionary to ensure it contains the required fields. And checks if the required mods for the specified Factorio version are present in the active mods list.
     Raises a ValueError if any required field is missing.
@@ -158,7 +158,7 @@ def validate_metadata_fields(metadata: dict) -> None:
         )
 
 
-def validate_quality_and_recycler_present(raw_data: dict) -> None:
+def _validate_quality_and_recycler_present(raw_data: dict) -> None:
     """
     Validates that the Quality and Recycler mechanics are present in the raw data.
     Raises a ValueError if either is missing.
@@ -183,17 +183,17 @@ def perform_parsing() -> None:
     raw_path = Path("data/raw")
     parser_output_path = Path("data/parsed")
 
-    metadata = read_json_from_file(
+    metadata = _read_json_from_file(
         raw_path / "metadata.json", "Metadata file not found."
     )
 
-    validate_metadata_fields(metadata)
-    write_json_to_file(metadata, parser_output_path, "metadata.json")
+    _validate_metadata_fields(metadata)
+    _write_json_to_file(metadata, parser_output_path, "metadata.json")
 
-    raw_data = read_json_from_file(
+    raw_data = _read_json_from_file(
         raw_path / metadata["source_file"], "Raw data file not found."
     )
 
-    validate_quality_and_recycler_present(raw_data)
+    _validate_quality_and_recycler_present(raw_data)
 
-    parse_all_to_files(raw_data, parser_output_path)
+    _parse_data_into_files(raw_data, parser_output_path)
