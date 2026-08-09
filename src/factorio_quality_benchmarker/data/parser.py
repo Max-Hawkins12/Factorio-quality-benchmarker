@@ -118,6 +118,7 @@ def _parse_data_into_files(raw_data: dict, parser_output_path: Path) -> None:
             ],
         ),
         "surfaces.json": (["planet", "surface"], ["name", "surface_properties"]),
+        "resources.json": (["resource"], ["name", "category", "minable"]),
     }
 
     for filename, (prototype_types, fields) in parse_jobs.items():
