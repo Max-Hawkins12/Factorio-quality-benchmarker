@@ -1,6 +1,6 @@
 import typer
 
-from factorio_quality_benchmarker.data.parser import perform_parsing
+from factorio_quality_benchmarker.data.raw_data_parser import perform_parsing
 
 app = typer.Typer()
 

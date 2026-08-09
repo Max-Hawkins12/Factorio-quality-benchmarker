@@ -2,7 +2,7 @@ import json
 
 import pytest
 
-from factorio_quality_benchmarker.data import parser
+from factorio_quality_benchmarker.data import raw_data_parser
 
 
 # Tests for metadata validation
@@ -13,7 +13,7 @@ def test_valid_factorio_20_metadata():
         "active_mods": ["Quality"],
     }
 
-    parser._validate_metadata_fields(metadata)
+    raw_data_parser._validate_metadata_fields(metadata)
 
 
 def test_valid_factorio_21_metadata():
@@ -23,7 +23,7 @@ def test_valid_factorio_21_metadata():
         "active_mods": ["Quality", "Recycler"],
     }
 
-    parser._validate_metadata_fields(metadata)
+    raw_data_parser._validate_metadata_fields(metadata)
 
 
 @pytest.mark.parametrize(
@@ -42,7 +42,7 @@ def test_metadata_requires_fields(missing_field):
         ValueError,
         match=f"Missing required field in metadata: {missing_field}",
     ):
-        parser._validate_metadata_fields(metadata)
+        raw_data_parser._validate_metadata_fields(metadata)
 
 
 def test_metadata_rejects_unsupported_version():
@@ -53,7 +53,7 @@ def test_metadata_rejects_unsupported_version():
     }
 
     with pytest.raises(ValueError, match="Unsupported Factorio version: 3.0"):
-        parser._validate_metadata_fields(metadata)
+        raw_data_parser._validate_metadata_fields(metadata)
 
 
 def test_factorio_20_requires_quality_mod():
@@ -64,7 +64,7 @@ def test_factorio_20_requires_quality_mod():
     }
 
     with pytest.raises(ValueError, match="Missing required mods"):
-        parser._validate_metadata_fields(metadata)
+        raw_data_parser._validate_metadata_fields(metadata)
 
 
 def test_factorio_21_requires_quality_mod():
@@ -75,7 +75,7 @@ def test_factorio_21_requires_quality_mod():
     }
 
     with pytest.raises(ValueError, match="Missing required mods"):
-        parser._validate_metadata_fields(metadata)
+        raw_data_parser._validate_metadata_fields(metadata)
 
 
 def test_factorio_21_requires_recycler_mod():
@@ -86,7 +86,7 @@ def test_factorio_21_requires_recycler_mod():
     }
 
     with pytest.raises(ValueError, match="Missing required mods"):
-        parser._validate_metadata_fields(metadata)
+        raw_data_parser._validate_metadata_fields(metadata)
 
 
 def test_metadata_allows_extra_mods():
@@ -96,7 +96,7 @@ def test_metadata_allows_extra_mods():
         "active_mods": ["Quality", "Recycler", "some-other-mod"],
     }
 
-    parser._validate_metadata_fields(metadata)
+    raw_data_parser._validate_metadata_fields(metadata)
 
 
 # Tests for required quality and recycler mechanics
@@ -106,7 +106,7 @@ def test_quality_and_recycler_are_required():
         "furnace": {"recycler": {"name": "recycler"}},
     }
 
-    parser._validate_quality_and_recycler_present(raw_data)
+    raw_data_parser._validate_quality_and_recycler_present(raw_data)
 
 
 @pytest.mark.parametrize(
@@ -119,7 +119,7 @@ def test_quality_and_recycler_are_required():
 )
 def test_quality_is_required(raw_data):
     with pytest.raises(ValueError, match="Quality mechanic is missing"):
-        parser._validate_quality_and_recycler_present(raw_data)
+        raw_data_parser._validate_quality_and_recycler_present(raw_data)
 
 
 @pytest.mark.parametrize(
@@ -132,7 +132,7 @@ def test_quality_is_required(raw_data):
 )
 def test_recycler_is_required(raw_data):
     with pytest.raises(ValueError, match="Recycler mechanic is missing"):
-        parser._validate_quality_and_recycler_present(raw_data)
+        raw_data_parser._validate_quality_and_recycler_present(raw_data)
 
 
 # Test for parser behaviour
@@ -147,7 +147,7 @@ def test_parse_prototypes_selects_requested_fields():
         }
     }
 
-    result = parser._parse_prototypes(
+    result = raw_data_parser._parse_prototypes(
         raw_data,
         ["item"],
         ["name", "type"],
@@ -164,7 +164,7 @@ def test_parse_prototypes_selects_requested_fields():
 def test_parse_prototypes_adds_none_for_missing_fields():
     raw_data = {"item": {"iron-plate": {"name": "iron-plate"}}}
 
-    result = parser._parse_prototypes(
+    result = raw_data_parser._parse_prototypes(
         raw_data,
         ["item"],
         ["name", "type"],
@@ -259,7 +259,7 @@ def minimal_raw_data():
 
 
 def test_parse_data_into_files_writes_expected_outputs(tmp_path, minimal_raw_data):
-    parser._parse_data_into_files(minimal_raw_data, tmp_path)
+    raw_data_parser._parse_data_into_files(minimal_raw_data, tmp_path)
 
     items = json.loads((tmp_path / "items.json").read_text())
     fluids = json.loads((tmp_path / "fluids.json").read_text())
@@ -304,7 +304,7 @@ def test_perform_parsing_reads_and_writes_files(
     (raw_path / "metadata.json").write_text(json.dumps(metadata))
     (raw_path / "data-raw-dump.json").write_text(json.dumps(minimal_raw_data))
 
-    parser.perform_parsing()
+    raw_data_parser.perform_parsing()
 
     parsed_path = tmp_path / "data" / "parsed"
 
