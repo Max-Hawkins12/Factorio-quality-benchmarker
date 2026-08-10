@@ -1,6 +1,8 @@
 import typer
 
+from factorio_quality_benchmarker.data.model_loader import load_game_data
 from factorio_quality_benchmarker.data.raw_data_parser import perform_parsing
+from factorio_quality_benchmarker.logging_config import configure_logging
 
 app = typer.Typer()
 
@@ -19,5 +21,12 @@ def version() -> None:
     print("0.1.0")
 
 
+@app.command()
+def dev() -> None:
+    load_game_data()
+
+
 def main() -> None:
+    configure_logging()
+
     app()
