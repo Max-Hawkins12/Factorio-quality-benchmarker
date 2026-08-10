@@ -34,7 +34,20 @@ def _parse_data_into_files(raw_data: dict, parser_output_path: Path) -> None:
     """Parses all the required data from the raw data and writes it to the output files."""
 
     parse_jobs = {
-        "items.json": (["item"], ["name", "type"]),
+        "items.json": (
+            [
+                "item",
+                "ammo",
+                "armor",
+                "capsule",
+                "gun",
+                "item-with-entity-data",
+                "module",
+                "rail-planner",
+                "repair-tool",
+            ],
+            ["name", "type"],
+        ),
         "fluids.json": (["fluid"], ["name", "type"]),
         "recipes.json": (
             ["recipe"],

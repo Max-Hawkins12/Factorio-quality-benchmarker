@@ -223,14 +223,6 @@ def minimal_raw_data():
                 "resource_categories": ["basic-solid"],
             }
         },
-        "module": {
-            "speed-module": {
-                "name": "speed-module",
-                "category": "speed",
-                "tier": 1,
-                "effect": {},
-            }
-        },
         "quality": {
             "normal": {
                 "name": "normal",
@@ -265,6 +257,8 @@ def test_parse_data_into_files_writes_expected_outputs(tmp_path, minimal_raw_dat
     fluids = json.loads((tmp_path / "fluids.json").read_text())
     recipes = json.loads((tmp_path / "recipes.json").read_text())
     crafting_machines = json.loads((tmp_path / "crafting_machines.json").read_text())
+
+    print(items)
 
     assert items == {
         "iron-plate": {

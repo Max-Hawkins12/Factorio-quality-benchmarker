@@ -1018,5 +1018,317 @@
     "fluoroketone-hot-barrel": {
         "name": "fluoroketone-hot-barrel",
         "type": "item"
+    },
+    "uranium-rounds-magazine": {
+        "name": "uranium-rounds-magazine",
+        "type": "ammo"
+    },
+    "flamethrower-ammo": {
+        "name": "flamethrower-ammo",
+        "type": "ammo"
+    },
+    "rocket": {
+        "name": "rocket",
+        "type": "ammo"
+    },
+    "explosive-rocket": {
+        "name": "explosive-rocket",
+        "type": "ammo"
+    },
+    "atomic-bomb": {
+        "name": "atomic-bomb",
+        "type": "ammo"
+    },
+    "piercing-shotgun-shell": {
+        "name": "piercing-shotgun-shell",
+        "type": "ammo"
+    },
+    "cannon-shell": {
+        "name": "cannon-shell",
+        "type": "ammo"
+    },
+    "explosive-cannon-shell": {
+        "name": "explosive-cannon-shell",
+        "type": "ammo"
+    },
+    "uranium-cannon-shell": {
+        "name": "uranium-cannon-shell",
+        "type": "ammo"
+    },
+    "explosive-uranium-cannon-shell": {
+        "name": "explosive-uranium-cannon-shell",
+        "type": "ammo"
+    },
+    "artillery-shell": {
+        "name": "artillery-shell",
+        "type": "ammo"
+    },
+    "firearm-magazine": {
+        "name": "firearm-magazine",
+        "type": "ammo"
+    },
+    "piercing-rounds-magazine": {
+        "name": "piercing-rounds-magazine",
+        "type": "ammo"
+    },
+    "shotgun-shell": {
+        "name": "shotgun-shell",
+        "type": "ammo"
+    },
+    "railgun-ammo": {
+        "name": "railgun-ammo",
+        "type": "ammo"
+    },
+    "capture-robot-rocket": {
+        "name": "capture-robot-rocket",
+        "type": "ammo"
+    },
+    "tesla-ammo": {
+        "name": "tesla-ammo",
+        "type": "ammo"
+    },
+    "modular-armor": {
+        "name": "modular-armor",
+        "type": "armor"
+    },
+    "power-armor": {
+        "name": "power-armor",
+        "type": "armor"
+    },
+    "power-armor-mk2": {
+        "name": "power-armor-mk2",
+        "type": "armor"
+    },
+    "light-armor": {
+        "name": "light-armor",
+        "type": "armor"
+    },
+    "heavy-armor": {
+        "name": "heavy-armor",
+        "type": "armor"
+    },
+    "mech-armor": {
+        "name": "mech-armor",
+        "type": "armor"
+    },
+    "raw-fish": {
+        "name": "raw-fish",
+        "type": "capsule"
+    },
+    "grenade": {
+        "name": "grenade",
+        "type": "capsule"
+    },
+    "defender-capsule": {
+        "name": "defender-capsule",
+        "type": "capsule"
+    },
+    "cluster-grenade": {
+        "name": "cluster-grenade",
+        "type": "capsule"
+    },
+    "poison-capsule": {
+        "name": "poison-capsule",
+        "type": "capsule"
+    },
+    "slowdown-capsule": {
+        "name": "slowdown-capsule",
+        "type": "capsule"
+    },
+    "distractor-capsule": {
+        "name": "distractor-capsule",
+        "type": "capsule"
+    },
+    "destroyer-capsule": {
+        "name": "destroyer-capsule",
+        "type": "capsule"
+    },
+    "cliff-explosives": {
+        "name": "cliff-explosives",
+        "type": "capsule"
+    },
+    "discharge-defense-remote": {
+        "name": "discharge-defense-remote",
+        "type": "capsule"
+    },
+    "artillery-targeting-remote": {
+        "name": "artillery-targeting-remote",
+        "type": "capsule"
+    },
+    "yumako": {
+        "name": "yumako",
+        "type": "capsule"
+    },
+    "jellynut": {
+        "name": "jellynut",
+        "type": "capsule"
+    },
+    "yumako-mash": {
+        "name": "yumako-mash",
+        "type": "capsule"
+    },
+    "jelly": {
+        "name": "jelly",
+        "type": "capsule"
+    },
+    "bioflux": {
+        "name": "bioflux",
+        "type": "capsule"
+    },
+    "flamethrower": {
+        "name": "flamethrower",
+        "type": "gun"
+    },
+    "tank-machine-gun": {
+        "name": "tank-machine-gun",
+        "type": "gun"
+    },
+    "tank-flamethrower": {
+        "name": "tank-flamethrower",
+        "type": "gun"
+    },
+    "rocket-launcher": {
+        "name": "rocket-launcher",
+        "type": "gun"
+    },
+    "combat-shotgun": {
+        "name": "combat-shotgun",
+        "type": "gun"
+    },
+    "tank-cannon": {
+        "name": "tank-cannon",
+        "type": "gun"
+    },
+    "artillery-wagon-cannon": {
+        "name": "artillery-wagon-cannon",
+        "type": "gun"
+    },
+    "spidertron-rocket-launcher-1": {
+        "name": "spidertron-rocket-launcher-1",
+        "type": "gun"
+    },
+    "spidertron-rocket-launcher-2": {
+        "name": "spidertron-rocket-launcher-2",
+        "type": "gun"
+    },
+    "spidertron-rocket-launcher-3": {
+        "name": "spidertron-rocket-launcher-3",
+        "type": "gun"
+    },
+    "spidertron-rocket-launcher-4": {
+        "name": "spidertron-rocket-launcher-4",
+        "type": "gun"
+    },
+    "pistol": {
+        "name": "pistol",
+        "type": "gun"
+    },
+    "submachine-gun": {
+        "name": "submachine-gun",
+        "type": "gun"
+    },
+    "vehicle-machine-gun": {
+        "name": "vehicle-machine-gun",
+        "type": "gun"
+    },
+    "shotgun": {
+        "name": "shotgun",
+        "type": "gun"
+    },
+    "railgun": {
+        "name": "railgun",
+        "type": "gun"
+    },
+    "teslagun": {
+        "name": "teslagun",
+        "type": "gun"
+    },
+    "car": {
+        "name": "car",
+        "type": "item-with-entity-data"
+    },
+    "locomotive": {
+        "name": "locomotive",
+        "type": "item-with-entity-data"
+    },
+    "cargo-wagon": {
+        "name": "cargo-wagon",
+        "type": "item-with-entity-data"
+    },
+    "fluid-wagon": {
+        "name": "fluid-wagon",
+        "type": "item-with-entity-data"
+    },
+    "artillery-wagon": {
+        "name": "artillery-wagon",
+        "type": "item-with-entity-data"
+    },
+    "tank": {
+        "name": "tank",
+        "type": "item-with-entity-data"
+    },
+    "spidertron": {
+        "name": "spidertron",
+        "type": "item-with-entity-data"
+    },
+    "speed-module": {
+        "name": "speed-module",
+        "type": "module"
+    },
+    "speed-module-2": {
+        "name": "speed-module-2",
+        "type": "module"
+    },
+    "speed-module-3": {
+        "name": "speed-module-3",
+        "type": "module"
+    },
+    "efficiency-module": {
+        "name": "efficiency-module",
+        "type": "module"
+    },
+    "efficiency-module-2": {
+        "name": "efficiency-module-2",
+        "type": "module"
+    },
+    "efficiency-module-3": {
+        "name": "efficiency-module-3",
+        "type": "module"
+    },
+    "productivity-module": {
+        "name": "productivity-module",
+        "type": "module"
+    },
+    "productivity-module-2": {
+        "name": "productivity-module-2",
+        "type": "module"
+    },
+    "productivity-module-3": {
+        "name": "productivity-module-3",
+        "type": "module"
+    },
+    "quality-module": {
+        "name": "quality-module",
+        "type": "module"
+    },
+    "quality-module-2": {
+        "name": "quality-module-2",
+        "type": "module"
+    },
+    "quality-module-3": {
+        "name": "quality-module-3",
+        "type": "module"
+    },
+    "rail": {
+        "name": "rail",
+        "type": "rail-planner"
+    },
+    "rail-ramp": {
+        "name": "rail-ramp",
+        "type": "rail-planner"
+    },
+    "repair-pack": {
+        "name": "repair-pack",
+        "type": "repair-tool"
     }
 }
