@@ -30,7 +30,7 @@ def _write_json_to_file(data: dict, parser_output_path: Path, filename: str) -> 
 
 
 # Helper functions for the parsing process
-def _parse_data_into_files(raw_data: dict, parser_output_path: Path) -> None:
+def _write_prototype_files(raw_data: dict, parser_output_path: Path) -> None:
     """Parses all the required data from the raw data and writes it to the output files."""
 
     parse_jobs = {
@@ -223,13 +223,13 @@ def perform_parsing() -> None:
         raw_path / "metadata.json", "Metadata file not found."
     )
 
-    _validate_metadata_fields(metadata)
+    _validate_metadata_fields(metadata["metadata"])
     _write_json_to_file(metadata, parser_output_path, "metadata.json")
 
     raw_data = _read_json_from_file(
-        raw_path / metadata["source_file"], "Raw data file not found."
+        raw_path / metadata["metadata"]["source_file"], "Raw data file not found."
     )
 
     _validate_quality_and_recycler_present(raw_data)
 
-    _parse_data_into_files(raw_data, parser_output_path)
+    _write_prototype_files(raw_data, parser_output_path)
