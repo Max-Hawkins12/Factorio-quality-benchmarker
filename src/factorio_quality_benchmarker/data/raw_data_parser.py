@@ -1,6 +1,9 @@
 import json
+import logging
 import shutil
 from pathlib import Path
+
+logger = logging.getLogger(__name__)
 
 """
 The system requires the recycler and quality mechanics to be present in the data dump to work. 
@@ -134,12 +137,29 @@ def _write_prototype_files(raw_data: dict, parser_output_path: Path) -> None:
         "resources.json": (["resource"], ["name", "category", "minable"]),
     }
 
+    total_parsed = 0
+
     for filename, (prototype_types, fields) in parse_jobs.items():
+        parsed = _parse_prototypes(raw_data, prototype_types, fields)
+
         _write_json_to_file(
-            _parse_prototypes(raw_data, prototype_types, fields),
+            parsed,
             parser_output_path,
             filename,
         )
+
+        total_parsed += len(parsed)
+
+        logger.debug(
+            "Parsed %d prototypes into %s",
+            len(parsed),
+            filename,
+        )
+
+    logger.info(
+        "Prototype parsing complete: %d prototypes written",
+        total_parsed,
+    )
 
 
 def _parse_prototypes(
@@ -214,22 +234,48 @@ def perform_parsing() -> None:
     raw_path = Path("data/raw")
     parser_output_path = Path("data/parsed")
 
+    logger.info("Starting Factorio data parsing...")
+
     if parser_output_path.exists():
         shutil.rmtree(parser_output_path)
 
     parser_output_path.mkdir(parents=True, exist_ok=True)
 
+    logger.info("Loading metadata...")
     metadata = _read_json_from_file(
-        raw_path / "metadata.json", "Metadata file not found."
+        raw_path / "metadata.json",
+        "Metadata file not found.",
     )
 
+    logger.debug("Validating metadata...")
     _validate_metadata_fields(metadata["metadata"])
-    _write_json_to_file(metadata, parser_output_path, "metadata.json")
 
-    raw_data = _read_json_from_file(
-        raw_path / metadata["metadata"]["source_file"], "Raw data file not found."
+    logger.info(
+        "Metadata validated for Factorio %s",
+        metadata["metadata"]["factorio_version"],
     )
 
+    _write_json_to_file(
+        metadata,
+        parser_output_path,
+        "metadata.json",
+    )
+
+    logger.info("Loading raw Factorio data...")
+    raw_data = _read_json_from_file(
+        raw_path / metadata["metadata"]["source_file"],
+        "Raw data file not found.",
+    )
+
+    logger.debug("Validating Quality and Recycler mechanics...")
     _validate_quality_and_recycler_present(raw_data)
 
+    logger.info("Raw Factorio data validated")
+
+    logger.info("Parsing prototypes...")
     _write_prototype_files(raw_data, parser_output_path)
+
+    logger.info(
+        "Parsing complete. Output written to %s",
+        parser_output_path,
+    )
