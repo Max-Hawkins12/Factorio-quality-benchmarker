@@ -51,7 +51,13 @@ def _write_prototype_files(raw_data: dict, parser_output_path: Path) -> None:
             ],
             ["name", "type"],
         ),
-        "fluids.json": (["fluid"], ["name", "type"]),
+        "fluids.json": (
+            ["fluid"],
+            [
+                "name",
+                "type",
+            ],
+        ),
         "recipes.json": (
             ["recipe"],
             [
@@ -75,8 +81,6 @@ def _write_prototype_files(raw_data: dict, parser_output_path: Path) -> None:
                 "module_slots",
                 "allowed_effects",
                 "selection_box",
-                "next_upgrade",
-                "energy_usage",
             ],
         ),
         "furnaces.json": (
@@ -89,8 +93,6 @@ def _write_prototype_files(raw_data: dict, parser_output_path: Path) -> None:
                 "module_slots",
                 "allowed_effects",
                 "selection_box",
-                "next_upgrade",
-                "energy_usage",
             ],
         ),
         "miners.json": (
@@ -102,10 +104,17 @@ def _write_prototype_files(raw_data: dict, parser_output_path: Path) -> None:
                 "module_slots",
                 "allowed_effects",
                 "selection_box",
-                "energy_usage",
             ],
         ),
-        "modules.json": (["module"], ["name", "category", "tier", "effect"]),
+        "modules.json": (
+            ["module"],
+            [
+                "name",
+                "category",
+                "tier",
+                "effect",
+            ],
+        ),
         "qualities.json": (
             ["quality"],
             [
@@ -115,8 +124,6 @@ def _write_prototype_files(raw_data: dict, parser_output_path: Path) -> None:
                 "next",
                 "next_probability",
                 "chain_probability",
-                "beacon_power_usage_multiplier",
-                "mining_drill_resource_drain_multiplier",
             ],
         ),
         "beacons.json": (
@@ -125,16 +132,30 @@ def _write_prototype_files(raw_data: dict, parser_output_path: Path) -> None:
                 "name",
                 "module_slots",
                 "distribution_effectivity",
-                "distribution_effectivity_bonus_per_quality_level",
                 "profile",
                 "allowed_effects",
                 "selection_box",
                 "supply_area_distance",
-                "energy_usage",
             ],
         ),
-        "surfaces.json": (["planet", "surface"], ["name", "surface_properties"]),
-        "resources.json": (["resource"], ["name", "category", "minable"]),
+        "surfaces.json": (
+            [
+                "planet",
+                "surface",
+            ],
+            [
+                "name",
+                "surface_properties",
+            ],
+        ),
+        "resources.json": (
+            ["resource"],
+            [
+                "name",
+                "category",
+                "minable",
+            ],
+        ),
     }
 
     total_parsed = 0

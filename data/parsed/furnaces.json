@@ -25,9 +25,7 @@
                 0.8,
                 1
             ]
-        ],
-        "next_upgrade": "steel-furnace",
-        "energy_usage": "90kW"
+        ]
     },
     "electric-furnace": {
         "name": "electric-furnace",
@@ -53,9 +51,7 @@
                 1.5,
                 1.5
             ]
-        ],
-        "next_upgrade": null,
-        "energy_usage": "180kW"
+        ]
     },
     "steel-furnace": {
         "name": "steel-furnace",
@@ -83,9 +79,7 @@
                 0.8,
                 1
             ]
-        ],
-        "next_upgrade": null,
-        "energy_usage": "90kW"
+        ]
     },
     "recycler": {
         "name": "recycler",
@@ -110,8 +104,6 @@
                 0.9,
                 1.85
             ]
-        ],
-        "next_upgrade": null,
-        "energy_usage": "180kW"
+        ]
     }
 }

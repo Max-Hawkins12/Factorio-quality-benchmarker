@@ -3,7 +3,6 @@
         "name": "beacon",
         "module_slots": 2,
         "distribution_effectivity": 1.5,
-        "distribution_effectivity_bonus_per_quality_level": 0.2,
         "profile": [
             1,
             0.7071,
@@ -121,7 +120,6 @@
                 1.5
             ]
         ],
-        "supply_area_distance": 3,
-        "energy_usage": "480kW"
+        "supply_area_distance": 3
     }
 }

@@ -26,9 +26,7 @@
                 1.5,
                 1.5
             ]
-        ],
-        "next_upgrade": "assembling-machine-2",
-        "energy_usage": "75kW"
+        ]
     },
     "assembling-machine-2": {
         "name": "assembling-machine-2",
@@ -56,9 +54,7 @@
                 1.5,
                 1.5
             ]
-        ],
-        "next_upgrade": "assembling-machine-3",
-        "energy_usage": "150kW"
+        ]
     },
     "assembling-machine-3": {
         "name": "assembling-machine-3",
@@ -86,9 +82,7 @@
                 1.5,
                 1.5
             ]
-        ],
-        "next_upgrade": null,
-        "energy_usage": "375kW"
+        ]
     },
     "oil-refinery": {
         "name": "oil-refinery",
@@ -113,9 +107,7 @@
                 2.5,
                 2.5
             ]
-        ],
-        "next_upgrade": null,
-        "energy_usage": "420kW"
+        ]
     },
     "chemical-plant": {
         "name": "chemical-plant",
@@ -141,9 +133,7 @@
                 1.5,
                 1.5
             ]
-        ],
-        "next_upgrade": null,
-        "energy_usage": "210kW"
+        ]
     },
     "centrifuge": {
         "name": "centrifuge",
@@ -169,9 +159,7 @@
                 1.5,
                 1.5
             ]
-        ],
-        "next_upgrade": null,
-        "energy_usage": "350kW"
+        ]
     },
     "biochamber": {
         "name": "biochamber",
@@ -201,9 +189,7 @@
                 1.5,
                 1.5
             ]
-        ],
-        "next_upgrade": null,
-        "energy_usage": "500kW"
+        ]
     },
     "crusher": {
         "name": "crusher",
@@ -229,9 +215,7 @@
                 1,
                 1.5
             ]
-        ],
-        "next_upgrade": null,
-        "energy_usage": "540kW"
+        ]
     },
     "foundry": {
         "name": "foundry",
@@ -261,9 +245,7 @@
                 2.5,
                 2.5
             ]
-        ],
-        "next_upgrade": null,
-        "energy_usage": "2500kW"
+        ]
     },
     "captive-biter-spawner": {
         "name": "captive-biter-spawner",
@@ -283,9 +265,7 @@
                 2.5,
                 2.5
             ]
-        ],
-        "next_upgrade": null,
-        "energy_usage": "100kW"
+        ]
     },
     "electromagnetic-plant": {
         "name": "electromagnetic-plant",
@@ -315,9 +295,7 @@
                 2,
                 2
             ]
-        ],
-        "next_upgrade": null,
-        "energy_usage": "2000kW"
+        ]
     },
     "cryogenic-plant": {
         "name": "cryogenic-plant",
@@ -343,8 +321,6 @@
                 2.5,
                 2.5
             ]
-        ],
-        "next_upgrade": null,
-        "energy_usage": "1500kW"
+        ]
     }
 }
