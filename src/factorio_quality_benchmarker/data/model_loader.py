@@ -616,21 +616,27 @@ def load_game_data() -> GameData:
         has_space_age=has_space_age(data),
     )
 
-    logger.info(
-        "Game data loaded successfully: "
-        "%d items, %d fluids, %d recipes, %d crafters, "
-        "%d miners, %d resources, %d modules, %d beacons, "
-        "%d surfaces, %d qualities",
-        len(game_data.items),
-        len(game_data.fluids),
-        len(game_data.recipes),
-        len(game_data.crafters),
-        len(game_data.miners),
-        len(game_data.resources),
-        len(game_data.modules),
-        len(game_data.beacons),
-        len(game_data.surfaces),
-        len(game_data.qualities),
+    if game_data.has_space_age:
+        log_header = f"Game data loaded successfully for Factorio Space Age {game_data.factorio_version}: "
+    else:
+        log_header = (
+            f"Game data loaded successfully for Factorio {game_data.factorio_version}: "
+        )
+
+    log = (
+        log_header
+        + f"items={len(game_data.items)}, "
+        + f"fluids={len(game_data.fluids)}, "
+        + f"recipes={len(game_data.recipes)}, "
+        + f"crafters={len(game_data.crafters)}, "
+        + f"miners={len(game_data.miners)}, "
+        + f"resources={len(game_data.resources)}, "
+        + f"modules={len(game_data.modules)}, "
+        + f"beacons={len(game_data.beacons)}, "
+        + f"surfaces={len(game_data.surfaces)}, "
+        + f"qualities={len(game_data.qualities)}"
     )
+
+    logger.info(log)
 
     return game_data
