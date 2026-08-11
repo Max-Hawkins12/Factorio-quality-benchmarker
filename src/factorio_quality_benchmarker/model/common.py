@@ -11,21 +11,12 @@ class CraftingCategory:
 
 
 @dataclass(frozen=True, slots=True)
-class ModuleCategory:
-    name: str
-
-    def __post_init__(self) -> None:
-        if not self.name.strip():
-            raise ValueError("Module category cannot be empty")
-
-
-@dataclass(frozen=True, slots=True)
 class ModuleEffect:
-    property: str
+    effect: str
 
     def __post_init__(self) -> None:
-        if not self.property.strip():
-            raise ValueError("Module category cannot be empty")
+        if not self.effect.strip():
+            raise ValueError("Module effect cannot be empty")
 
 
 @dataclass(frozen=True, slots=True)
@@ -35,3 +26,12 @@ class ResourceCategory:
     def __post_init__(self) -> None:
         if not self.name.strip():
             raise ValueError("Resource category cannot be empty")
+
+
+@dataclass(frozen=True, slots=True)
+class SurfaceProperty:
+    property: str
+
+    def __post_init__(self) -> None:
+        if not self.property.strip():
+            raise ValueError("Surface property cannot be empty")

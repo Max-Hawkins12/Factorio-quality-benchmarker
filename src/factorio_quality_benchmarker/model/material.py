@@ -27,14 +27,12 @@ class FluidIngredient:
 class ItemProduct:
     item: Item
     amount: float
-    probability: float = 1.0
 
 
 @dataclass(frozen=True, slots=True)
 class FluidProduct:
     fluid: Fluid
     amount: float
-    probability: float = 1.0
 
 
 Material = Item | Fluid

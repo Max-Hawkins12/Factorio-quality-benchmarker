@@ -1,11 +1,11 @@
+from collections.abc import Mapping
 from dataclasses import dataclass
 
-from .common import ModuleCategory, ModuleEffect
+from .common import ModuleEffect
 
 
 @dataclass(frozen=True, slots=True)
 class Module:
     name: str
-    category: ModuleCategory
     tier: int
-    effects: tuple[tuple[ModuleEffect, float], ...]
+    effects: Mapping[ModuleEffect, float]

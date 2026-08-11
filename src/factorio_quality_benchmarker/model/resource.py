@@ -11,4 +11,4 @@ class Resource:
     category: ResourceCategory
 
     mining_time: float
-    product: tuple[Product, ...]
+    product: Product

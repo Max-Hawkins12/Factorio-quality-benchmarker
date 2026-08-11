@@ -1,11 +1,12 @@
 from .beacon import Beacon  # noqa: F401
 from .common import (  # noqa: F401
     CraftingCategory,
-    ModuleCategory,
     ModuleEffect,
     ResourceCategory,
+    SurfaceProperty,
 )
 from .crafting_machine import CraftingMachine  # noqa: F401
+from .game_data import GameData  # noqa: F401
 from .material import (  # noqa: F401
     Fluid,
     FluidIngredient,

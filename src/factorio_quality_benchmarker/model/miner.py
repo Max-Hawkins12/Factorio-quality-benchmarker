@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from .common import ModuleCategory, ModuleEffect, ResourceCategory
+from .common import ModuleEffect, ResourceCategory
 
 
 @dataclass(frozen=True, slots=True)
@@ -13,6 +13,6 @@ class Miner:
     module_slots: int
 
     allowed_effects: frozenset[ModuleEffect]
-    allowed_module_categories: frozenset[ModuleCategory]
 
-    maximum_beacons: int
+    width: int
+    height: int

@@ -1,9 +1,10 @@
+from collections.abc import Mapping
 from dataclasses import dataclass
+
+from .common import SurfaceProperty
 
 
 @dataclass(frozen=True, slots=True)
 class Surface:
     name: str
-    magnetic_field: float
-    gravity: float
-    pressure: float
+    properties: Mapping[SurfaceProperty, float]
