@@ -32,6 +32,7 @@ from factorio_quality_benchmarker.model import (
 
 from .normaliser import normalise_game_data
 from .types import ParsedGameData, Prototype, PrototypeCollection
+from .utils import has_space_age
 
 logger = logging.getLogger(__name__)
 
@@ -500,8 +501,6 @@ def _load_qualities(
     json_qualities = data.get("qualities", {})
     qualities: dict[str, Quality] = {}
 
-    # Tracks the current recursion path so malformed circular references can be
-    # reported rather than causing infinite recursion.
     loading: set[str] = set()
 
     def load_quality(name: str) -> Quality:
@@ -548,11 +547,6 @@ def _load_qualities(
 def _load_version(data: ParsedGameData) -> str:
     """Returns the Factorio version associated with the parsed data."""
     return data["metadata"]["metadata"]["factorio_version"]
-
-
-def _has_space_age(data: ParsedGameData) -> bool:
-    """Returns whether the Space Age mod was active for the data dump."""
-    return "Space Age" in data["metadata"]["metadata"]["active_mods"]
 
 
 def load_game_data() -> GameData:
@@ -619,7 +613,7 @@ def load_game_data() -> GameData:
         ),
         qualities=_load_qualities(data),
         factorio_version=_load_version(data),
-        has_space_age=_has_space_age(data),
+        has_space_age=has_space_age(data),
     )
 
     logger.info(

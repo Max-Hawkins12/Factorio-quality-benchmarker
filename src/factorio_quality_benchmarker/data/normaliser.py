@@ -3,6 +3,7 @@ from collections.abc import Callable, MutableMapping
 from collections.abc import Set as AbstractSet
 
 from .types import ParsedGameData, Prototype, PrototypeCollection
+from .utils import has_space_age
 
 logger = logging.getLogger(__name__)
 
@@ -113,7 +114,7 @@ def _get_excluded_machines(game_data: ParsedGameData):
     """
     to_exclude = EXCLUDED_CRAFTING_MACHINES | EXCLUDED_FURNACES | EXCLUDED_MINERS
 
-    if "Space Age" in game_data["metadata"]["metadata"]["active_mods"]:
+    if has_space_age(game_data):
         to_exclude = to_exclude | {"electric-mining-drill"}
 
     return to_exclude
