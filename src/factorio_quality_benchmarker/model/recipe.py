@@ -1,13 +1,14 @@
 from dataclasses import dataclass
 
-from . import CraftingCategory, Ingredient
+from .common import CraftingCategory
+from .material import Ingredient, Product
 
 
 @dataclass(frozen=True, slots=True)
-class SurfaceCondtion:
+class SurfaceCondition:
     property: str
     minimum: float | None = None
-    maximim: float | None = None
+    maximum: float | None = None
 
 
 @dataclass(frozen=True, slots=True)
@@ -15,9 +16,12 @@ class Recipe:
     name: str
     categories: frozenset[CraftingCategory]
     ingredients: tuple[Ingredient, ...]
-    results: tuple[Ingredient, ...]
+    products: tuple[Product, ...]
+
+    energy_required: float
 
     allow_productivity: bool
     allow_quality: bool
+    maximum_productivity: float
 
-    surface_conditions: tuple[SurfaceCondtion, ...]
+    surface_conditions: tuple[SurfaceCondition, ...]

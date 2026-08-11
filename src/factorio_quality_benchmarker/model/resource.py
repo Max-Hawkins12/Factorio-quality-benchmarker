@@ -1,15 +1,14 @@
 from dataclasses import dataclass
 
-from . import Material
+from .common import ResourceCategory
+from .material import Product
 
 
 @dataclass(frozen=True, slots=True)
 class Resource:
     name: str
 
-    category: (
-        str  # Maybe redunant, fluids are ignored, and only the big miner will be used
-    )
+    category: ResourceCategory
 
     mining_time: float
-    result: Material
+    product: tuple[Product, ...]

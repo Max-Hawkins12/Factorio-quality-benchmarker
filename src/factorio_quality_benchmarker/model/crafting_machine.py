@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from .common import CraftingCategory
+from .common import CraftingCategory, ModuleCategory, ModuleEffect
 
 
 @dataclass(frozen=True, slots=True)
@@ -10,7 +10,9 @@ class CraftingMachine:
 
     crafting_speed: float
     module_slots: int
-    allowed_modules: list  # List of module types
+
+    allowed_effects: frozenset[ModuleEffect]
+    allowed_module_categories: frozenset[ModuleCategory]
 
     inherent_productivity: float
 
