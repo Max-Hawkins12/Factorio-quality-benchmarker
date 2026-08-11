@@ -5,7 +5,7 @@ from .common import (  # noqa: F401
     ResourceCategory,
     SurfaceProperty,
 )
-from .crafting_machine import CraftingMachine  # noqa: F401
+from .crafter import Crafter  # noqa: F401
 from .game_data import GameData  # noqa: F401
 from .material import (  # noqa: F401
     Fluid,

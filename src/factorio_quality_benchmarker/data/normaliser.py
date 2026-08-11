@@ -1,11 +1,9 @@
 import logging
 from collections.abc import Callable, MutableMapping
 from collections.abc import Set as AbstractSet
-from typing import TypeVar
 
 from .types import ParsedGameData, Prototype, PrototypeCollection
 
-T = TypeVar("T")
 logger = logging.getLogger(__name__)
 
 # Factorio defaults that are missing from the data dump
@@ -52,6 +50,24 @@ def _apply_factorio_defaults(game_data: ParsedGameData) -> None:
 
         for property_name, default_value in NAUVIS_DEFAULT_SURFACE_PROPERTIES.items():
             properties.setdefault(property_name, default_value)
+
+    logger.debug("Added missing default values")
+
+
+def _normalise_resource_result(game_data: ParsedGameData) -> None:
+    """
+    Adds a standard results dict to item resources,
+    which only have a result field in the data dump
+    """
+    for resource in game_data.get("resources", {}).values():
+        if "result" in resource["minable"]:
+            resource["minable"]["results"] = {
+                "type": "item",
+                "name": resource["minable"]["result"],
+                "amount": 1,
+            }
+
+    logger.debug("Normalised resource results field")
 
 
 # Hard coded values to remove redundant data from the model
@@ -417,6 +433,7 @@ def normalise_game_data(game_data: ParsedGameData) -> ParsedGameData:
     logger.debug("Found %d prototypes", start_count)
 
     _apply_factorio_defaults(game_data)
+    _normalise_resource_result(game_data)
 
     _clean_prototype_noise(game_data)
 

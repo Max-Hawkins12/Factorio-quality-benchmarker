@@ -4,7 +4,7 @@ from .common import CraftingCategory, ModuleEffect
 
 
 @dataclass(frozen=True, slots=True)
-class CraftingMachine:
+class Crafter:
     name: str
     categories: frozenset[CraftingCategory]
 

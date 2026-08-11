@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 
 from .beacon import Beacon
-from .crafting_machine import CraftingMachine
+from .crafter import Crafter
 from .material import Fluid, Item
 from .miner import Miner
 from .module import Module
@@ -17,7 +17,7 @@ class GameData:
     fluids: dict[str, Fluid]
 
     recipes: dict[str, Recipe]
-    crafting_machines: dict[str, CraftingMachine]
+    crafters: dict[str, Crafter]
     miners: dict[str, Miner]
 
     resources: dict[str, Resource]
