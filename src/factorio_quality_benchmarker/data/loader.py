@@ -19,6 +19,7 @@ from factorio_quality_benchmarker.model import (
     ItemProduct,
     Miner,
     Module,
+    ModuleCategory,
     ModuleEffect,
     Product,
     Quality,
@@ -149,6 +150,25 @@ def _collect_module_effects(
     )
 
     return effects
+
+
+def _collect_module_categories(
+    data: ParsedGameData,
+) -> dict[str, ModuleCategory]:
+    """Collects canonical module-category objects from their references."""
+    category_types: set[str] = set()
+
+    for module in data.get("modules", {}).values():
+        category_types.add(module["category"])
+
+    categories = {type: ModuleCategory(type=type) for type in category_types}
+
+    logger.debug(
+        "Collected %d module categories",
+        len(categories),
+    )
+
+    return categories
 
 
 def _collect_resource_categories(
@@ -415,6 +435,9 @@ def _load_beacons(
         return Beacon(
             name=name,
             distribution_effectivity=beacon["distribution_effectivity"],
+            distribution_effectivity_bonus_per_quality_level=beacon[
+                "distribution_effectivity_bonus_per_quality_level"
+            ],
             diminishing_returns_profile=tuple(beacon["profile"]),
             module_slots=beacon["module_slots"],
             allowed_effects=frozenset(
@@ -430,6 +453,7 @@ def _load_beacons(
 
 def _load_modules(
     data: ParsedGameData,
+    module_categories: dict[str, ModuleCategory],
     module_effects: dict[str, ModuleEffect],
 ) -> dict[str, Module]:
     """Loads modules and resolves their effect names to canonical objects."""
@@ -438,6 +462,7 @@ def _load_modules(
         return Module(
             name=name,
             tier=module["tier"],
+            category=module_categories[module["category"]],
             effects={
                 module_effects[effect_name]: amount
                 for effect_name, amount in module["effect"].items()
@@ -567,6 +592,7 @@ def load_game_data() -> GameData:
 
     crafting_categories = _collect_crafting_categories(data)
     module_effects = _collect_module_effects(data)
+    module_categories = _collect_module_categories(data)
     resource_categories = _collect_resource_categories(data)
     surface_properties = _collect_surface_properties(data)
 
@@ -603,6 +629,7 @@ def load_game_data() -> GameData:
         ),
         modules=_load_modules(
             data,
+            module_categories,
             module_effects,
         ),
         resources=_load_resources(

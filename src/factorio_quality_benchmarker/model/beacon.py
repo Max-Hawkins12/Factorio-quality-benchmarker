@@ -8,6 +8,7 @@ class Beacon:
     name: str
 
     distribution_effectivity: float
+    distribution_effectivity_bonus_per_quality_level: float
     diminishing_returns_profile: tuple[int, ...]
 
     module_slots: int

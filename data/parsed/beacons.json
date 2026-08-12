@@ -3,6 +3,7 @@
         "name": "beacon",
         "module_slots": 2,
         "distribution_effectivity": 1.5,
+        "distribution_effectivity_bonus_per_quality_level": 0.2,
         "profile": [
             1,
             0.7071,

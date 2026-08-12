@@ -132,6 +132,7 @@ def _write_prototype_files(raw_data: dict, parser_output_path: Path) -> None:
                 "name",
                 "module_slots",
                 "distribution_effectivity",
+                "distribution_effectivity_bonus_per_quality_level",
                 "profile",
                 "allowed_effects",
                 "selection_box",
