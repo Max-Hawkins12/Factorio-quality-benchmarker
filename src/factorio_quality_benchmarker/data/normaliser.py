@@ -1,6 +1,5 @@
 import logging
-from collections.abc import Callable, MutableMapping
-from collections.abc import Set as AbstractSet
+from collections.abc import Callable
 
 from .types import ParsedGameData, Prototype, PrototypeCollection
 from .utils import has_space_age
@@ -138,6 +137,93 @@ def _remove_empty_recipes(game_data: ParsedGameData) -> None:
     logger.debug("Removed %d recipes with no ingredients and no results", removed)
 
 
+def _remove_disconnected_crafting_data(game_data: ParsedGameData) -> None:
+    """
+    Removes recipes, crafting machines, furnaces, and crafting categories that are disconnected from the retained crafting system.
+
+    A recipe must have at least one category supported by a retained machine.
+    A machine must support at least one category used by a retained recipe.
+    A crafting category must be referenced by both sides of the relationship.
+    """
+    recipes = game_data.get("recipes", {})
+    crafting_categories = game_data.get("crafting_categories", {})
+
+    machine_collections = (
+        game_data.get("crafting_machines", {}),
+        game_data.get("furnaces", {}),
+    )
+
+    total_removed_recipes = 0
+    total_removed_machines = 0
+    total_removed_categories = 0
+
+    while True:
+        removed_this_pass = 0
+
+        machine_categories = {
+            category
+            for machines in machine_collections
+            for machine in machines.values()
+            for category in machine.get("crafting_categories") or []
+        }
+
+        removed_recipes = _remove_prototypes(
+            recipes,
+            lambda recipe: (
+                not (set(recipe.get("categories") or []) & machine_categories)  # noqa: B023
+            ),
+        )
+
+        recipe_categories = {
+            category
+            for recipe in recipes.values()
+            for category in recipe.get("categories") or []
+        }
+
+        removed_machines = 0
+
+        for machines in machine_collections:
+            removed_machines += _remove_prototypes(
+                machines,
+                lambda machine: (
+                    not (
+                        set(machine.get("crafting_categories") or [])
+                        & recipe_categories  # noqa: B023
+                    )
+                ),
+            )
+
+        machine_categories = {
+            category
+            for machines in machine_collections
+            for machine in machines.values()
+            for category in machine.get("crafting_categories") or []
+        }
+
+        connected_categories = recipe_categories & machine_categories
+
+        removed_categories = _remove_prototypes(
+            crafting_categories,
+            lambda category: category["name"] not in connected_categories,  # noqa: B023
+        )
+
+        total_removed_recipes += removed_recipes
+        total_removed_machines += removed_machines
+        total_removed_categories += removed_categories
+
+        removed_this_pass += removed_recipes + removed_machines + removed_categories
+
+        if removed_this_pass == 0:
+            break
+
+    logger.debug(
+        "Removed %d disconnected recipes, %d machines, and %d crafting categories",
+        total_removed_recipes,
+        total_removed_machines,
+        total_removed_categories,
+    )
+
+
 def _remove_recipes_with_missing_materials(game_data: ParsedGameData) -> None:
     """
     Remove recipes that reference an item or fluid that is absent from the parsed material collections.
@@ -241,6 +327,7 @@ def normalise_game_data(game_data: ParsedGameData) -> ParsedGameData:
 
     _remove_empty_recipes(game_data)
     _remove_recipes_with_missing_materials(game_data)
+    _remove_disconnected_crafting_data(game_data)
     _remove_materials_not_used_in_recipes(game_data)
     _remove_redundant_machines(game_data)
 

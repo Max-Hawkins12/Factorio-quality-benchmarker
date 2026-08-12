@@ -108,24 +108,12 @@ def _load_collection[T](
 def _collect_crafting_categories(
     data: ParsedGameData,
 ) -> dict[str, CraftingCategory]:
-    """Collects canonical crafting-category objects from their references."""
-    category_names: set[str] = set()
-
-    for recipe in data.get("recipes", {}).values():
-        category_names.update(recipe.get("categories") or [])
-
-    for collection_name in ("crafting_machines", "furnaces"):
-        for machine in data.get(collection_name, {}).values():
-            category_names.update(machine.get("crafting_categories") or [])
-
-    categories = {name: CraftingCategory(name=name) for name in category_names}
-
-    logger.debug(
-        "Collected %d crafting categories",
-        len(categories),
+    """Collects canonical crafting-category objects."""
+    return _load_collection(
+        data,
+        "crafting_category",
+        lambda name, _: CraftingCategory(name=name),
     )
-
-    return categories
 
 
 def _collect_module_effects(
@@ -155,42 +143,23 @@ def _collect_module_effects(
 def _collect_module_categories(
     data: ParsedGameData,
 ) -> dict[str, ModuleCategory]:
-    """Collects canonical module-category objects from their references."""
-    category_types: set[str] = set()
-
-    for module in data.get("modules", {}).values():
-        category_types.add(module["category"])
-
-    categories = {type: ModuleCategory(type=type) for type in category_types}
-
-    logger.debug(
-        "Collected %d module categories",
-        len(categories),
+    """Collects canonical module-category objects."""
+    return _load_collection(
+        data,
+        "module_category",
+        lambda type, _: ModuleCategory(type=type),
     )
-
-    return categories
 
 
 def _collect_resource_categories(
     data: ParsedGameData,
 ) -> dict[str, ResourceCategory]:
-    """Collects canonical resource-category objects from resources and miners."""
-    category_names: set[str] = set()
-
-    for resource in data.get("resources", {}).values():
-        category_names.add(resource["category"])
-
-    for miner in data.get("miners", {}).values():
-        category_names.update(miner.get("resource_categories") or [])
-
-    categories = {name: ResourceCategory(name=name) for name in category_names}
-
-    logger.debug(
-        "Collected %d resource categories",
-        len(categories),
+    """Collects canonical resource-category objects."""
+    return _load_collection(
+        data,
+        "resource_category",
+        lambda name, _: ResourceCategory(name=name),
     )
-
-    return categories
 
 
 def _collect_surface_properties(

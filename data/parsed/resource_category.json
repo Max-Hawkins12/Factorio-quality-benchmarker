@@ -1,0 +1,11 @@
+{
+    "basic-solid": {
+        "name": "basic-solid"
+    },
+    "basic-fluid": {
+        "name": "basic-fluid"
+    },
+    "hard-solid": {
+        "name": "hard-solid"
+    }
+}

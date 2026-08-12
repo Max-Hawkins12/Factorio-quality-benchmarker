@@ -1,0 +1,53 @@
+{
+    "parameters": {
+        "name": "parameters"
+    },
+    "crafting": {
+        "name": "crafting"
+    },
+    "advanced-crafting": {
+        "name": "advanced-crafting"
+    },
+    "smelting": {
+        "name": "smelting"
+    },
+    "chemistry": {
+        "name": "chemistry"
+    },
+    "crafting-with-fluid": {
+        "name": "crafting-with-fluid"
+    },
+    "oil-processing": {
+        "name": "oil-processing"
+    },
+    "rocket-building": {
+        "name": "rocket-building"
+    },
+    "centrifuging": {
+        "name": "centrifuging"
+    },
+    "hand-crafting": {
+        "name": "hand-crafting"
+    },
+    "recycling": {
+        "name": "recycling"
+    },
+    "crushing": {
+        "name": "crushing"
+    },
+    "metallurgy": {
+        "name": "metallurgy"
+    },
+    "organic": {
+        "name": "organic"
+    },
+    "captive-spawner-process": {
+        "name": "captive-spawner-process"
+    },
+    "electromagnetics": {
+        "name": "electromagnetics"
+    },
+    "cryogenics": {
+        "name": "cryogenics"
+    }
+}

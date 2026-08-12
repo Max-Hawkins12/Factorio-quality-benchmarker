@@ -158,6 +158,9 @@ def _write_prototype_files(raw_data: dict, parser_output_path: Path) -> None:
                 "minable",
             ],
         ),
+        "crafting_category.json": (["recipe-category"], ["name"]),
+        "module_category.json": (["module-category"], ["name"]),
+        "resource_category.json": (["resource-category"], ["name"]),
     }
 
     total_parsed = 0
