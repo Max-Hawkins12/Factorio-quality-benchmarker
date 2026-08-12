@@ -1,7 +1,7 @@
 import typer
 
-from factorio_quality_benchmarker.data.model_loader import load_game_data
-from factorio_quality_benchmarker.data.raw_data_parser import perform_parsing
+from factorio_quality_benchmarker.data.loader import load_game_data
+from factorio_quality_benchmarker.data.parser import perform_parsing
 from factorio_quality_benchmarker.logging_config import configure_logging
 
 app = typer.Typer()
