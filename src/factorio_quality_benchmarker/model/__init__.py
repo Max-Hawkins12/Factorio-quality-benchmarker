@@ -25,6 +25,7 @@ from .qualified_objects import (  # noqa: F401
     QualifiedCrafter,
     QualifiedItem,
     QualifiedModule,
+    QualifiedMiner,
 )
 from .quality import Quality  # noqa: F401
 from .recipe import Recipe, SurfaceCondition  # noqa: F401

@@ -1,19 +1,3 @@
-"""
-beacon: "distribution_effectivity_bonus_per_quality_level": 0.2,
-
-normal scaling = speed * 1 + (0.3 *q_level)
-
-2.0
-module scaling = effect * floor(1 + (0.3 *q_level))
-
-2.1
-module scaling = effect * (1 + (0.3 *q_level))
-
-
-beacon scaling = distribution + 0.2 * q_level
-
-"""
-
 from collections.abc import Mapping
 from math import floor
 
