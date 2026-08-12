@@ -32,7 +32,6 @@ from factorio_quality_benchmarker.model import (
 
 from .normaliser import normalise_game_data
 from .types import ParsedGameData, Prototype, PrototypeCollection
-from .utils import has_space_age
 
 logger = logging.getLogger(__name__)
 
@@ -549,6 +548,11 @@ def _load_version(data: ParsedGameData) -> str:
     return data["metadata"]["metadata"]["factorio_version"]
 
 
+def _load_metadata(data: ParsedGameData) -> PrototypeCollection:
+    """Returns the metadata associated with the parsed data."""
+    return data["metadata"]
+
+
 def load_game_data() -> GameData:
     """Loads, normalises, and constructs the complete Factorio domain model."""
     parsed_path = Path("data/parsed")
@@ -612,8 +616,7 @@ def load_game_data() -> GameData:
             surface_properties,
         ),
         qualities=_load_qualities(data),
-        factorio_version=_load_version(data),
-        has_space_age=has_space_age(data),
+        metadata=_load_metadata(data),
     )
 
     if game_data.has_space_age:

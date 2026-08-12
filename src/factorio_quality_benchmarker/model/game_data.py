@@ -28,5 +28,19 @@ class GameData:
     qualities: dict[str, Quality]
     surfaces: dict[str, Surface]
 
-    factorio_version: str
-    has_space_age: bool
+    metadata: dict
+
+    @property
+    def factorio_version(self) -> str:
+        return self.metadata["metadata"]["factorio_version"]
+
+    @property
+    def is_2_1(self) -> bool:
+        major, minor, *_ = map(
+            int, self.metadata["metadata"]["factorio_version"].split(".")
+        )
+        return (major, minor) >= (2, 1)
+
+    @property
+    def has_space_age(self) -> bool:
+        return "Space Age" in self.metadata["metadata"]["active_mods"]
