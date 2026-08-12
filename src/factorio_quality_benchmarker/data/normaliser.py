@@ -121,6 +121,21 @@ def _get_redundant_machines(game_data: ParsedGameData) -> set[str]:
 
 
 # Cleaning methods
+def _remove_prototype_placeholders(game_data: ParsedGameData) -> None:
+    """
+    Removes any prototypes that have names like "*-unknown" or "parameter-*".
+    """
+    removed = 0
+
+    for prototypes in game_data.values():
+        removed += _remove_prototypes(
+            prototypes,
+            lambda prototype: prototype.get("name", "").endswith("-unknown"),
+        )
+
+    logger.debug("Removed %d prototype placeholders", removed)
+
+
 def _remove_empty_recipes(game_data: ParsedGameData) -> None:
     """
     Remove recipes that have neither ingredients nor results.
@@ -286,8 +301,7 @@ def _remove_materials_not_used_in_recipes(game_data: ParsedGameData) -> None:
 
 def _remove_redundant_machines(game_data: ParsedGameData) -> None:
     """
-    Remove only machines that are explicitly known to be directly superseded
-    for the simulator's purposes.
+    Remove only machines that are explicitly known to be directly superseded for the simulator's purposes.
     """
     redundant = _get_redundant_machines(game_data)
     removed = 0
@@ -303,7 +317,7 @@ def _remove_redundant_machines(game_data: ParsedGameData) -> None:
 
 def _count_prototypes(game_data: ParsedGameData) -> int:
     """
-    Returns the total number of prototypes in the data
+    Returns the total number of prototypes in the data.
     """
 
     return sum(len(prototypes) for prototypes in game_data.values())
@@ -324,6 +338,8 @@ def normalise_game_data(game_data: ParsedGameData) -> ParsedGameData:
 
     _apply_factorio_defaults(game_data)
     _normalise_resource_result(game_data)
+
+    _remove_prototype_placeholders(game_data)
 
     _remove_empty_recipes(game_data)
     _remove_recipes_with_missing_materials(game_data)
