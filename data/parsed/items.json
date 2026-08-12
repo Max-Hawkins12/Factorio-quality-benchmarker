@@ -1330,5 +1330,9 @@
     "repair-pack": {
         "name": "repair-pack",
         "type": "repair-tool"
+    },
+    "space-platform-starter-pack": {
+        "name": "space-platform-starter-pack",
+        "type": "space-platform-starter-pack"
     }
 }

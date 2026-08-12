@@ -483,12 +483,19 @@ def _load_resources(
     def constructor(name: str, resource: Prototype) -> Resource:
         minable = resource["minable"]
 
+        results = minable["results"]
+
+        if len(results) != 1:
+            raise ValueError(
+                f"Resource {name!r} has {len(results)} mining results; expected exactly one"
+            )
+
         return Resource(
             name=name,
             category=resource_categories[resource["category"]],
             mining_time=minable["mining_time"],
             product=_load_product(
-                minable["results"],
+                results[0],
                 items,
                 fluids,
             ),

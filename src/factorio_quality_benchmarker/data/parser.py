@@ -48,6 +48,7 @@ def _write_prototype_files(raw_data: dict, parser_output_path: Path) -> None:
                 "module",
                 "rail-planner",
                 "repair-tool",
+                "space-platform-starter-pack",
             ],
             ["name", "type"],
         ),
