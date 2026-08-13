@@ -4,7 +4,6 @@ from collections.abc import Callable
 from math import ceil
 from pathlib import Path
 
-from factorio_quality_benchmarker.engine import calculate_product_ammount
 from factorio_quality_benchmarker.model import (
     Beacon,
     Crafter,
@@ -227,6 +226,22 @@ def _load_ingredient(
             raise ValueError(f"Unknown ingredient type: {ingredient_type!r}")
 
 
+def _calculate_product_ammount(product: Prototype) -> float:
+    """
+    Calculates the expected product amount of a recipe product.
+    """
+
+    amount = product["amount"]
+
+    if "extra_count_fraction" in product:
+        return amount + product["extra_count_fraction"]
+
+    if "independent_probability" in product:
+        return amount * product["independent_probability"]
+
+    return float(amount)
+
+
 def _load_product(
     product: Prototype,
     items: dict[str, Item],
@@ -237,7 +252,7 @@ def _load_product(
     expected output amount.
     """
     name = product["name"]
-    amount = calculate_product_ammount(product)
+    amount = _calculate_product_ammount(product)
 
     match product["type"]:
         case "item":
