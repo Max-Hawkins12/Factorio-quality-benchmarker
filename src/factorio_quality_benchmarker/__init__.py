@@ -2,7 +2,13 @@ import typer
 
 from factorio_quality_benchmarker.data.loader import load_game_data
 from factorio_quality_benchmarker.data.parser import perform_parsing
+from factorio_quality_benchmarker.engine import calculate_maximum_number_of_beacons
 from factorio_quality_benchmarker.logging_config import configure_logging
+from factorio_quality_benchmarker.model import (
+    QualifiedBeacon,
+    QualifiedCrafter,
+    QualifiedModule,
+)
 
 app = typer.Typer()
 
@@ -23,7 +29,9 @@ def version() -> None:
 
 @app.command()
 def dev() -> None:
-    load_game_data()
+    game_data = load_game_data()
+
+    print(game_data.recipes["speed-module"])
 
 
 def main() -> None:

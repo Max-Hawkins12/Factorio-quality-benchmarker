@@ -20,22 +20,22 @@ class QualifiedItem:
 
 @dataclass(frozen=True, slots=True)
 class QualifiedCrafter:
-    crafter: Crafter
+    machine: Crafter
     quality: Quality
 
     @property
     def name(self) -> str:
-        return f"{self.quality.name}-{self.crafter.name}"
+        return f"{self.quality.name}-{self.machine.name}"
 
 
 @dataclass(frozen=True, slots=True)
 class QualifiedMiner:
-    miner: Miner
+    machine: Miner
     quality: Quality
 
     @property
     def name(self) -> str:
-        return f"{self.quality.name}-{self.miner.name}"
+        return f"{self.quality.name}-{self.machine.name}"
 
 
 @dataclass(frozen=True, slots=True)
@@ -56,3 +56,37 @@ class QualifiedBeacon:
     @property
     def name(self) -> str:
         return f"{self.quality.name}-{self.beacon.name}"
+
+
+@dataclass(frozen=True, slots=True)
+class BeaconConfiguration:
+    beacon: QualifiedBeacon
+    modules: tuple[QualifiedModule, ...]
+
+
+@dataclass(frozen=True, slots=True)
+class CrafterConfiguration:
+    machine: QualifiedCrafter
+    modules: tuple[QualifiedModule, ...]
+    beacons: tuple[BeaconConfiguration, ...]
+
+
+@dataclass(frozen=True, slots=True)
+class MinerConfiguration:
+    miner: QualifiedMiner
+    modules: tuple[QualifiedModule, ...]
+    beacons: tuple[BeaconConfiguration, ...]
+
+
+@dataclass(frozen=True, slots=True)
+class EffectiveCrafterStats:
+    crafting_speed: float
+    productivity: float
+    quality: float
+
+
+@dataclass(frozen=True, slots=True)
+class EffectiveMinerStats:
+    crafting_speed: float
+    productivity: float
+    quality: float

@@ -20,14 +20,14 @@ from .material import (  # noqa: F401
 )
 from .miner import Miner  # noqa: F401
 from .module import Module, ModuleCategory  # noqa: F401
-from .qualified_objects import (  # noqa: F401
-    QualifiedBeacon,
-    QualifiedCrafter,
-    QualifiedItem,
-    QualifiedModule,
-    QualifiedMiner,
-)
 from .quality import Quality  # noqa: F401
 from .recipe import Recipe, SurfaceCondition  # noqa: F401
 from .resource import Resource  # noqa: F401
+from .runtime_models import (  # noqa: F401
+    QualifiedBeacon,
+    QualifiedCrafter,
+    QualifiedItem,
+    QualifiedMiner,
+    QualifiedModule,
+)
 from .surface import Surface  # noqa: F401

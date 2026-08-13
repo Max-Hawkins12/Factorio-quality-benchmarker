@@ -281,8 +281,8 @@ def _load_recipes(
                 _load_product(product, items, fluids) for product in recipe["results"]
             ),
             energy_required=recipe["energy_required"],
-            allow_productivity=recipe["allow_productivity"],
-            allow_quality=recipe["allow_quality"],
+            allow_productivity=recipe["allow_productivity"] is True,
+            allow_quality=recipe["allow_quality"] is not False,
             surface_conditions=tuple(
                 SurfaceCondition(
                     property=surface_properties[condition["property"]],

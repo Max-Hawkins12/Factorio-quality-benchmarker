@@ -24,7 +24,7 @@ def apply_crafter_quality_speed(crafter: QualifiedCrafter) -> float:
     Apply the Factorio engine calculation to determine a crafter's speed at a quality level
     """
 
-    crafting_speed = crafter.crafter.crafting_speed
+    crafting_speed = crafter.machine.crafting_speed
     quality_level = crafter.quality.level
 
     return crafting_speed * (1 + DEFAULT_QUALITY_SCALE * quality_level)
