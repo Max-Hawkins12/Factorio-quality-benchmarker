@@ -93,7 +93,7 @@ def _remove_prototypes(
 # Cleaning methods
 def _remove_prototype_placeholders(game_data: ParsedGameData) -> None:
     """
-    Removes any prototypes that have names like "*-unknown" or "parameter-*".
+    Removes any prototypes that have names like "*-unknown".
     """
     removed = 0
 
@@ -120,6 +120,65 @@ def _remove_empty_recipes(game_data: ParsedGameData) -> None:
     )
 
     logger.debug("Removed %d recipes with no ingredients and no results", removed)
+
+
+def _remove_materials_not_used_in_recipes(game_data: ParsedGameData) -> None:
+    """
+    Remove items and fluids that are not referenced by any remaining recipe.
+    """
+    used_items: set[str] = set()
+    used_fluids: set[str] = set()
+
+    for recipe in game_data.get("recipes", {}).values():
+        materials = (recipe.get("ingredients") or []) + (recipe.get("results") or [])
+
+        for material in materials:
+            if material.get("type") == "item":
+                used_items.add(material["name"])
+            elif material.get("type") == "fluid":
+                used_fluids.add(material["name"])
+
+    removed_items = _remove_prototypes(
+        game_data.get("items", {}),
+        lambda item: item["name"] not in used_items,
+    )
+
+    removed_fluids = _remove_prototypes(
+        game_data.get("fluids", {}),
+        lambda fluid: fluid["name"] not in used_fluids,
+    )
+
+    logger.debug("Removed %d items unused by recipes", removed_items)
+    logger.debug("Removed %d fluids unused by recipes", removed_fluids)
+
+
+def _remove_items_without_recycling_recipes(game_data: ParsedGameData) -> None:
+    """
+    Remove items that do not have a recycling recipe.
+
+    Fluids are unaffected because they cannot be recycled or upcycled.
+    """
+    recyclable_items: set[str] = set()
+
+    for recipe in game_data.get("recipes", {}).values():
+        categories = recipe.get("categories") or []
+
+        if "recycling" not in categories:
+            continue
+
+        for ingredient in recipe.get("ingredients") or []:
+            if ingredient.get("type") == "item":
+                recyclable_items.add(ingredient["name"])
+
+    removed_items = _remove_prototypes(
+        game_data.get("items", {}),
+        lambda item: item["name"] not in recyclable_items,
+    )
+
+    logger.debug(
+        "Removed %d items without recycling recipes",
+        removed_items,
+    )
 
 
 def _remove_recipes_with_missing_materials(game_data: ParsedGameData) -> None:
@@ -177,6 +236,9 @@ def normalise_game_data(game_data: ParsedGameData) -> ParsedGameData:
     _normalise_resource_result(game_data)
 
     _remove_prototype_placeholders(game_data)
+
+    _remove_materials_not_used_in_recipes(game_data)
+    _remove_items_without_recycling_recipes(game_data)
 
     _remove_empty_recipes(game_data)
     _remove_recipes_with_missing_materials(game_data)

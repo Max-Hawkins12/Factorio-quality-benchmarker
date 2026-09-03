@@ -29,6 +29,13 @@ from factorio_quality_benchmarker.model import (
     SurfaceCondition,
     SurfaceProperty,
 )
+from factorio_quality_benchmarker.upcycler_system import (
+    find_crafting_loops,
+    generate_recipe_index,
+    generate_upcycler_systems,
+    write_upcycler_system,
+    write_upcycler_systems,
+)
 
 from .normaliser import normalise_game_data
 from .types import ParsedGameData, Prototype, PrototypeCollection
@@ -67,8 +74,7 @@ def _load_all_game_data(parsed_path: Path) -> ParsedGameData:
     for file_path in files:
         if not file_path.is_file() or file_path.suffix != ".json":
             raise ValueError(
-                f"There is a non-JSON file {file_path.name} in {parsed_path}. "
-                "Please remove it."
+                f"There is a non-JSON file {file_path.name} in {parsed_path}. Please remove it."
             )
 
     logger.debug(
@@ -559,11 +565,6 @@ def _load_qualities(
     return qualities
 
 
-def _load_version(data: ParsedGameData) -> str:
-    """Returns the Factorio version associated with the parsed data."""
-    return data["metadata"]["metadata"]["factorio_version"]
-
-
 def _load_metadata(data: ParsedGameData) -> PrototypeCollection:
     """Returns the metadata associated with the parsed data."""
     return data["metadata"]
@@ -661,3 +662,42 @@ def load_game_data() -> GameData:
     logger.info(log)
 
     return game_data
+
+
+def load_upcycler_systems() -> None:
+    """
+    TODO If systems exist load them
+    """
+
+    parsed_path = Path("data/parsed")
+
+    raw_data = _load_all_game_data(parsed_path)
+    data = normalise_game_data(raw_data)
+
+    crafting_categories = _collect_crafting_categories(data)
+    resource_categories = _collect_resource_categories(data)
+    surface_properties = _collect_surface_properties(data)
+
+    items = _load_items(data)
+    fluids = _load_fluids(data)
+
+    materials = items | fluids
+
+    recipes = _load_recipes(
+        data,
+        items,
+        fluids,
+        crafting_categories,
+        surface_properties,
+    )
+
+    resources = _load_resources(data, resource_categories, items, fluids)
+
+    write_upcycler_system(
+        find_crafting_loops(
+            items["holmium-plate"],
+            generate_recipe_index(materials, recipes, crafting_categories),
+            set(resources.values()),
+        ),
+        directory=Path("data/generated/upcyclers"),
+    )

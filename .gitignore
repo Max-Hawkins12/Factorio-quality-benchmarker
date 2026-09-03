@@ -22,3 +22,6 @@ AGENTS.md
 # Raw imported Factorio data files are ignored, as they are large and not needed for the repository.
 data/raw/data-raw-dump.json
 data/raw/metadata.json
+
+# Upcycler graphs are very large and can be generated at any time from parsed data
+data/generated/upcyclers/
