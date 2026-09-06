@@ -7,25 +7,23 @@ from factorio_quality_benchmarker.model import (
     Miner,
     Module,
     ModuleEffect,
-    QualifiedBeacon,
-    QualifiedCrafter,
-    QualifiedModule,
     Recipe,
 )
+from factorio_quality_benchmarker.simulation import Qualified
 
 from .beacons import calculate_maximum_number_of_beacons
 
 
 @dataclass(frozen=True, slots=True)
 class ModuledCrafter:
-    crafter: QualifiedCrafter
-    modules: tuple[QualifiedModule, ...]
+    crafter: Qualified[Crafter]
+    modules: tuple[Qualified[Module], ...]
 
 
 @dataclass(frozen=True, slots=True)
 class ModuledBeacon:
-    beacon: QualifiedBeacon
-    modules: tuple[QualifiedModule, ...]
+    beacon: Qualified[Beacon]
+    modules: tuple[Qualified[Module], ...]
 
 
 @dataclass(frozen=True, slots=True)
@@ -65,8 +63,8 @@ def _is_module_allowed(
 def _get_allowed_modules(
     machine: Beacon | Crafter | Miner,
     recipe: Recipe,
-    modules: set[QualifiedModule],
-) -> frozenset[QualifiedModule]:
+    modules: set[Qualified[Module]],
+) -> frozenset[Qualified[Module]]:
     """
     Return all qualified modules valid for the given machine and recipe.
     """
@@ -75,20 +73,20 @@ def _get_allowed_modules(
     return frozenset(
         module
         for module in modules
-        if _is_module_allowed(module.module, allowed_effects)
+        if _is_module_allowed(module.entity, allowed_effects)
     )
 
 
 def _generate_module_configurations(
-    allowed_modules: frozenset[QualifiedModule],
+    allowed_modules: frozenset[Qualified[Module]],
     module_slots: int,
-) -> frozenset[tuple[QualifiedModule, ...]]:
+) -> frozenset[tuple[Qualified[Module], ...]]:
     """
     Generate every module configuration using up to the given number of slots.
 
     Slot ordering is irrelevant, but duplicate modules are allowed.
     """
-    configurations: set[tuple[QualifiedModule, ...]] = {()}
+    configurations: set[tuple[Qualified[Module], ...]] = {()}
 
     for slots_used in range(1, module_slots + 1):
         configurations.update(
@@ -126,35 +124,35 @@ def _generate_beacon_configurations(
 
 
 def get_full_module_beacon_arrangements(
-    crafter: QualifiedCrafter,
+    crafter: Qualified[Crafter],
     recipe: Recipe,
-    beacon: QualifiedBeacon,
-    modules: set[QualifiedModule],
+    beacon: Qualified[Beacon],
+    modules: set[Qualified[Module]],
 ) -> frozenset[BeaconedCrafter]:
     """
     Generate every valid combination of machine modules and beacon
     configurations for the given crafter and recipe.
     """
     crafter_allowed_modules = _get_allowed_modules(
-        crafter.machine,
+        crafter.entity,
         recipe,
         modules,
     )
 
     beacon_allowed_modules = _get_allowed_modules(
-        beacon.beacon,
+        beacon.entity,
         recipe,
         modules,
     )
 
     crafter_module_configurations = _generate_module_configurations(
         crafter_allowed_modules,
-        crafter.machine.module_slots,
+        crafter.entity.module_slots,
     )
 
     beacon_module_configurations = _generate_module_configurations(
         beacon_allowed_modules,
-        beacon.beacon.module_slots,
+        beacon.entity.module_slots,
     )
 
     available_beacons = frozenset(
@@ -166,8 +164,8 @@ def get_full_module_beacon_arrangements(
     )
 
     maximum_beacons = calculate_maximum_number_of_beacons(
-        crafter.machine,
-        beacon.beacon,
+        crafter.entity,
+        beacon.entity,
     )
 
     beacon_configurations = _generate_beacon_configurations(

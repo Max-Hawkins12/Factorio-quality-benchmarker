@@ -3,11 +3,6 @@ import typer
 from factorio_quality_benchmarker.data.loader import load_game_data
 from factorio_quality_benchmarker.data.parser import perform_parsing
 from factorio_quality_benchmarker.logging_config import configure_logging
-from factorio_quality_benchmarker.model import (
-    QualifiedBeacon,
-    QualifiedCrafter,
-    QualifiedModule,
-)
 from factorio_quality_benchmarker.recipe_graph import generate_upcycler_index
 
 app = typer.Typer()
