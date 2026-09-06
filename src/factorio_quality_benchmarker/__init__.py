@@ -8,7 +8,7 @@ from factorio_quality_benchmarker.model import (
     QualifiedCrafter,
     QualifiedModule,
 )
-from factorio_quality_benchmarker.upcycler_index import generate_upcycler_index
+from factorio_quality_benchmarker.recipe_graph import generate_upcycler_index
 
 app = typer.Typer()
 
