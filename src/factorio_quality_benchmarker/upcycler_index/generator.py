@@ -198,6 +198,7 @@ def generate_upcycler_index(
                     and graph not in upcycling_graphs[intermediate_item]
                 ):
                     upcycling_graphs[intermediate_item].append(graph)
+                    excluded_recipes_by_item[intermediate_item].add(graph.end_recipe)
 
         logger.debug(
             "%s: found %d graphs (%d production, %d upcycling), %d upcyclers already covered",
