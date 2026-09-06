@@ -1,4 +1,6 @@
+import logging
 from collections.abc import Set as AbstractSet
+from time import perf_counter
 
 import networkx as nx
 
@@ -6,23 +8,7 @@ from factorio_quality_benchmarker.model import Item, Material, Recipe
 
 from .models import ProductionGraph, RecipeGraph, RecipeGraphIndex, UpcyclingGraph
 
-
-def _get_producer_recipes(
-    materials: dict[str, Material],
-    recipes: dict[str, Recipe],
-) -> dict[Material, tuple[Recipe, ...]]:
-    """
-    Returns an index of every recipe by the material they produce
-    """
-    producer_recipes: dict[Material, list[Recipe]] = {
-        material: [] for material in materials.values()
-    }
-
-    for recipe in recipes.values():
-        for material in recipe.product_materials:
-            producer_recipes[material].append(recipe)
-
-    return {material: tuple(recipe) for material, recipe in producer_recipes.items()}
+logger = logging.getLogger(__name__)
 
 
 # Graph Helpers
@@ -40,19 +26,25 @@ def _make_graph_of_recipe(recipe: Recipe) -> nx.DiGraph:
 
 
 def _make_recipe_graph(
-    graph: nx.DiGraph, start_recipe: Recipe, end_recipe: Recipe
+    graph: nx.DiGraph,
+    start_recipe: Recipe,
+    end_recipe: Recipe,
 ) -> RecipeGraph:
-    if start_recipe.ingredient_items == end_recipe.product_items:
+    if UpcyclingGraph.is_valid(graph, start_recipe, end_recipe):
         return UpcyclingGraph(
             graph=graph,
             start_recipe=start_recipe,
             end_recipe=end_recipe,
         )
+    elif ProductionGraph.is_valid(graph, start_recipe, end_recipe):
+        return ProductionGraph(
+            graph=graph,
+            start_recipe=start_recipe,
+            end_recipe=end_recipe,
+        )
 
-    return ProductionGraph(
-        graph=graph,
-        start_recipe=start_recipe,
-        end_recipe=end_recipe,
+    raise ValueError(
+        f"Bad recipe graph, start recipe: {start_recipe.name}, end recipe: {end_recipe.name}"
     )
 
 
@@ -130,17 +122,40 @@ def _find_recipe_graphs(
     return tuple(graphs)
 
 
+def _get_producer_recipes(
+    materials: dict[str, Material],
+    recipes: dict[str, Recipe],
+) -> dict[Material, tuple[Recipe, ...]]:
+    """
+    Returns an index of every recipe by the material they produce
+    """
+    producer_recipes: dict[Material, list[Recipe]] = {
+        material: [] for material in materials.values()
+    }
+
+    for recipe in recipes.values():
+        for material in recipe.product_materials:
+            producer_recipes[material].append(recipe)
+
+    return {material: tuple(recipe) for material, recipe in producer_recipes.items()}
+
+
 # Public API
 def generate_upcycler_index(
     materials: dict[str, Material],
     recipes: dict[str, Recipe],
 ) -> RecipeGraphIndex:
-    """
-    Returns an index of all upcycling and production graphs by the item they produce.
-    """
+    """Returns an index of all upcycling and production graphs by the item they produce."""
+    start_time = perf_counter()
 
     items = tuple(
         material for material in materials.values() if isinstance(material, Item)
+    )
+
+    logger.info(
+        "Generating recipe graph index for %d items from %d recipes",
+        len(items),
+        len(recipes),
     )
 
     producer_recipes = _get_producer_recipes(materials, recipes)
@@ -151,14 +166,26 @@ def generate_upcycler_index(
     excluded_recipes_by_item: dict[Item, set[Recipe]] = {item: set() for item in items}
 
     for item in items:
+        excluded_producers = excluded_recipes_by_item[item]
+        excluded_producer_count = len(excluded_producers)
+
         raw_graphs = _find_recipe_graphs(
-            item, producer_recipes, excluded_producers=excluded_recipes_by_item[item]
+            item,
+            producer_recipes,
+            excluded_producers=excluded_producers,
         )
+
+        production_count = 0
+        upcycling_count = 0
 
         for graph in raw_graphs:
             if isinstance(graph, ProductionGraph):
+                production_count += 1
                 production_graphs[item].append(graph)
+
             elif isinstance(graph, UpcyclingGraph):
+                upcycling_count += 1
+
                 for output_item in graph.output_items:
                     if graph not in upcycling_graphs[output_item]:
                         upcycling_graphs[output_item].append(graph)
@@ -172,7 +199,16 @@ def generate_upcycler_index(
                 ):
                     upcycling_graphs[intermediate_item].append(graph)
 
-    return RecipeGraphIndex(
+        logger.debug(
+            "%s: found %d graphs (%d production, %d upcycling), %d upcyclers already covered",
+            item.name,
+            len(raw_graphs),
+            production_count,
+            upcycling_count,
+            excluded_producer_count,
+        )
+
+    index = RecipeGraphIndex(
         upcycling_graphs_by_item={
             item: tuple(graphs) for item, graphs in upcycling_graphs.items()
         },
@@ -180,3 +216,12 @@ def generate_upcycler_index(
             item: tuple(graphs) for item, graphs in production_graphs.items()
         },
     )
+
+    logger.info(
+        "Generated recipe graph index in %.2fs: %d production graph references, %d upcycling graph references",
+        perf_counter() - start_time,
+        sum(len(graphs) for graphs in production_graphs.values()),
+        sum(len(graphs) for graphs in upcycling_graphs.values()),
+    )
+
+    return index

@@ -29,9 +29,6 @@ from factorio_quality_benchmarker.model import (
     SurfaceCondition,
     SurfaceProperty,
 )
-from factorio_quality_benchmarker.upcycler_index import (
-    generate_upcycler_index,
-)
 
 from .normaliser import normalise_game_data
 from .types import ParsedGameData, Prototype, PrototypeCollection
@@ -39,6 +36,7 @@ from .types import ParsedGameData, Prototype, PrototypeCollection
 logger = logging.getLogger(__name__)
 
 
+# Helper methods
 def _load_parsed_file(
     filename: str,
     parsed_path: Path,
@@ -106,6 +104,7 @@ def _load_collection[T](
     return objects
 
 
+# Collection of shared categories
 def _collect_crafting_categories(
     data: ParsedGameData,
 ) -> dict[str, CraftingCategory]:
@@ -186,6 +185,7 @@ def _collect_surface_properties(
     return properties
 
 
+# Loading of all game entities
 def _load_items(data: ParsedGameData) -> dict[str, Item]:
     return _load_collection(
         data,
@@ -566,6 +566,7 @@ def _load_metadata(data: ParsedGameData) -> PrototypeCollection:
     return data["metadata"]
 
 
+# Public API
 def load_game_data() -> GameData:
     """Loads, normalises, and constructs the complete Factorio domain model."""
     parsed_path = Path("data/parsed")
@@ -658,79 +659,3 @@ def load_game_data() -> GameData:
     logger.info(log)
 
     return game_data
-
-
-import time
-
-
-def load_upcycler_systems() -> None:
-
-    parsed_path = Path("data/parsed")
-
-    raw_data = _load_all_game_data(parsed_path)
-    data = normalise_game_data(raw_data)
-
-    crafting_categories = _collect_crafting_categories(data)
-    surface_properties = _collect_surface_properties(data)
-    resource_categories = _collect_resource_categories(data)
-
-    items = _load_items(data)
-    fluids = _load_fluids(data)
-
-    materials = items | fluids
-
-    recipes = _load_recipes(
-        data,
-        items,
-        fluids,
-        crafting_categories,
-        surface_properties,
-    )
-
-    resources = _load_resources(data, resource_categories, items, fluids)
-
-    before_time = time.time()
-    index = generate_upcycler_index(materials, recipes)
-    after_time = time.time()
-    print(f"Total time: {after_time - before_time}")
-
-    testing = "copper-plate"
-
-    print(f"------ Upcyclers: {testing} ------\n")
-    for graph in index.upcycling_graphs_by_item[items[testing]]:
-        print(f"START RECIPE: {graph.start_recipe.name}")
-        print(f"INPUT MATERIALS: {[mat.name for mat in graph.input_materials]}")
-
-        print(f"END RECIPE: {graph.end_recipe.name}")
-        print(f"OUTPUT MATERIALS: {[mat.name for mat in graph.output_items]}")
-
-        print("GRAPH NODES:")
-        for node in graph.graph.nodes:
-            print(f"{type(node).__name__}: {node.name}")
-
-        print("GRAPH EDGES:")
-        for source, target in graph.graph.edges:
-            print(
-                f"{type(source).__name__} : {source.name} -> {type(target).__name__} : {target.name}"
-            )
-        print()
-
-    print(f"------ Production: {testing} ------\n")
-
-    for graph in index.production_graphs_by_item[items[testing]]:
-        print(f"START RECIPE: {graph.start_recipe.name}")
-        print(f"INPUT MATERIALS: {[mat.name for mat in graph.input_materials]}")
-
-        print(f"END RECIPE: {graph.end_recipe.name}")
-        print(f"OUTPUT MATERIALS: {[mat.name for mat in graph.output_items]}")
-
-        print("GRAPH NODES:")
-        for node in graph.graph.nodes:
-            print(f"{type(node).__name__}: {node.name}")
-
-        print("GRAPH EDGES:")
-        for source, target in graph.graph.edges:
-            print(
-                f"{type(source).__name__} : {source.name} -> {type(target).__name__} : {target.name}"
-            )
-        print()

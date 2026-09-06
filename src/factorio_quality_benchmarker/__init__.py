@@ -1,9 +1,6 @@
 import typer
 
-from factorio_quality_benchmarker.data.loader import (
-    load_game_data,
-    load_upcycler_systems,
-)
+from factorio_quality_benchmarker.data.loader import load_game_data
 from factorio_quality_benchmarker.data.parser import perform_parsing
 from factorio_quality_benchmarker.logging_config import configure_logging
 from factorio_quality_benchmarker.model import (
@@ -11,6 +8,7 @@ from factorio_quality_benchmarker.model import (
     QualifiedCrafter,
     QualifiedModule,
 )
+from factorio_quality_benchmarker.upcycler_index import generate_upcycler_index
 
 app = typer.Typer()
 
@@ -24,19 +22,15 @@ def parse() -> None:
 
 
 @app.command()
-def version() -> None:
-    """Temp since Typer doesn't like only one command"""
-    print("0.1.0")
-
-
-@app.command()
 def dev() -> None:
-    # game_data = load_game_data()
+    # Temp command name while the project is still taking shape
 
-    load_upcycler_systems()
+    game_data = load_game_data()
+
+    upcycler_index = generate_upcycler_index(game_data.materials, game_data.recipes)
 
 
 def main() -> None:
-    configure_logging(verbose=False)
+    configure_logging(verbose=True)
 
     app()
