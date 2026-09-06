@@ -2,7 +2,7 @@ from dataclasses import dataclass
 
 from .beacon import Beacon
 from .crafter import Crafter
-from .material import Fluid, Item
+from .material import Fluid, Item, Material
 from .miner import Miner
 from .module import Module
 from .quality import Quality
@@ -15,6 +15,10 @@ from .surface import Surface
 class GameData:
     items: dict[str, Item]
     fluids: dict[str, Fluid]
+
+    @property
+    def materials(self) -> dict[str, Material]:
+        return self.items | self.fluids
 
     recipes: dict[str, Recipe]
     crafters: dict[str, Crafter]

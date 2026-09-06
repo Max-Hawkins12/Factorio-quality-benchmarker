@@ -11,10 +11,17 @@ class Fluid:
     name: str
 
 
+Material = Item | Fluid
+
+
 @dataclass(frozen=True, slots=True)
 class ItemIngredient:
     item: Item
     amount: float
+
+    @property
+    def material(self) -> Material:
+        return self.item
 
 
 @dataclass(frozen=True, slots=True)
@@ -22,11 +29,22 @@ class FluidIngredient:
     fluid: Fluid
     amount: float
 
+    @property
+    def material(self) -> Material:
+        return self.fluid
+
+
+Ingredient = ItemIngredient | FluidIngredient
+
 
 @dataclass(frozen=True, slots=True)
 class ItemProduct:
     item: Item
     amount: float
+
+    @property
+    def material(self) -> Material:
+        return self.item
 
 
 @dataclass(frozen=True, slots=True)
@@ -34,7 +52,9 @@ class FluidProduct:
     fluid: Fluid
     amount: float
 
+    @property
+    def material(self) -> Material:
+        return self.fluid
 
-Material = Item | Fluid
-Ingredient = ItemIngredient | FluidIngredient
+
 Product = ItemProduct | FluidProduct

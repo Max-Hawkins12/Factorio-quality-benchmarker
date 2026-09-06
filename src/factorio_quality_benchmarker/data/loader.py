@@ -4,7 +4,6 @@ from collections.abc import Callable
 from math import ceil
 from pathlib import Path
 
-from factorio_quality_benchmarker.engine import calculate_product_ammount
 from factorio_quality_benchmarker.model import (
     Beacon,
     Crafter,
@@ -37,6 +36,7 @@ from .types import ParsedGameData, Prototype, PrototypeCollection
 logger = logging.getLogger(__name__)
 
 
+# Helper methods
 def _load_parsed_file(
     filename: str,
     parsed_path: Path,
@@ -68,8 +68,7 @@ def _load_all_game_data(parsed_path: Path) -> ParsedGameData:
     for file_path in files:
         if not file_path.is_file() or file_path.suffix != ".json":
             raise ValueError(
-                f"There is a non-JSON file {file_path.name} in {parsed_path}. "
-                "Please remove it."
+                f"There is a non-JSON file {file_path.name} in {parsed_path}. Please remove it."
             )
 
     logger.debug(
@@ -105,6 +104,7 @@ def _load_collection[T](
     return objects
 
 
+# Collection of shared categories
 def _collect_crafting_categories(
     data: ParsedGameData,
 ) -> dict[str, CraftingCategory]:
@@ -185,6 +185,7 @@ def _collect_surface_properties(
     return properties
 
 
+# Loading of all game entities
 def _load_items(data: ParsedGameData) -> dict[str, Item]:
     return _load_collection(
         data,
@@ -227,6 +228,22 @@ def _load_ingredient(
             raise ValueError(f"Unknown ingredient type: {ingredient_type!r}")
 
 
+def _calculate_product_ammount(product: Prototype) -> float:
+    """
+    Calculates the expected product amount of a recipe product.
+    """
+
+    amount = product["amount"]
+
+    if "extra_count_fraction" in product:
+        return amount + product["extra_count_fraction"]
+
+    if "independent_probability" in product:
+        return amount * product["independent_probability"]
+
+    return float(amount)
+
+
 def _load_product(
     product: Prototype,
     items: dict[str, Item],
@@ -237,7 +254,7 @@ def _load_product(
     expected output amount.
     """
     name = product["name"]
-    amount = calculate_product_ammount(product)
+    amount = _calculate_product_ammount(product)
 
     match product["type"]:
         case "item":
@@ -544,16 +561,12 @@ def _load_qualities(
     return qualities
 
 
-def _load_version(data: ParsedGameData) -> str:
-    """Returns the Factorio version associated with the parsed data."""
-    return data["metadata"]["metadata"]["factorio_version"]
-
-
 def _load_metadata(data: ParsedGameData) -> PrototypeCollection:
     """Returns the metadata associated with the parsed data."""
     return data["metadata"]
 
 
+# Public API
 def load_game_data() -> GameData:
     """Loads, normalises, and constructs the complete Factorio domain model."""
     parsed_path = Path("data/parsed")

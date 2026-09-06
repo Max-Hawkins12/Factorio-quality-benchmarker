@@ -2,13 +2,13 @@ import typer
 
 from factorio_quality_benchmarker.data.loader import load_game_data
 from factorio_quality_benchmarker.data.parser import perform_parsing
-from factorio_quality_benchmarker.engine import calculate_maximum_number_of_beacons
 from factorio_quality_benchmarker.logging_config import configure_logging
 from factorio_quality_benchmarker.model import (
     QualifiedBeacon,
     QualifiedCrafter,
     QualifiedModule,
 )
+from factorio_quality_benchmarker.upcycler_index import generate_upcycler_index
 
 app = typer.Typer()
 
@@ -22,16 +22,12 @@ def parse() -> None:
 
 
 @app.command()
-def version() -> None:
-    """Temp since Typer doesn't like only one command"""
-    print("0.1.0")
-
-
-@app.command()
 def dev() -> None:
+    # Temp command name while the project is still taking shape
+
     game_data = load_game_data()
 
-    print(game_data.recipes["speed-module"])
+    upcycler_index = generate_upcycler_index(game_data.materials, game_data.recipes)
 
 
 def main() -> None:

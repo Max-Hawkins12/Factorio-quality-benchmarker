@@ -2,7 +2,6 @@ import logging
 from collections.abc import Callable
 
 from .types import ParsedGameData, Prototype, PrototypeCollection
-from .utils import has_space_age
 
 logger = logging.getLogger(__name__)
 
@@ -21,21 +20,6 @@ NAUVIS_DEFAULT_SURFACE_PROPERTIES: Prototype = {
     "solar-power": 100,
     "pressure": 1000,
     "gravity": 10,
-}
-
-# Machines that are strictly superseded for the simulator's purposes.
-REDUNDANT_CRAFTING_MACHINES = {
-    "assembling-machine-1",
-    "assembling-machine-2",
-}
-
-REDUNDANT_FURNACES = {
-    "stone-furnace",
-    "steel-furnace",
-}
-
-REDUNDANT_MINERS = {
-    "burner-mining-drill",
 }
 
 
@@ -106,24 +90,10 @@ def _remove_prototypes(
     return removed
 
 
-def _get_redundant_machines(game_data: ParsedGameData) -> set[str]:
-    """
-    Return machines that are directly superseded by another retained machine.
-
-    The electric mining drill is only redundant when Space Age is enabled, because the big mining drill then provides the direct upgrade.
-    """
-    redundant = REDUNDANT_CRAFTING_MACHINES | REDUNDANT_FURNACES | REDUNDANT_MINERS
-
-    if has_space_age(game_data):
-        redundant = redundant | {"electric-mining-drill"}
-
-    return redundant
-
-
 # Cleaning methods
 def _remove_prototype_placeholders(game_data: ParsedGameData) -> None:
     """
-    Removes any prototypes that have names like "*-unknown" or "parameter-*".
+    Removes any prototypes that have names like "*-unknown".
     """
     removed = 0
 
@@ -152,90 +122,62 @@ def _remove_empty_recipes(game_data: ParsedGameData) -> None:
     logger.debug("Removed %d recipes with no ingredients and no results", removed)
 
 
-def _remove_disconnected_crafting_data(game_data: ParsedGameData) -> None:
+def _remove_materials_not_used_in_recipes(game_data: ParsedGameData) -> None:
     """
-    Removes recipes, crafting machines, furnaces, and crafting categories that are disconnected from the retained crafting system.
-
-    A recipe must have at least one category supported by a retained machine.
-    A machine must support at least one category used by a retained recipe.
-    A crafting category must be referenced by both sides of the relationship.
+    Remove items and fluids that are not referenced by any remaining recipe.
     """
-    recipes = game_data.get("recipes", {})
-    crafting_categories = game_data.get("crafting_categories", {})
+    used_items: set[str] = set()
+    used_fluids: set[str] = set()
 
-    machine_collections = (
-        game_data.get("crafting_machines", {}),
-        game_data.get("furnaces", {}),
+    for recipe in game_data.get("recipes", {}).values():
+        materials = (recipe.get("ingredients") or []) + (recipe.get("results") or [])
+
+        for material in materials:
+            if material.get("type") == "item":
+                used_items.add(material["name"])
+            elif material.get("type") == "fluid":
+                used_fluids.add(material["name"])
+
+    removed_items = _remove_prototypes(
+        game_data.get("items", {}),
+        lambda item: item["name"] not in used_items,
     )
 
-    total_removed_recipes = 0
-    total_removed_machines = 0
-    total_removed_categories = 0
+    removed_fluids = _remove_prototypes(
+        game_data.get("fluids", {}),
+        lambda fluid: fluid["name"] not in used_fluids,
+    )
 
-    while True:
-        removed_this_pass = 0
+    logger.debug("Removed %d items unused by recipes", removed_items)
+    logger.debug("Removed %d fluids unused by recipes", removed_fluids)
 
-        machine_categories = {
-            category
-            for machines in machine_collections
-            for machine in machines.values()
-            for category in machine.get("crafting_categories") or []
-        }
 
-        removed_recipes = _remove_prototypes(
-            recipes,
-            lambda recipe: (
-                not (set(recipe.get("categories") or []) & machine_categories)  # noqa: B023
-            ),
-        )
+def _remove_items_without_recycling_recipes(game_data: ParsedGameData) -> None:
+    """
+    Remove items that do not have a recycling recipe.
 
-        recipe_categories = {
-            category
-            for recipe in recipes.values()
-            for category in recipe.get("categories") or []
-        }
+    Fluids are unaffected because they cannot be recycled or upcycled.
+    """
+    recyclable_items: set[str] = set()
 
-        removed_machines = 0
+    for recipe in game_data.get("recipes", {}).values():
+        categories = recipe.get("categories") or []
 
-        for machines in machine_collections:
-            removed_machines += _remove_prototypes(
-                machines,
-                lambda machine: (
-                    not (
-                        set(machine.get("crafting_categories") or [])
-                        & recipe_categories  # noqa: B023
-                    )
-                ),
-            )
+        if "recycling" not in categories:
+            continue
 
-        machine_categories = {
-            category
-            for machines in machine_collections
-            for machine in machines.values()
-            for category in machine.get("crafting_categories") or []
-        }
+        for ingredient in recipe.get("ingredients") or []:
+            if ingredient.get("type") == "item":
+                recyclable_items.add(ingredient["name"])
 
-        connected_categories = recipe_categories & machine_categories
-
-        removed_categories = _remove_prototypes(
-            crafting_categories,
-            lambda category: category["name"] not in connected_categories,  # noqa: B023
-        )
-
-        total_removed_recipes += removed_recipes
-        total_removed_machines += removed_machines
-        total_removed_categories += removed_categories
-
-        removed_this_pass += removed_recipes + removed_machines + removed_categories
-
-        if removed_this_pass == 0:
-            break
+    removed_items = _remove_prototypes(
+        game_data.get("items", {}),
+        lambda item: item["name"] not in recyclable_items,
+    )
 
     logger.debug(
-        "Removed %d disconnected recipes, %d machines, and %d crafting categories",
-        total_removed_recipes,
-        total_removed_machines,
-        total_removed_categories,
+        "Removed %d items without recycling recipes",
+        removed_items,
     )
 
 
@@ -269,52 +211,6 @@ def _remove_recipes_with_missing_materials(game_data: ParsedGameData) -> None:
     logger.debug("Removed %d recipes referencing missing materials", removed)
 
 
-def _remove_materials_not_used_in_recipes(game_data: ParsedGameData) -> None:
-    """
-    Remove items and fluids that are not referenced by any remaining recipe.
-    """
-    used_items: set[str] = set()
-    used_fluids: set[str] = set()
-
-    for recipe in game_data.get("recipes", {}).values():
-        materials = (recipe.get("ingredients") or []) + (recipe.get("results") or [])
-
-        for material in materials:
-            if material.get("type") == "item":
-                used_items.add(material["name"])
-            elif material.get("type") == "fluid":
-                used_fluids.add(material["name"])
-
-    removed_items = _remove_prototypes(
-        game_data.get("items", {}),
-        lambda item: item["name"] not in used_items,
-    )
-
-    removed_fluids = _remove_prototypes(
-        game_data.get("fluids", {}),
-        lambda fluid: fluid["name"] not in used_fluids,
-    )
-
-    logger.debug("Removed %d items unused by recipes", removed_items)
-    logger.debug("Removed %d fluids unused by recipes", removed_fluids)
-
-
-def _remove_redundant_machines(game_data: ParsedGameData) -> None:
-    """
-    Remove only machines that are explicitly known to be directly superseded for the simulator's purposes.
-    """
-    redundant = _get_redundant_machines(game_data)
-    removed = 0
-
-    for collection_name in ("crafting_machines", "furnaces", "miners"):
-        removed += _remove_prototypes(
-            game_data.get(collection_name, {}),
-            lambda machine: machine["name"] in redundant,
-        )
-
-    logger.debug("Removed %d explicitly redundant machines", removed)
-
-
 def _count_prototypes(game_data: ParsedGameData) -> int:
     """
     Returns the total number of prototypes in the data.
@@ -325,13 +221,13 @@ def _count_prototypes(game_data: ParsedGameData) -> int:
 
 def normalise_game_data(game_data: ParsedGameData) -> ParsedGameData:
     """
-    Apply Factorio defaults and perform only conservative cleanup:
+    Apply Factorio defaults and perform conservative data cleanup:
 
-    - normalise missing/default values;
+    - add implicit Factorio default values;
+    - normalise equivalent data representations;
+    - remove placeholder prototypes;
     - remove structurally empty recipes;
-    - remove recipes that reference missing items or fluids;
-    - remove items and fluids unused by any remaining recipe;
-    - remove explicitly superseded machines.
+    - remove recipes referencing missing materials.
     """
     start_count = _count_prototypes(game_data)
     logger.debug("Found %d prototypes", start_count)
@@ -341,11 +237,11 @@ def normalise_game_data(game_data: ParsedGameData) -> ParsedGameData:
 
     _remove_prototype_placeholders(game_data)
 
+    _remove_materials_not_used_in_recipes(game_data)
+    _remove_items_without_recycling_recipes(game_data)
+
     _remove_empty_recipes(game_data)
     _remove_recipes_with_missing_materials(game_data)
-    _remove_disconnected_crafting_data(game_data)
-    _remove_materials_not_used_in_recipes(game_data)
-    _remove_redundant_machines(game_data)
 
     end_count = _count_prototypes(game_data)
 
