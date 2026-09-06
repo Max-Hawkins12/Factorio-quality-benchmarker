@@ -29,12 +29,8 @@ from factorio_quality_benchmarker.model import (
     SurfaceCondition,
     SurfaceProperty,
 )
-from factorio_quality_benchmarker.upcycler_system import (
-    find_crafting_loops,
-    generate_recipe_index,
-    generate_upcycler_systems,
-    write_upcycler_system,
-    write_upcycler_systems,
+from factorio_quality_benchmarker.upcycler_index import (
+    generate_upcycler_index,
 )
 
 from .normaliser import normalise_game_data
@@ -664,10 +660,10 @@ def load_game_data() -> GameData:
     return game_data
 
 
+import time
+
+
 def load_upcycler_systems() -> None:
-    """
-    TODO If systems exist load them
-    """
 
     parsed_path = Path("data/parsed")
 
@@ -675,8 +671,8 @@ def load_upcycler_systems() -> None:
     data = normalise_game_data(raw_data)
 
     crafting_categories = _collect_crafting_categories(data)
-    resource_categories = _collect_resource_categories(data)
     surface_properties = _collect_surface_properties(data)
+    resource_categories = _collect_resource_categories(data)
 
     items = _load_items(data)
     fluids = _load_fluids(data)
@@ -693,11 +689,48 @@ def load_upcycler_systems() -> None:
 
     resources = _load_resources(data, resource_categories, items, fluids)
 
-    write_upcycler_system(
-        find_crafting_loops(
-            items["holmium-plate"],
-            generate_recipe_index(materials, recipes, crafting_categories),
-            set(resources.values()),
-        ),
-        directory=Path("data/generated/upcyclers"),
-    )
+    before_time = time.time()
+    index = generate_upcycler_index(materials, recipes)
+    after_time = time.time()
+    print(f"Total time: {after_time - before_time}")
+
+    testing = "copper-plate"
+
+    print(f"------ Upcyclers: {testing} ------\n")
+    for graph in index.upcycling_graphs_by_item[items[testing]]:
+        print(f"START RECIPE: {graph.start_recipe.name}")
+        print(f"INPUT MATERIALS: {[mat.name for mat in graph.input_materials]}")
+
+        print(f"END RECIPE: {graph.end_recipe.name}")
+        print(f"OUTPUT MATERIALS: {[mat.name for mat in graph.output_items]}")
+
+        print("GRAPH NODES:")
+        for node in graph.graph.nodes:
+            print(f"{type(node).__name__}: {node.name}")
+
+        print("GRAPH EDGES:")
+        for source, target in graph.graph.edges:
+            print(
+                f"{type(source).__name__} : {source.name} -> {type(target).__name__} : {target.name}"
+            )
+        print()
+
+    print(f"------ Production: {testing} ------\n")
+
+    for graph in index.production_graphs_by_item[items[testing]]:
+        print(f"START RECIPE: {graph.start_recipe.name}")
+        print(f"INPUT MATERIALS: {[mat.name for mat in graph.input_materials]}")
+
+        print(f"END RECIPE: {graph.end_recipe.name}")
+        print(f"OUTPUT MATERIALS: {[mat.name for mat in graph.output_items]}")
+
+        print("GRAPH NODES:")
+        for node in graph.graph.nodes:
+            print(f"{type(node).__name__}: {node.name}")
+
+        print("GRAPH EDGES:")
+        for source, target in graph.graph.edges:
+            print(
+                f"{type(source).__name__} : {source.name} -> {type(target).__name__} : {target.name}"
+            )
+        print()
