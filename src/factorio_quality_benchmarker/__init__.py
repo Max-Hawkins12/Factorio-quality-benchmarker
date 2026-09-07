@@ -25,6 +25,6 @@ def dev() -> None:
 
 
 def main() -> None:
-    configure_logging(verbose=False)
+    configure_logging(verbose=True)
 
     app()

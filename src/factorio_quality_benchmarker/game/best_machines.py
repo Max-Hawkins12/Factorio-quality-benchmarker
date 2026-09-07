@@ -1,3 +1,4 @@
+import logging
 from collections.abc import Callable, Iterable
 from typing import TypeVar
 
@@ -7,6 +8,8 @@ from factorio_quality_benchmarker.game.models import (
     Miner,
     ResourceCategory,
 )
+
+logger = logging.getLogger(__name__)
 
 TCategory = TypeVar("TCategory")
 TEntity = TypeVar("TEntity")
@@ -19,6 +22,7 @@ def _find_best_per_category[TCategory, TEntity](
     supports_category: Callable[[TEntity, TCategory], bool],
     module_slots: Callable[[TEntity], int],
     speed: Callable[[TEntity], float],
+    logger_message: str,
 ) -> dict[TCategory, TEntity]:
     entities = tuple(entities)
     best_per_category: dict[TCategory, TEntity] = {}
@@ -42,6 +46,8 @@ def _find_best_per_category[TCategory, TEntity](
                     f"No single dominant entity exists for category {category!r}"
                 )
 
+    logger.debug("Found the domanant machine for all %s", logger_message)
+
     return best_per_category
 
 
@@ -55,6 +61,7 @@ def find_best_crafter_per_category(
         supports_category=lambda crafter, category: category in crafter.categories,
         module_slots=lambda crafter: crafter.module_slots,
         speed=lambda crafter: crafter.crafting_speed,
+        logger_message="crafting categories",
     )
 
 
@@ -68,4 +75,5 @@ def find_best_miner_per_category(
         supports_category=lambda miner, category: category in miner.resource_categories,
         module_slots=lambda miner: miner.module_slots,
         speed=lambda miner: miner.mining_speed,
+        logger_message="resource categories",
     )
