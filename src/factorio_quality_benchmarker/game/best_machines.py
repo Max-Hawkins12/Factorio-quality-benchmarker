@@ -20,25 +20,27 @@ def _find_best_per_category[TCategory, TEntity](
     module_slots: Callable[[TEntity], int],
     speed: Callable[[TEntity], float],
 ) -> dict[TCategory, TEntity]:
+    entities = tuple(entities)
     best_per_category: dict[TCategory, TEntity] = {}
 
-    entities = tuple(entities)
-
     for category in categories:
-        best: TEntity | None = None
+        candidates = tuple(
+            entity for entity in entities if supports_category(entity, category)
+        )
 
-        for entity in entities:
-            if not supports_category(entity, category):
-                continue
-
-            if best is None or (
-                module_slots(entity) >= module_slots(best)
-                and speed(entity) >= speed(best)
+        for candidate in candidates:
+            if all(
+                module_slots(candidate) >= module_slots(other)
+                and speed(candidate) >= speed(other)
+                for other in candidates
             ):
-                best = entity
-
-        if best is not None:
-            best_per_category[category] = best
+                best_per_category[category] = candidate
+                break
+        else:
+            if candidates:
+                raise ValueError(
+                    f"No single dominant entity exists for category {category!r}"
+                )
 
     return best_per_category
 
