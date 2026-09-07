@@ -3,7 +3,7 @@ import typer
 from factorio_quality_benchmarker.data.loader import load_game_data
 from factorio_quality_benchmarker.data.parser import perform_parsing
 from factorio_quality_benchmarker.logging_config import configure_logging
-from factorio_quality_benchmarker.upcycler.graphs import generate_upcycler_index
+from factorio_quality_benchmarker.upcycler.graphs import generate_recipe_graph_index
 
 app = typer.Typer()
 
@@ -22,7 +22,7 @@ def dev() -> None:
 
     game_data = load_game_data()
 
-    upcycler_index = generate_upcycler_index(game_data.materials, game_data.recipes)
+    generate_recipe_graph_index(game_data.materials, game_data.recipes)
 
 
 def main() -> None:
