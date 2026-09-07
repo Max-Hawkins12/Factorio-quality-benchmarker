@@ -4,7 +4,7 @@ from dataclasses import dataclass
 
 import networkx as nx
 
-from factorio_quality_benchmarker.model import (
+from factorio_quality_benchmarker.game.models import (
     Fluid,
     Item,
     Material,

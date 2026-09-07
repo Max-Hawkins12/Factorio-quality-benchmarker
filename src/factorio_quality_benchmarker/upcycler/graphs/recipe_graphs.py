@@ -4,7 +4,7 @@ from time import perf_counter
 
 import networkx as nx
 
-from factorio_quality_benchmarker.model import Item, Material, Recipe
+from factorio_quality_benchmarker.game.models import Item, Material, Recipe
 
 from .models import ProductionGraph, RecipeGraph, RecipeGraphIndex, UpcyclingGraph
 

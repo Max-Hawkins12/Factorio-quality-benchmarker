@@ -1,6 +1,6 @@
 from math import floor
 
-from factorio_quality_benchmarker.model import Beacon, Crafter, Miner
+from factorio_quality_benchmarker.game.models import Beacon, Crafter, Miner
 
 
 def calculate_maximum_number_of_beacons(

@@ -4,14 +4,14 @@ from collections.abc import Callable
 from math import ceil
 from pathlib import Path
 
-from factorio_quality_benchmarker.model import (
+from factorio_quality_benchmarker.game import GameData
+from factorio_quality_benchmarker.game.models import (
     Beacon,
     Crafter,
     CraftingCategory,
     Fluid,
     FluidIngredient,
     FluidProduct,
-    GameData,
     Ingredient,
     Item,
     ItemIngredient,

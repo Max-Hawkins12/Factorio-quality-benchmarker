@@ -1,8 +1,13 @@
 from collections.abc import Mapping
 from math import floor
 
-from factorio_quality_benchmarker.model import Beacon, Crafter, Module, ModuleEffect
-from factorio_quality_benchmarker.simulation import Qualified
+from factorio_quality_benchmarker.game.models import (
+    Beacon,
+    Crafter,
+    Module,
+    ModuleEffect,
+)
+from factorio_quality_benchmarker.upcycler.simulation import Qualified
 
 DEFAULT_QUALITY_SCALE = 0.3
 

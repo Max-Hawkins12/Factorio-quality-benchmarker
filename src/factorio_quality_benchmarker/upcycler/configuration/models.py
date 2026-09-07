@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 
-from factorio_quality_benchmarker.model import Beacon, Crafter, Miner, Module
-from factorio_quality_benchmarker.simulation import Qualified
+from factorio_quality_benchmarker.game.models import Beacon, Crafter, Miner, Module
+from factorio_quality_benchmarker.upcycler.simulation import Qualified
 
 
 @dataclass(frozen=True, slots=True)

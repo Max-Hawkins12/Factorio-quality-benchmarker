@@ -1,14 +1,18 @@
 from dataclasses import dataclass
 
-from .beacon import Beacon
-from .crafter import Crafter
-from .material import Fluid, Item, Material
-from .miner import Miner
-from .module import Module
-from .quality import Quality
-from .recipe import Recipe
-from .resource import Resource
-from .surface import Surface
+from factorio_quality_benchmarker.game.models import (
+    Beacon,
+    Crafter,
+    Fluid,
+    Item,
+    Material,
+    Miner,
+    Module,
+    Quality,
+    Recipe,
+    Resource,
+    Surface,
+)
 
 
 @dataclass(frozen=True, slots=True)

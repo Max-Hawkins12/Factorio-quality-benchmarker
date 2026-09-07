@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from itertools import combinations_with_replacement
 
-from factorio_quality_benchmarker.model import (
+from factorio_quality_benchmarker.game.models import (
     Beacon,
     Crafter,
     Miner,
@@ -9,7 +9,7 @@ from factorio_quality_benchmarker.model import (
     ModuleEffect,
     Recipe,
 )
-from factorio_quality_benchmarker.simulation import Qualified
+from factorio_quality_benchmarker.upcycler.simulation import Qualified
 
 from .beacons import calculate_maximum_number_of_beacons
 

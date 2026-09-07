@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import Protocol
 
-from factorio_quality_benchmarker.model import Quality
+from factorio_quality_benchmarker.game.models import Quality
 
 
 class Named(Protocol):
