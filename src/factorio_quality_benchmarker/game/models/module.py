@@ -15,3 +15,11 @@ class Module:
     tier: int
     category: ModuleCategory
     effects: Mapping[ModuleEffect, float]
+
+
+EMPTY_MODULE = Module(
+    name="empty",
+    tier=0,
+    category=ModuleCategory(type="empty"),
+    effects={},
+)

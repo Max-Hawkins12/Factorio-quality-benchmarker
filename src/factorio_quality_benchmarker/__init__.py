@@ -1,7 +1,11 @@
 import typer
 
 from factorio_quality_benchmarker.data import load_game_data, perform_parsing
+from factorio_quality_benchmarker.game.models import EMPTY_MODULE
 from factorio_quality_benchmarker.logging_config import configure_logging
+from factorio_quality_benchmarker.upcycler.configuration.modules import (
+    get_module_configurations,
+)
 from factorio_quality_benchmarker.upcycler.graphs import generate_recipe_graph_index
 
 app = typer.Typer()
@@ -21,10 +25,14 @@ def dev() -> None:
 
     game_data = load_game_data()
 
+    modules = tuple(game_data.modules.values()) + (EMPTY_MODULE,)
+
+    print(len(get_module_configurations(tuple(modules), 8)))
+
     # generate_recipe_graph_index(game_data.materials, game_data.recipes)
 
 
 def main() -> None:
-    configure_logging(verbose=True)
+    configure_logging(verbose=False)
 
     app()
