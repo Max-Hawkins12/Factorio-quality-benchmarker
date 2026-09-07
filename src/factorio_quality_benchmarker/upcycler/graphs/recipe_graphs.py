@@ -141,7 +141,7 @@ def _get_producer_recipes(
 
 
 # Public API
-def generate_upcycler_index(
+def generate_recipe_graph_index(
     materials: dict[str, Material],
     recipes: dict[str, Recipe],
 ) -> RecipeGraphIndex:
