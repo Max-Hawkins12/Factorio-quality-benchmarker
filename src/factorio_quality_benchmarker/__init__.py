@@ -21,7 +21,7 @@ def dev() -> None:
 
     game_data = load_game_data()
 
-    generate_recipe_graph_index(game_data.materials, game_data.recipes)
+    # generate_recipe_graph_index(game_data.materials, game_data.recipes)
 
 
 def main() -> None:

@@ -3,6 +3,7 @@ from dataclasses import dataclass
 from factorio_quality_benchmarker.game.models import (
     Beacon,
     Crafter,
+    CraftingCategory,
     Fluid,
     Item,
     Material,
@@ -11,6 +12,7 @@ from factorio_quality_benchmarker.game.models import (
     Quality,
     Recipe,
     Resource,
+    ResourceCategory,
     Surface,
 )
 
@@ -37,6 +39,9 @@ class GameData:
     surfaces: dict[str, Surface]
 
     metadata: dict
+
+    best_crafter_by_category: dict[CraftingCategory, Crafter]
+    best_miner_by_category: dict[ResourceCategory, Miner]
 
     @property
     def factorio_version(self) -> str:

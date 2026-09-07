@@ -4,7 +4,11 @@ from collections.abc import Callable
 from math import ceil
 from pathlib import Path
 
-from factorio_quality_benchmarker.game import GameData
+from factorio_quality_benchmarker.game import (
+    GameData,
+    find_best_crafter_per_category,
+    find_best_miner_per_category,
+)
 from factorio_quality_benchmarker.game.models import (
     Beacon,
     Crafter,
@@ -353,7 +357,7 @@ def _load_crafters(
                 for category in machine["crafting_categories"]
             ),
             crafting_speed=machine["crafting_speed"],
-            module_slots=machine["module_slots"],
+            module_slots=machine["module_slots"] if machine["module_slots"] else 0,
             allowed_effects=frozenset(
                 module_effects[effect] for effect in machine["allowed_effects"]
             ),
@@ -400,7 +404,7 @@ def _load_miners(
                 for category in miner["resource_categories"]
             ),
             mining_speed=miner["mining_speed"],
-            module_slots=miner["module_slots"],
+            module_slots=miner["module_slots"] if miner["module_slots"] else 0,
             allowed_effects=frozenset(
                 module_effects[effect] for effect in miner["allowed_effects"]
             ),
@@ -589,6 +593,16 @@ def load_game_data() -> GameData:
 
     items = _load_items(data)
     fluids = _load_fluids(data)
+    crafters = _load_crafters(
+        data,
+        crafting_categories,
+        module_effects,
+    )
+    miners = _load_miners(
+        data,
+        resource_categories,
+        module_effects,
+    )
 
     logger.debug("Constructing game model")
 
@@ -602,16 +616,8 @@ def load_game_data() -> GameData:
             crafting_categories,
             surface_properties,
         ),
-        crafters=_load_crafters(
-            data,
-            crafting_categories,
-            module_effects,
-        ),
-        miners=_load_miners(
-            data,
-            resource_categories,
-            module_effects,
-        ),
+        crafters=crafters,
+        miners=miners,
         beacons=_load_beacons(
             data,
             module_effects,
@@ -633,6 +639,14 @@ def load_game_data() -> GameData:
         ),
         qualities=_load_qualities(data),
         metadata=_load_metadata(data),
+        best_crafter_by_category=find_best_crafter_per_category(
+            crafting_categories,
+            crafters,
+        ),
+        best_miner_by_category=find_best_miner_per_category(
+            resource_categories,
+            miners,
+        ),
     )
 
     if game_data.has_space_age:
