@@ -130,7 +130,7 @@ def _collect_module_effects(
     for module in data.get("modules", {}).values():
         effect_names.update(module.get("effect") or {})
 
-    for collection_name in ("crafting_machines", "furnaces", "miners"):
+    for collection_name in ("crafters", "furnaces", "miners"):
         for machine in data.get(collection_name, {}).values():
             effect_names.update(machine.get("allowed_effects") or [])
 
@@ -368,7 +368,7 @@ def _load_crafters(
 
     machines = _load_collection(
         data,
-        "crafting_machines",
+        "crafters",
         constructor,
     )
     furnaces = _load_collection(

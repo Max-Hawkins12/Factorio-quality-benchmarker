@@ -72,7 +72,7 @@ def _write_prototype_files(raw_data: dict, parser_output_path: Path) -> None:
                 "surface_conditions",
             ],
         ),
-        "crafting_machines.json": (
+        "crafters.json": (
             ["assembling-machine"],
             [
                 "name",
