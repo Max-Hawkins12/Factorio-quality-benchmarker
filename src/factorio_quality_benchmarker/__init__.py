@@ -1,7 +1,6 @@
 import typer
 
-from factorio_quality_benchmarker.data.loader import load_game_data
-from factorio_quality_benchmarker.data.parser import perform_parsing
+from factorio_quality_benchmarker.data import load_game_data, perform_parsing
 from factorio_quality_benchmarker.logging_config import configure_logging
 from factorio_quality_benchmarker.upcycler.graphs import generate_recipe_graph_index
 
@@ -26,6 +25,6 @@ def dev() -> None:
 
 
 def main() -> None:
-    configure_logging(verbose=True)
+    configure_logging(verbose=False)
 
     app()
