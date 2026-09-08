@@ -627,6 +627,7 @@ def load_game_data() -> GameData:
             module_categories,
             module_effects,
         ),
+        module_effects=module_effects,
         resources=_load_resources(
             data,
             resource_categories,

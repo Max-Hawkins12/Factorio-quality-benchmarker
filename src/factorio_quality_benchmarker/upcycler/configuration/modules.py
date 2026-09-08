@@ -1,48 +1,47 @@
-from itertools import combinations_with_replacement, product
+from factorio_quality_benchmarker.game.models import EMPTY_MODULE, Module, ModuleEffect
 
-from factorio_quality_benchmarker.game.models import Module
-
-from .models import BeaconConfiguration, MachineConfiguration, ModuleConfiguration
+DESIRED_MODULE_EFFECTS = ("productivity", "quality", "speed")
 
 
-def get_module_configurations(
+def _get_desired_module_effects(
+    effects: dict[str, ModuleEffect],
+) -> tuple[ModuleEffect, ...]:
+    return tuple(effects[effect] for effect in DESIRED_MODULE_EFFECTS)
+
+
+def _module_dominates(
+    a: Module,
+    b: Module,
+    effects: tuple[ModuleEffect, ...],
+) -> bool:
+
+    a_effects = tuple(a.effects.get(effect, 0.0) for effect in effects)
+    b_effects = tuple(b.effects.get(effect, 0.0) for effect in effects)
+
+    return all(a >= b for a, b in zip(a_effects, b_effects)) and any(
+        a > b for a, b in zip(a_effects, b_effects)
+    )
+
+
+def get_desired_modules(
     modules: tuple[Module, ...],
-    num_module_slots: int,
-) -> tuple[ModuleConfiguration, ...]:
-    return tuple(
-        ModuleConfiguration(modules=configuration)
-        for configuration in combinations_with_replacement(
-            modules,
-            num_module_slots,
-        )
+    effects: dict[str, ModuleEffect],
+) -> tuple[Module, ...]:
+
+    desired_effects = _get_desired_module_effects(effects)
+
+    relevant_modules = tuple(
+        module
+        for module in modules
+        if any(effect in module.effects for effect in desired_effects)
     )
 
-
-def get_beacon_configurations(
-    module_configurations: tuple[ModuleConfiguration, ...],
-    max_beacons: int,
-) -> tuple[BeaconConfiguration, ...]:
     return tuple(
-        BeaconConfiguration(beacons=configuration)
-        for num_beacons in range(max_beacons + 1)
-        for configuration in combinations_with_replacement(
-            module_configurations,
-            num_beacons,
+        module
+        for module in relevant_modules
+        if not any(
+            _module_dominates(other, module, desired_effects)
+            for other in relevant_modules
+            if other is not module
         )
-    )
-
-
-def get_machine_configurations(
-    module_configurations: tuple[ModuleConfiguration, ...],
-    beacon_configurations: tuple[BeaconConfiguration, ...],
-) -> tuple[MachineConfiguration, ...]:
-    return tuple(
-        MachineConfiguration(
-            modules=modules,
-            beacons=beacons,
-        )
-        for modules, beacons in product(
-            module_configurations,
-            beacon_configurations,
-        )
-    )
+    ) + (EMPTY_MODULE,)

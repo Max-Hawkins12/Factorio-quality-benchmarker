@@ -2,6 +2,7 @@ from .beacon import Beacon  # noqa: F401
 from .common import (  # noqa: F401
     CraftingCategory,
     ModuleEffect,
+    ModuleMachine,
     ResourceCategory,
     SurfaceProperty,
 )

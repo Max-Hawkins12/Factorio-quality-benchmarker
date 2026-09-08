@@ -1,18 +1,11 @@
 from dataclasses import dataclass
 
-from .common import ModuleEffect, ResourceCategory
+from .common import ModuleMachine, ResourceCategory
 
 
 @dataclass(frozen=True, slots=True)
-class Miner:
+class Miner(ModuleMachine):
     name: str
-
     resource_categories: frozenset[ResourceCategory]
 
     mining_speed: float
-    module_slots: int
-
-    allowed_effects: frozenset[ModuleEffect]
-
-    width: int
-    height: int
