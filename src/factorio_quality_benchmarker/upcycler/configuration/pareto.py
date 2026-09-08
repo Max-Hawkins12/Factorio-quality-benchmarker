@@ -30,19 +30,6 @@ class MaxFenwickTree:
         return maximum
 
 
-def _effects_dominate(a: MachineEffects, b: MachineEffects) -> bool:
-    return (
-        a.speed >= b.speed
-        and a.productivity >= b.productivity
-        and a.quality >= b.quality
-        and (
-            a.speed > b.speed
-            or a.productivity > b.productivity
-            or a.quality > b.quality
-        )
-    )
-
-
 def _deduplicate_configurations[T: HasMachineEffects](
     configurations: tuple[T, ...],
 ) -> tuple[T, ...]:
