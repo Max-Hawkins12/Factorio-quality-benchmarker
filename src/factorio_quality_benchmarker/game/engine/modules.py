@@ -1,8 +1,13 @@
-from factorio_quality_benchmarker.game.models import Module, ModuleEffect, ModuleMachine
+from factorio_quality_benchmarker.game.models import (
+    Beacon,
+    Machine,
+    Module,
+    ModuleEffect,
+)
 
 
 def get_allowed_modules(
-    machine: ModuleMachine,
+    machine: Machine | Beacon,
     modules: tuple[Module, ...],
     quality_effect: ModuleEffect,
 ) -> tuple[Module, ...]:

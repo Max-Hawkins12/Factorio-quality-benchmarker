@@ -1,10 +1,10 @@
 from dataclasses import dataclass
 
-from .common import ModuleMachine
+from .common import ModuleEffect
 
 
 @dataclass(frozen=True, slots=True)
-class Beacon(ModuleMachine):
+class Beacon:
     name: str
 
     distribution_effectivity: float
@@ -12,3 +12,8 @@ class Beacon(ModuleMachine):
     diminishing_returns_profile: tuple[float, ...]
 
     effect_range: int
+
+    module_slots: int
+    allowed_effects: frozenset[ModuleEffect]
+    width: int
+    height: int

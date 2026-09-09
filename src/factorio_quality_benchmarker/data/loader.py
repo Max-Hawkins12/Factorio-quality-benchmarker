@@ -4,11 +4,7 @@ from collections.abc import Callable
 from math import ceil
 from pathlib import Path
 
-from factorio_quality_benchmarker.game import (
-    GameData,
-    find_best_crafter_per_category,
-    find_best_miner_per_category,
-)
+from factorio_quality_benchmarker.game import GameData
 from factorio_quality_benchmarker.game.models import (
     Beacon,
     Crafter,
@@ -640,14 +636,6 @@ def load_game_data() -> GameData:
         ),
         qualities=_load_qualities(data),
         metadata=_load_metadata(data),
-        best_crafter_by_category=find_best_crafter_per_category(
-            crafting_categories,
-            crafters,
-        ),
-        best_miner_by_category=find_best_miner_per_category(
-            resource_categories,
-            miners,
-        ),
     )
 
     if game_data.has_space_age:

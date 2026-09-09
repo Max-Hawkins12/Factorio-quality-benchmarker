@@ -1,9 +1,9 @@
 from math import floor
 
-from factorio_quality_benchmarker.game.models import Beacon, ModuleMachine
+from factorio_quality_benchmarker.game.models import Beacon, Machine
 
 
-def calculate_maximum_beacons(machine: ModuleMachine, beacon: Beacon) -> int:
+def calculate_maximum_beacons(machine: Machine, beacon: Beacon) -> int:
     """
     Geometrically calculate the maximum number of beacons that can affect a machine.
 

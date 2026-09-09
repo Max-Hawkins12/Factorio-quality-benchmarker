@@ -2,11 +2,10 @@ from .beacon import Beacon  # noqa: F401
 from .common import (  # noqa: F401
     CraftingCategory,
     ModuleEffect,
-    ModuleMachine,
     ResourceCategory,
     SurfaceProperty,
 )
-from .crafter import Crafter  # noqa: F401
+from .machine import Crafter, Machine, Miner  # noqa: F401
 from .material import (  # noqa: F401
     Fluid,
     FluidIngredient,
@@ -18,7 +17,6 @@ from .material import (  # noqa: F401
     Material,
     Product,
 )
-from .miner import Miner  # noqa: F401
 from .module import EMPTY_MODULE, Module, ModuleCategory  # noqa: F401
 from .quality import Quality  # noqa: F401
 from .recipe import Recipe, SurfaceCondition  # noqa: F401

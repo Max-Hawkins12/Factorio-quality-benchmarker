@@ -35,13 +35,3 @@ class SurfaceProperty:
     def __post_init__(self) -> None:
         if not self.property.strip():
             raise ValueError("Surface property cannot be empty")
-
-
-@dataclass(frozen=True, slots=True)
-class ModuleMachine:
-    """A parent class for any machine which accepts module and beacon effects"""
-
-    module_slots: int
-    allowed_effects: frozenset[ModuleEffect]
-    width: int
-    height: int

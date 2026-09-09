@@ -6,9 +6,9 @@ from factorio_quality_benchmarker.game.engine import (
 )
 from factorio_quality_benchmarker.game.models import (
     Beacon,
+    Machine,
     Module,
     ModuleEffect,
-    ModuleMachine,
 )
 
 from .effects import (
@@ -62,7 +62,7 @@ def _get_beacon_configurations(
 
 
 def _get_effective_module_configurations(
-    machine: ModuleMachine,
+    machine: Machine,
     modules: tuple[Module, ...],
     module_effects: dict[str, ModuleEffect],
 ) -> tuple[EffectiveModuleConfiguration, ...]:
@@ -167,11 +167,11 @@ def _get_beacon_configurations_for_max(
 
 # Public API
 def get_best_configurations(
-    machines: dict[str, ModuleMachine],
+    machines: dict[str, Machine],
     beacons: dict[str, Beacon],
     all_modules: dict[str, Module],
     module_effects: dict[str, ModuleEffect],
-) -> dict[ModuleMachine, tuple[MachineConfiguration, ...]]:
+) -> dict[Machine, tuple[MachineConfiguration, ...]]:
     beacon = beacons["beacon"]
     modules: tuple[Module, ...] = get_desired_modules(
         tuple(all_modules.values()),
