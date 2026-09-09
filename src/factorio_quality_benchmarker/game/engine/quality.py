@@ -1,4 +1,3 @@
-from collections.abc import Mapping
 from math import floor
 
 from factorio_quality_benchmarker.game.models import (
@@ -6,6 +5,7 @@ from factorio_quality_benchmarker.game.models import (
     Crafter,
     Module,
     ModuleEffect,
+    Quality,
 )
 from factorio_quality_benchmarker.upcycler.simulation import Qualified
 
@@ -20,23 +20,23 @@ QUALITY_MODULE_SCALED_EFFECT = {
 }
 
 
-def apply_crafter_quality_speed(crafter: Qualified[Crafter]) -> float:
-    """
-    Apply the Factorio engine calculation to determine a crafter's speed at a quality level
-    """
-
-    crafting_speed = crafter.entity.crafting_speed
-    quality_level = crafter.quality.level
-
-    return crafting_speed * (1 + DEFAULT_QUALITY_SCALE * quality_level)
+def _quality_multiplier(
+    quality: Quality,
+    scale: float = DEFAULT_QUALITY_SCALE,
+) -> float:
+    return 1 + scale * quality.level
 
 
-def apply_module_quality(
-    module: Qualified[Module], is_2_1: bool
-) -> Mapping[ModuleEffect, float]:
-    """
-    Apply the Factorio engine calculation to determine a modules's effects at a quality level
-    """
+def get_qualified_crafting_speed(
+    crafter: Qualified[Crafter],
+) -> float:
+    return crafter.entity.crafting_speed * _quality_multiplier(crafter.quality)
+
+
+def get_qualified_module_effects(
+    module: Qualified[Module],
+    is_2_1: bool,
+) -> dict[ModuleEffect, float]:
     scaled_effect_name = QUALITY_MODULE_SCALED_EFFECT[module.entity.category.type]
 
     scaled_effect = next(
@@ -44,27 +44,29 @@ def apply_module_quality(
         for effect in module.entity.effects
         if effect.effect == scaled_effect_name
     )
-    base_value = module.entity.effects[scaled_effect]
-
-    qualified_value = base_value * (1 + 0.3 * module.quality.level)
 
     resolution = 0.0001 if is_2_1 else 0.001
-    qualified_value = floor(qualified_value / resolution) * resolution
+
+    qualified_value = (
+        floor(
+            module.entity.effects[scaled_effect]
+            * _quality_multiplier(module.quality)
+            / resolution
+        )
+        * resolution
+    )
 
     return {
-        effect: qualified_value if effect == scaled_effect else value
+        effect: (qualified_value if effect == scaled_effect else value)
         for effect, value in module.entity.effects.items()
     }
 
 
-def apply_beacon_quality_distribution_effectivity(beacon: Qualified[Beacon]) -> float:
-    """
-    Apply the Factorio engine calculation to determine a beacons's distribution effectivity at a quality level
-    """
-    bonus_per_quality_level = (
-        beacon.entity.distribution_effectivity_bonus_per_quality_level
+def get_qualified_beacon_distribution_effectivity(
+    beacon: Qualified[Beacon],
+) -> float:
+    return (
+        beacon.entity.distribution_effectivity
+        + beacon.entity.distribution_effectivity_bonus_per_quality_level
+        * beacon.quality.level
     )
-    distribution_effectivity = beacon.entity.distribution_effectivity
-    quality_level = beacon.quality.level
-
-    return distribution_effectivity + bonus_per_quality_level * quality_level
