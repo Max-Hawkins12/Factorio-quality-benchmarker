@@ -22,13 +22,6 @@ def dev() -> None:
 
     game_data = load_game_data()
 
-    configs = get_best_configurations(
-        dict(game_data.best_machines),
-        game_data.beacons,
-        game_data.modules,
-        game_data.module_effects,
-    )
-
     # generate_recipe_graph_index(game_data.materials, game_data.recipes)
 
 

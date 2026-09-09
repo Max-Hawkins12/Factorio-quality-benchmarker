@@ -2,11 +2,12 @@ from dataclasses import dataclass
 from typing import Protocol
 
 from factorio_quality_benchmarker.game.models import Module
+from factorio_quality_benchmarker.upcycler.simulation import Qualified
 
 
 @dataclass(frozen=True, slots=True)
 class ModuleConfiguration:
-    modules: tuple[Module, ...]
+    modules: tuple[Qualified[Module], ...]
 
 
 @dataclass(frozen=True, slots=True)

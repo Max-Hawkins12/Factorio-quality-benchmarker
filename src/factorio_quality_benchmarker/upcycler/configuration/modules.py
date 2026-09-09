@@ -1,4 +1,5 @@
-from factorio_quality_benchmarker.game.models import EMPTY_MODULE, Module, ModuleEffect
+from factorio_quality_benchmarker.game.models import Module, ModuleEffect
+from factorio_quality_benchmarker.upcycler.simulation import EMPTY_MODULE, Qualified
 
 DESIRED_MODULE_EFFECTS = ("productivity", "quality", "speed")
 
@@ -24,23 +25,23 @@ def _module_dominates(
 
 
 def get_desired_modules(
-    modules: tuple[Module, ...],
+    modules: tuple[Qualified[Module], ...],
     effects: dict[str, ModuleEffect],
-) -> tuple[Module, ...]:
+) -> tuple[Qualified[Module], ...]:
 
     desired_effects = _get_desired_module_effects(effects)
 
     relevant_modules = tuple(
         module
         for module in modules
-        if any(effect in module.effects for effect in desired_effects)
+        if any(effect in module.entity.effects for effect in desired_effects)
     )
 
     return tuple(
         module
         for module in relevant_modules
         if not any(
-            _module_dominates(other, module, desired_effects)
+            _module_dominates(other.entity, module.entity, desired_effects)
             for other in relevant_modules
             if other is not module
         )

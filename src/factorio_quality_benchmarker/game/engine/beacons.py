@@ -1,6 +1,9 @@
 from math import floor
 
 from factorio_quality_benchmarker.game.models import Beacon, Machine
+from factorio_quality_benchmarker.upcycler.simulation import Qualified
+
+from .quality import get_qualified_beacon_distribution_effectivity
 
 
 def calculate_maximum_beacons(machine: Machine, beacon: Beacon) -> int:
@@ -18,14 +21,17 @@ def calculate_maximum_beacons(machine: Machine, beacon: Beacon) -> int:
     return beacons_on_vertical_sides + beacons_on_horizontal_sides + 4
 
 
-def calculate_distribution_effectivity(beacon: Beacon, num_beacons: int) -> float:
+def calculate_distribution_effectivity(
+    beacon: Qualified[Beacon],
+    num_beacons: int,
+) -> float:
     """
-    Use the beacon's deminishing returns profile and Factorio engine rules to calculate the distribution effectivity for the number of beacons,
+    Use the beacon's deminishing returns profile and Factorio engine rules to calculate the distribution effectivity for the number of beacons
     """
     return (
-        beacon.distribution_effectivity
+        get_qualified_beacon_distribution_effectivity(beacon)
         * num_beacons
-        * beacon.diminishing_returns_profile[num_beacons - 1]
+        * beacon.entity.diminishing_returns_profile[num_beacons - 1]
         if num_beacons > 0
         else 0.0
     )

@@ -1,5 +1,6 @@
 from factorio_quality_benchmarker.game.engine import calculate_distribution_effectivity
 from factorio_quality_benchmarker.game.models import Beacon, ModuleEffect
+from factorio_quality_benchmarker.upcycler.simulation import Qualified
 
 from .models import (
     BeaconConfiguration,
@@ -15,21 +16,21 @@ def get_module_configuration_effects(
     return MachineEffects(
         speed=round(
             sum(
-                module.effects.get(effects["speed"], 0.0)
+                module.entity.effects.get(effects["speed"], 0.0)
                 for module in configuration.modules
             ),
             10,
         ),
         productivity=round(
             sum(
-                module.effects.get(effects["productivity"], 0.0)
+                module.entity.effects.get(effects["productivity"], 0.0)
                 for module in configuration.modules
             ),
             10,
         ),
         quality=round(
             sum(
-                module.effects.get(effects["quality"], 0.0)
+                module.entity.effects.get(effects["quality"], 0.0)
                 for module in configuration.modules
             ),
             10,
@@ -40,7 +41,7 @@ def get_module_configuration_effects(
 def get_beacon_configuration_effects(
     configuration: BeaconConfiguration,
     effects: dict[str, ModuleEffect],
-    beacon: Beacon,
+    beacon: Qualified[Beacon],
 ) -> MachineEffects:
 
     module_effects = get_module_configuration_effects(configuration.modules, effects)

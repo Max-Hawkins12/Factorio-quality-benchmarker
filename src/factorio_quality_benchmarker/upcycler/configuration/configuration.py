@@ -10,6 +10,7 @@ from factorio_quality_benchmarker.game.models import (
     Module,
     ModuleEffect,
 )
+from factorio_quality_benchmarker.upcycler.simulation import Qualified
 
 from .effects import (
     get_beacon_configuration_effects,
@@ -31,7 +32,7 @@ from .pareto import get_pareto_frontier, get_unique_pareto_frontier
 
 # Configuration helpers
 def _get_module_configurations(
-    modules: tuple[Module, ...],
+    modules: tuple[Qualified[Module], ...],
     num_module_slots: int,
 ) -> tuple[ModuleConfiguration, ...]:
     return tuple(
@@ -44,7 +45,7 @@ def _get_module_configurations(
 
 
 def _get_beacon_configurations(
-    modules: tuple[Module, ...],
+    modules: tuple[Qualified[Module], ...],
     module_slots_per_beacon: int,
     max_beacons: int,
 ) -> tuple[BeaconConfiguration, ...]:
@@ -62,14 +63,14 @@ def _get_beacon_configurations(
 
 
 def _get_effective_module_configurations(
-    machine: Machine,
-    modules: tuple[Module, ...],
+    machine: Qualified[Machine],
+    modules: tuple[Qualified[Module], ...],
     module_effects: dict[str, ModuleEffect],
 ) -> tuple[EffectiveModuleConfiguration, ...]:
 
     module_configs = _get_module_configurations(
         modules=get_allowed_modules(machine, modules, module_effects["quality"]),
-        num_module_slots=machine.module_slots,
+        num_module_slots=machine.entity.module_slots,
     )
 
     return get_unique_pareto_frontier(
@@ -87,9 +88,9 @@ def _get_effective_module_configurations(
 
 
 def _get_effective_beacon_configurations(
-    beacon: Beacon,
+    beacon: Qualified[Beacon],
     max_beacons: int,
-    modules: tuple[Module, ...],
+    modules: tuple[Qualified[Module], ...],
     module_effects: dict[str, ModuleEffect],
     machine_allowed_effects: frozenset[ModuleEffect],
 ) -> tuple[EffectiveBeaconConfiguration, ...]:
@@ -100,9 +101,11 @@ def _get_effective_beacon_configurations(
             for module in get_allowed_modules(
                 beacon, modules, module_effects["quality"]
             )
-            if all(effect in machine_allowed_effects for effect in module.effects)
+            if all(
+                effect in machine_allowed_effects for effect in module.entity.effects
+            )
         ),
-        module_slots_per_beacon=beacon.module_slots,
+        module_slots_per_beacon=beacon.entity.module_slots,
         max_beacons=max_beacons,
     )
 
@@ -153,16 +156,16 @@ def _get_machine_configurations(
 
 # Cashing for beacon layouts of a given max size
 def _get_beacon_configurations_for_max(
-    machine: Machine,
-    beacon: Beacon,
-    modules: tuple[Module, ...],
+    machine: Qualified[Machine],
+    beacon: Qualified[Beacon],
+    modules: tuple[Qualified[Module], ...],
     module_effects: dict[str, ModuleEffect],
     beacon_configurations_by_max_and_effects: dict[
         tuple[int, frozenset[ModuleEffect]], tuple[EffectiveBeaconConfiguration, ...]
     ],
 ) -> tuple[EffectiveBeaconConfiguration, ...]:
-    max_beacons = calculate_maximum_beacons(machine, beacon)
-    allowed_effects = machine.allowed_effects
+    max_beacons = calculate_maximum_beacons(machine.entity, beacon.entity)
+    allowed_effects = machine.entity.allowed_effects
 
     if max_beacons not in beacon_configurations_by_max_and_effects:
         beacon_configurations_by_max_and_effects[(max_beacons, allowed_effects)] = (
@@ -180,13 +183,13 @@ def _get_beacon_configurations_for_max(
 
 # Public API
 def get_best_configurations(
-    machines: dict[str, Machine],
-    beacons: dict[str, Beacon],
-    all_modules: dict[str, Module],
+    machines: dict[str, Qualified[Machine]],
+    beacons: dict[str, Qualified[Beacon]],
+    all_modules: dict[str, Qualified[Module]],
     module_effects: dict[str, ModuleEffect],
-) -> dict[Machine, tuple[MachineConfiguration, ...]]:
+) -> dict[Qualified[Machine], tuple[MachineConfiguration, ...]]:
     beacon = beacons["beacon"]
-    modules: tuple[Module, ...] = get_desired_modules(
+    modules: tuple[Qualified[Module], ...] = get_desired_modules(
         tuple(all_modules.values()),
         module_effects,
     )
