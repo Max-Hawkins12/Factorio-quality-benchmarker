@@ -1,3 +1,4 @@
+from collections.abc import Mapping
 from dataclasses import dataclass
 
 from factorio_quality_benchmarker.game.models import (
@@ -19,31 +20,31 @@ from factorio_quality_benchmarker.game.models import (
 
 @dataclass(frozen=True, slots=True)
 class GameData:
-    items: dict[str, Item]
-    fluids: dict[str, Fluid]
+    items: Mapping[str, Item]
+    fluids: Mapping[str, Fluid]
 
     @property
-    def materials(self) -> dict[str, Material]:
-        return self.items | self.fluids
+    def materials(self) -> Mapping[str, Material]:
+        return {**self.items, **self.fluids}
 
-    recipes: dict[str, Recipe]
+    recipes: Mapping[str, Recipe]
 
-    crafters: dict[str, Crafter]
-    miners: dict[str, Miner]
+    crafters: Mapping[str, Crafter]
+    miners: Mapping[str, Miner]
 
     @property
-    def machines(self) -> dict[str, Machine]:
-        return self.crafters | self.miners
+    def machines(self) -> Mapping[str, Machine]:
+        return {**self.crafters, **self.miners}
 
-    modules: dict[str, Module]
-    module_effects: dict[str, ModuleEffect]
-    beacons: dict[str, Beacon]
+    modules: Mapping[str, Module]
+    module_effects: Mapping[str, ModuleEffect]
+    beacons: Mapping[str, Beacon]
 
-    resources: dict[str, Resource]
-    surfaces: dict[str, Surface]
+    resources: Mapping[str, Resource]
+    surfaces: Mapping[str, Surface]
 
-    qualities: dict[str, Quality]
-    metadata: dict
+    qualities: Mapping[str, Quality]
+    metadata: Mapping
 
     @property
     def factorio_version(self) -> str:
