@@ -91,10 +91,17 @@ def _get_effective_beacon_configurations(
     max_beacons: int,
     modules: tuple[Module, ...],
     module_effects: dict[str, ModuleEffect],
+    machine_allowed_effects: frozenset[ModuleEffect],
 ) -> tuple[EffectiveBeaconConfiguration, ...]:
 
     beacon_configs = _get_beacon_configurations(
-        modules=get_allowed_modules(beacon, modules, module_effects["quality"]),
+        modules=tuple(
+            module
+            for module in get_allowed_modules(
+                beacon, modules, module_effects["quality"]
+            )
+            if all(effect in machine_allowed_effects for effect in module.effects)
+        ),
         module_slots_per_beacon=beacon.module_slots,
         max_beacons=max_beacons,
     )
@@ -146,23 +153,29 @@ def _get_machine_configurations(
 
 # Cashing for beacon layouts of a given max size
 def _get_beacon_configurations_for_max(
+    machine: Machine,
     beacon: Beacon,
     modules: tuple[Module, ...],
     module_effects: dict[str, ModuleEffect],
-    max_beacons: int,
-    beacon_configurations_by_max: dict[int, tuple[EffectiveBeaconConfiguration, ...]],
+    beacon_configurations_by_max_and_effects: dict[
+        tuple[int, frozenset[ModuleEffect]], tuple[EffectiveBeaconConfiguration, ...]
+    ],
 ) -> tuple[EffectiveBeaconConfiguration, ...]:
-    if max_beacons not in beacon_configurations_by_max:
-        beacon_configurations_by_max[max_beacons] = (
+    max_beacons = calculate_maximum_beacons(machine, beacon)
+    allowed_effects = machine.allowed_effects
+
+    if max_beacons not in beacon_configurations_by_max_and_effects:
+        beacon_configurations_by_max_and_effects[(max_beacons, allowed_effects)] = (
             _get_effective_beacon_configurations(
                 beacon,
                 max_beacons,
                 modules,
                 module_effects,
+                allowed_effects,
             )
         )
 
-    return beacon_configurations_by_max[max_beacons]
+    return beacon_configurations_by_max_and_effects[(max_beacons, allowed_effects)]
 
 
 # Public API
@@ -178,8 +191,8 @@ def get_best_configurations(
         module_effects,
     )
 
-    beacon_configurations_by_max: dict[
-        int, tuple[EffectiveBeaconConfiguration, ...]
+    beacon_configurations_by_max_and_effects: dict[
+        tuple[int, frozenset[ModuleEffect]], tuple[EffectiveBeaconConfiguration, ...]
     ] = {}
 
     return {
@@ -190,11 +203,11 @@ def get_best_configurations(
                 module_effects,
             ),
             beacon_configurations=_get_beacon_configurations_for_max(
+                machine,
                 beacon,
                 modules,
                 module_effects,
-                calculate_maximum_beacons(machine, beacon),
-                beacon_configurations_by_max,
+                beacon_configurations_by_max_and_effects,
             ),
         )
         for machine in machines.values()
