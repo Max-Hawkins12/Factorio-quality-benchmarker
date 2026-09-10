@@ -11,7 +11,7 @@ class Fluid:
     name: str
 
 
-Material = Item | Fluid
+type Material = Item | Fluid
 
 
 @dataclass(frozen=True, slots=True)

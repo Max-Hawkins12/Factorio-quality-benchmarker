@@ -1,14 +1,13 @@
 from factorio_quality_benchmarker.game.models import (
     Beacon,
-    Machine,
     Module,
     ModuleEffect,
 )
-from factorio_quality_benchmarker.upcycler.simulation import Qualified
+from factorio_quality_benchmarker.upcycler.simulation import Qualified, QualifiedMachine
 
 
 def get_allowed_modules(
-    machine: Qualified[Machine] | Qualified[Beacon],
+    machine: QualifiedMachine | Qualified[Beacon],
     modules: tuple[Qualified[Module], ...],
     quality_effect: ModuleEffect,
 ) -> tuple[Qualified[Module], ...]:

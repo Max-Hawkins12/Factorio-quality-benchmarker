@@ -1,3 +1,4 @@
+from collections.abc import Mapping
 from dataclasses import dataclass
 from typing import Protocol
 
@@ -23,10 +24,33 @@ class MachineConfiguration:
 
 
 @dataclass(frozen=True, slots=True)
+class RecipeEffects:
+    productivity: bool
+    quality: bool
+
+
+type ModuleConfigurationIndex = Mapping[RecipeEffects, tuple[ModuleConfiguration, ...]]
+
+type EffeciveModuleConfigurationIndex = Mapping[
+    RecipeEffects, tuple[EffectiveModuleConfiguration, ...]
+]
+
+type MachineConfigurationIndex = Mapping[
+    RecipeEffects, tuple[MachineConfiguration, ...]
+]
+
+
+# Internal computation models
+@dataclass(frozen=True, slots=True)
 class MachineEffects:
     speed: float
     productivity: float
     quality: float
+
+
+class HasMachineEffects(Protocol):
+    @property
+    def effects(self) -> MachineEffects: ...
 
 
 @dataclass(frozen=True, slots=True)
@@ -45,8 +69,3 @@ class EffectiveBeaconConfiguration:
 class EffectiveMachineConfiguration:
     configuration: MachineConfiguration
     effects: MachineEffects
-
-
-class HasMachineEffects(Protocol):
-    @property
-    def effects(self) -> MachineEffects: ...

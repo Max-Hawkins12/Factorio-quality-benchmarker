@@ -1,6 +1,6 @@
 from typing import TypeVar
 
-from .models import HasMachineEffects, MachineEffects
+from .models import HasMachineEffects, MachineEffects, RecipeEffects
 
 T = TypeVar("T")
 
@@ -30,35 +30,61 @@ class MaxFenwickTree:
         return maximum
 
 
+def _get_pareto_effects(
+    effects: MachineEffects,
+    recipe_effects: RecipeEffects,
+) -> MachineEffects:
+    return MachineEffects(
+        speed=effects.speed,
+        productivity=(effects.productivity if recipe_effects.productivity else 0.0),
+        quality=(effects.quality if recipe_effects.quality else 0.0),
+    )
+
+
 def _deduplicate_configurations[T: HasMachineEffects](
     configurations: tuple[T, ...],
+    recipe_effects: RecipeEffects,
 ) -> tuple[T, ...]:
     unique: dict[MachineEffects, T] = {}
 
     for configuration in configurations:
-        unique.setdefault(
+        effects = _get_pareto_effects(
             configuration.effects,
-            configuration,
+            recipe_effects,
         )
+
+        unique.setdefault(effects, configuration)
 
     return tuple(unique.values())
 
 
 def get_pareto_frontier[T: HasMachineEffects](
     configurations: tuple[T, ...],
+    recipe_effects: RecipeEffects,
 ) -> tuple[T, ...]:
 
+    configurations_with_effects = tuple(
+        (
+            configuration,
+            _get_pareto_effects(
+                configuration.effects,
+                recipe_effects,
+            ),
+        )
+        for configuration in configurations
+    )
+
     ordered = sorted(
-        configurations,
-        key=lambda config: (
-            -config.effects.speed,
-            -config.effects.productivity,
-            -config.effects.quality,
+        configurations_with_effects,
+        key=lambda value: (
+            -value[1].speed,
+            -value[1].productivity,
+            -value[1].quality,
         ),
     )
 
     productivity_values = sorted(
-        {configuration.effects.productivity for configuration in ordered},
+        {effects.productivity for _, effects in ordered},
         reverse=True,
     )
 
@@ -74,9 +100,7 @@ def get_pareto_frontier[T: HasMachineEffects](
 
     frontier: list[T] = []
 
-    for configuration in ordered:
-        effects = configuration.effects
-
+    for configuration, effects in ordered:
         index = productivity_index[effects.productivity]
 
         best_quality = tree.query(index)
@@ -96,5 +120,12 @@ def get_pareto_frontier[T: HasMachineEffects](
 
 def get_unique_pareto_frontier[T: HasMachineEffects](
     configurations: tuple[T, ...],
+    recipe_effects: RecipeEffects,
 ) -> tuple[T, ...]:
-    return get_pareto_frontier(_deduplicate_configurations(configurations))
+    return get_pareto_frontier(
+        _deduplicate_configurations(
+            configurations,
+            recipe_effects,
+        ),
+        recipe_effects,
+    )

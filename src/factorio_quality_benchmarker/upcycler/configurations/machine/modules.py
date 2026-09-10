@@ -1,7 +1,7 @@
 from factorio_quality_benchmarker.game.models import Module, ModuleEffect
 from factorio_quality_benchmarker.upcycler.simulation import EMPTY_MODULE, Qualified
 
-DESIRED_MODULE_EFFECTS = ("productivity", "quality", "speed")
+from .constants import DESIRED_MODULE_EFFECTS
 
 
 def _get_desired_module_effects(

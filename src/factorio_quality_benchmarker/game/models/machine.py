@@ -30,4 +30,4 @@ class Miner:
     height: int
 
 
-Machine = Crafter | Miner
+type Machine = Crafter | Miner

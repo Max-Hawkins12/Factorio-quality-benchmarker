@@ -26,7 +26,7 @@ def calculate_distribution_effectivity(
     num_beacons: int,
 ) -> float:
     """
-    Use the beacon's deminishing returns profile and Factorio engine rules to calculate the distribution effectivity for the number of beacons
+    Use the beacon's deminishing returns profile and Factorio engine rules to calculate the distribution effectivity for the number of beacons and quality level.
     """
     return (
         get_qualified_beacon_distribution_effectivity(beacon)

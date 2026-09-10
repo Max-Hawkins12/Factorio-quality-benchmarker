@@ -27,14 +27,26 @@ class Qualified[T: Named]:
         return f"{self.quality.name}-{self.entity.name}"
 
 
-type QualifiedIndex[T: Named] = Mapping[Quality, Mapping[str, Qualified[T]]]
+type QualifiedIndex[T] = Mapping[Quality, Mapping[str, T]]
+
+type QualifiedMachine = Qualified[Crafter] | Qualified[Miner]
 
 
 @dataclass(frozen=True, slots=True)
 class SimulationData:
     game_data: GameData
 
-    crafters_by_quality: QualifiedIndex[Crafter]
-    miners_by_quality: QualifiedIndex[Miner]
-    modules_by_quality: QualifiedIndex[Module]
-    beacons_by_quality: QualifiedIndex[Beacon]
+    crafters_by_quality: QualifiedIndex[Qualified[Crafter]]
+    miners_by_quality: QualifiedIndex[Qualified[Miner]]
+    modules_by_quality: QualifiedIndex[Qualified[Module]]
+    beacons_by_quality: QualifiedIndex[Qualified[Beacon]]
+
+    @property
+    def machines_by_quality(self) -> QualifiedIndex[QualifiedMachine]:
+        return {
+            quality: {
+                **self.crafters_by_quality[quality],
+                **self.miners_by_quality[quality],
+            }
+            for quality in self.game_data.qualities.values()
+        }

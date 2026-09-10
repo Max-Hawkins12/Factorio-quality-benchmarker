@@ -6,12 +6,12 @@ from factorio_quality_benchmarker.game.engine import (
 )
 from factorio_quality_benchmarker.game.models import (
     Beacon,
-    Machine,
     Module,
     ModuleEffect,
 )
-from factorio_quality_benchmarker.upcycler.simulation import Qualified
+from factorio_quality_benchmarker.upcycler.simulation import Qualified, QualifiedMachine
 
+from .constants import ALL_RECIPE_EFFECTS, NO_EFFECTS, QUALITY
 from .effects import (
     get_beacon_configuration_effects,
     get_machine_configuration_effects,
@@ -19,18 +19,42 @@ from .effects import (
 )
 from .models import (
     BeaconConfiguration,
+    EffeciveModuleConfigurationIndex,
     EffectiveBeaconConfiguration,
     EffectiveMachineConfiguration,
     EffectiveModuleConfiguration,
     MachineConfiguration,
+    MachineConfigurationIndex,
     MachineEffects,
     ModuleConfiguration,
+    ModuleConfigurationIndex,
+    RecipeEffects,
 )
 from .modules import get_desired_modules
 from .pareto import get_pareto_frontier, get_unique_pareto_frontier
 
 
-# Configuration helpers
+def _get_recipe_modules(
+    modules: tuple[Qualified[Module], ...],
+    recipe_effects: RecipeEffects,
+    module_effects: dict[str, ModuleEffect],
+) -> tuple[Qualified[Module], ...]:
+    productivity = module_effects["productivity"]
+    quality = module_effects["quality"]
+
+    return tuple(
+        module
+        for module in modules
+        if (productivity not in module.entity.effects or recipe_effects.productivity)
+        and (
+            quality not in module.entity.effects
+            or recipe_effects.quality
+            or module.entity.effects[quality] < 0
+        )
+    )
+
+
+# Module configurations
 def _get_module_configurations(
     modules: tuple[Qualified[Module], ...],
     num_module_slots: int,
@@ -44,6 +68,52 @@ def _get_module_configurations(
     )
 
 
+def _get_module_configuration_index(
+    modules: tuple[Qualified[Module], ...],
+    num_module_slots: int,
+    module_effects: dict[str, ModuleEffect],
+) -> ModuleConfigurationIndex:
+    return {
+        recipe_effects: _get_module_configurations(
+            _get_recipe_modules(modules, recipe_effects, module_effects),
+            num_module_slots,
+        )
+        for recipe_effects in ALL_RECIPE_EFFECTS
+    }
+
+
+def _get_effective_module_configuration_index(
+    machine: QualifiedMachine,
+    modules: tuple[Qualified[Module], ...],
+    module_effects: dict[str, ModuleEffect],
+) -> EffeciveModuleConfigurationIndex:
+
+    module_config_index = _get_module_configuration_index(
+        get_allowed_modules(machine, modules, module_effects["quality"]),
+        machine.entity.module_slots,
+        module_effects,
+    )
+
+    return {
+        recipe_effects: get_unique_pareto_frontier(
+            tuple(
+                EffectiveModuleConfiguration(
+                    configuration=configuration,
+                    effects=get_module_configuration_effects(
+                        configuration,
+                        module_effects,
+                    ),
+                )
+                for configuration in module_config_index[recipe_effects]
+            ),
+            recipe_effects,
+        )
+        for recipe_effects in module_config_index
+    }
+
+
+# Beacon Configurations
+# Beacons only accept speed modules, so we do not need to index them allowing productivity and quality
 def _get_beacon_configurations(
     modules: tuple[Qualified[Module], ...],
     module_slots_per_beacon: int,
@@ -58,31 +128,6 @@ def _get_beacon_configurations(
         for configuration in combinations_with_replacement(
             modules,
             num_beacons * module_slots_per_beacon,
-        )
-    )
-
-
-def _get_effective_module_configurations(
-    machine: Qualified[Machine],
-    modules: tuple[Qualified[Module], ...],
-    module_effects: dict[str, ModuleEffect],
-) -> tuple[EffectiveModuleConfiguration, ...]:
-
-    module_configs = _get_module_configurations(
-        modules=get_allowed_modules(machine, modules, module_effects["quality"]),
-        num_module_slots=machine.entity.module_slots,
-    )
-
-    return get_unique_pareto_frontier(
-        tuple(
-            EffectiveModuleConfiguration(
-                configuration=configuration,
-                effects=get_module_configuration_effects(
-                    configuration,
-                    module_effects,
-                ),
-            )
-            for configuration in module_configs
         )
     )
 
@@ -102,7 +147,8 @@ def _get_effective_beacon_configurations(
                 beacon, modules, module_effects["quality"]
             )
             if all(
-                effect in machine_allowed_effects for effect in module.entity.effects
+                effect in set(machine_allowed_effects | {module_effects["quality"]})
+                for effect in module.entity.effects
             )
         ),
         module_slots_per_beacon=beacon.entity.module_slots,
@@ -120,43 +166,62 @@ def _get_effective_beacon_configurations(
                 ),
             )
             for configuration in beacon_configs
-        )
+        ),
+        recipe_effects=QUALITY
+        if module_effects["quality"] in machine_allowed_effects
+        else NO_EFFECTS,
     )
 
 
-def _get_machine_configurations(
-    module_configurations: tuple[EffectiveModuleConfiguration, ...],
+# Machine Configurations
+def _get_machine_configuration_index(
+    module_configuration_index: EffeciveModuleConfigurationIndex,
     beacon_configurations: tuple[EffectiveBeaconConfiguration, ...],
-) -> tuple[MachineConfiguration, ...]:
+) -> MachineConfigurationIndex:
 
-    unique: dict[MachineEffects, EffectiveMachineConfiguration] = {}
+    unique_index: dict[
+        RecipeEffects, dict[MachineEffects, EffectiveMachineConfiguration]
+    ] = {}
 
-    for modules, beacons in product(
-        module_configurations,
-        beacon_configurations,
-    ):
-        effects = get_machine_configuration_effects(modules.effects, beacons.effects)
+    for recipe_effects in module_configuration_index:
+        unique: dict[MachineEffects, EffectiveMachineConfiguration] = {}
 
-        unique.setdefault(
-            effects,
-            EffectiveMachineConfiguration(
-                configuration=MachineConfiguration(
-                    modules=modules.configuration,
-                    beacons=beacons.configuration,
+        for modules, beacons in product(
+            module_configuration_index[recipe_effects],
+            beacon_configurations,
+        ):
+            effects = get_machine_configuration_effects(
+                modules.effects, beacons.effects
+            )
+
+            unique.setdefault(
+                effects,
+                EffectiveMachineConfiguration(
+                    configuration=MachineConfiguration(
+                        modules=modules.configuration,
+                        beacons=beacons.configuration,
+                    ),
+                    effects=effects,
                 ),
-                effects=effects,
-            ),
-        )
+            )
 
-    return tuple(
-        configuration.configuration
-        for configuration in get_pareto_frontier(tuple(unique.values()))
-    )
+        unique_index[recipe_effects] = unique
+
+    return {
+        recipe_effects: tuple(
+            configuration.configuration
+            for configuration in get_pareto_frontier(
+                tuple(unique_index[recipe_effects].values()),
+                recipe_effects,
+            )
+        )
+        for recipe_effects in module_configuration_index
+    }
 
 
 # Cashing for beacon layouts of a given max size
 def _get_beacon_configurations_for_max(
-    machine: Qualified[Machine],
+    machine: QualifiedMachine,
     beacon: Qualified[Beacon],
     modules: tuple[Qualified[Module], ...],
     module_effects: dict[str, ModuleEffect],
@@ -183,11 +248,11 @@ def _get_beacon_configurations_for_max(
 
 # Public API
 def get_best_configurations(
-    machines: dict[str, Qualified[Machine]],
+    machines: dict[str, QualifiedMachine],
     beacons: dict[str, Qualified[Beacon]],
     all_modules: dict[str, Qualified[Module]],
     module_effects: dict[str, ModuleEffect],
-) -> dict[Qualified[Machine], tuple[MachineConfiguration, ...]]:
+) -> dict[QualifiedMachine, MachineConfigurationIndex]:
     beacon = beacons["beacon"]
     modules: tuple[Qualified[Module], ...] = get_desired_modules(
         tuple(all_modules.values()),
@@ -199,8 +264,8 @@ def get_best_configurations(
     ] = {}
 
     return {
-        machine: _get_machine_configurations(
-            module_configurations=_get_effective_module_configurations(
+        machine: _get_machine_configuration_index(
+            module_configuration_index=_get_effective_module_configuration_index(
                 machine,
                 modules,
                 module_effects,
