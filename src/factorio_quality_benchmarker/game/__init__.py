@@ -1,1 +1,3 @@
-from .game_data import GameData  # noqa: F401
+from .game_data import GameData
+
+__all__ = ["GameData"]
