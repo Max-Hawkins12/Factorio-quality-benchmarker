@@ -9,7 +9,7 @@ from .models import (
     ProductivityResearchLevels,
     Qualified,
     QualifiedIndex,
-    RunConfiguration,
+    RunConfig,
     SimulationContext,
 )
 
@@ -33,8 +33,7 @@ def _remove_uncraftable_recipes(recipes: Mapping[str, Recipe]) -> Mapping[str, R
     return {
         name: recipe
         for name, recipe in recipes.items()
-        if name not in UNCRAFTABLE_ITEMS
-        or name.removesuffix("-recycling") not in UNCRAFTABLE_ITEMS
+        if name.removesuffix("-recycling") not in UNCRAFTABLE_ITEMS
     }
 
 
@@ -53,8 +52,10 @@ def _get_productivity_level_index(
 
 def build_simulation_context(
     game_data: GameData,
-    run_config: RunConfiguration,
+    run_config: RunConfig,
 ) -> SimulationContext:
+
+    # TODO Implement hard-coded Curated and Essentials lists of items
 
     qualities = tuple(game_data.qualities.values())
     valid_items = _remove_uncraftable_items(game_data.items)

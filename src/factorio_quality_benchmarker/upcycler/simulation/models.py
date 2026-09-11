@@ -67,24 +67,22 @@ class UpcyclerScope(StrEnum):
 
 
 @dataclass(frozen=True, slots=True)
-class RunConfiguration:
+class RunConfig:
     productivity_levels: ProductivityResearchLevels
     upcycler_scope: UpcyclerScope
 
     entity_quality: Quality
+    desired_quality: Quality
 
-    """ LATER:
-     Will define a curated scope, essentials scope, and entire scope
-    blacklisted_recipes: tuple[Recipe, ...] Will define a list of uncraftable recipes
-
-    desired_quality: Quality Will define the desired quality of the upcycler (MAYBE)
-    """
+    def __post_init__(self):
+        if self.desired_quality.name == "normal":
+            raise ValueError("An upcycler must produce a quality higher than normal.")
 
 
 @dataclass(frozen=True, slots=True)
 class SimulationContext:
     game_data: GameData
-    run_config: RunConfiguration
+    run_config: RunConfig
 
     productivity_research_index: Mapping[Item, int]
 
