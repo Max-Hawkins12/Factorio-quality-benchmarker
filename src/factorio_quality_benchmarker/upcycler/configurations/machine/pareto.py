@@ -1,8 +1,13 @@
-from typing import TypeVar
+from typing import Protocol, TypeVar
 
-from .models import HasMachineEffects, MachineEffects, RecipeEffects
+from .models import AllowedRecipeEffects, MachineEffects
 
 T = TypeVar("T")
+
+
+class HasMachineEffects(Protocol):
+    @property
+    def effects(self) -> MachineEffects: ...
 
 
 class MaxFenwickTree:
@@ -32,25 +37,27 @@ class MaxFenwickTree:
 
 def _get_pareto_effects(
     effects: MachineEffects,
-    recipe_effects: RecipeEffects,
+    allowed_recipe_effects: AllowedRecipeEffects,
 ) -> MachineEffects:
     return MachineEffects(
         speed=effects.speed,
-        productivity=(effects.productivity if recipe_effects.productivity else 0.0),
-        quality=(effects.quality if recipe_effects.quality else 0.0),
+        productivity=(
+            effects.productivity if allowed_recipe_effects.productivity else 0.0
+        ),
+        quality=(effects.quality if allowed_recipe_effects.quality else 0.0),
     )
 
 
 def _deduplicate_configurations[T: HasMachineEffects](
     configurations: tuple[T, ...],
-    recipe_effects: RecipeEffects,
+    allowed_recipe_effects: AllowedRecipeEffects,
 ) -> tuple[T, ...]:
     unique: dict[MachineEffects, T] = {}
 
     for configuration in configurations:
         effects = _get_pareto_effects(
             configuration.effects,
-            recipe_effects,
+            allowed_recipe_effects,
         )
 
         unique.setdefault(effects, configuration)
@@ -60,7 +67,7 @@ def _deduplicate_configurations[T: HasMachineEffects](
 
 def get_pareto_frontier[T: HasMachineEffects](
     configurations: tuple[T, ...],
-    recipe_effects: RecipeEffects,
+    allowed_recipe_effects: AllowedRecipeEffects,
 ) -> tuple[T, ...]:
 
     configurations_with_effects = tuple(
@@ -68,7 +75,7 @@ def get_pareto_frontier[T: HasMachineEffects](
             configuration,
             _get_pareto_effects(
                 configuration.effects,
-                recipe_effects,
+                allowed_recipe_effects,
             ),
         )
         for configuration in configurations
@@ -120,12 +127,12 @@ def get_pareto_frontier[T: HasMachineEffects](
 
 def get_unique_pareto_frontier[T: HasMachineEffects](
     configurations: tuple[T, ...],
-    recipe_effects: RecipeEffects,
+    allowed_recipe_effects: AllowedRecipeEffects,
 ) -> tuple[T, ...]:
     return get_pareto_frontier(
         _deduplicate_configurations(
             configurations,
-            recipe_effects,
+            allowed_recipe_effects,
         ),
-        recipe_effects,
+        allowed_recipe_effects,
     )

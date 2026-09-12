@@ -34,7 +34,7 @@ class FluidIngredient:
         return self.fluid
 
 
-Ingredient = ItemIngredient | FluidIngredient
+type Ingredient = ItemIngredient | FluidIngredient
 
 
 @dataclass(frozen=True, slots=True)
@@ -57,4 +57,4 @@ class FluidProduct:
         return self.fluid
 
 
-Product = ItemProduct | FluidProduct
+type Product = ItemProduct | FluidProduct

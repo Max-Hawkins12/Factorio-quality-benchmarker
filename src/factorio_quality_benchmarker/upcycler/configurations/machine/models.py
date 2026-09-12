@@ -1,7 +1,7 @@
 from collections.abc import Mapping
 from dataclasses import dataclass
-from typing import Protocol
 
+from factorio_quality_benchmarker.game.engine import MachineEffects
 from factorio_quality_benchmarker.game.models import Module
 from factorio_quality_benchmarker.upcycler.simulation import Qualified
 
@@ -9,63 +9,34 @@ from factorio_quality_benchmarker.upcycler.simulation import Qualified
 @dataclass(frozen=True, slots=True)
 class ModuleConfiguration:
     modules: tuple[Qualified[Module], ...]
+    effects: MachineEffects
 
 
 @dataclass(frozen=True, slots=True)
 class BeaconConfiguration:
     num_beacons: int
-    modules: ModuleConfiguration
+    modules: tuple[Qualified[Module], ...]
+    effects: MachineEffects
 
 
 @dataclass(frozen=True, slots=True)
 class MachineConfiguration:
     modules: ModuleConfiguration
     beacons: BeaconConfiguration
+    effects: MachineEffects
 
 
 @dataclass(frozen=True, slots=True)
-class RecipeEffects:
+class AllowedRecipeEffects:
     productivity: bool
     quality: bool
 
 
-type ModuleConfigurationIndex = Mapping[RecipeEffects, tuple[ModuleConfiguration, ...]]
-
-type EffeciveModuleConfigurationIndex = Mapping[
-    RecipeEffects, tuple[EffectiveModuleConfiguration, ...]
+type ModuleConfigurationIndex = Mapping[
+    AllowedRecipeEffects, tuple[ModuleConfiguration, ...]
 ]
+
 
 type MachineConfigurationIndex = Mapping[
-    RecipeEffects, tuple[MachineConfiguration, ...]
+    AllowedRecipeEffects, tuple[MachineConfiguration, ...]
 ]
-
-
-# Internal computation models
-@dataclass(frozen=True, slots=True)
-class MachineEffects:
-    speed: float
-    productivity: float
-    quality: float
-
-
-class HasMachineEffects(Protocol):
-    @property
-    def effects(self) -> MachineEffects: ...
-
-
-@dataclass(frozen=True, slots=True)
-class EffectiveModuleConfiguration:
-    configuration: ModuleConfiguration
-    effects: MachineEffects
-
-
-@dataclass(frozen=True, slots=True)
-class EffectiveBeaconConfiguration:
-    configuration: BeaconConfiguration
-    effects: MachineEffects
-
-
-@dataclass(frozen=True, slots=True)
-class EffectiveMachineConfiguration:
-    configuration: MachineConfiguration
-    effects: MachineEffects

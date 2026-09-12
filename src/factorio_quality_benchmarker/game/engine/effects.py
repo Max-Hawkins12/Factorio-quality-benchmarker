@@ -1,52 +1,45 @@
-from factorio_quality_benchmarker.game.engine import calculate_distribution_effectivity
-from factorio_quality_benchmarker.game.models import Beacon, ModuleEffect
+from factorio_quality_benchmarker.game.models import Beacon, Module, ModuleEffect
 from factorio_quality_benchmarker.upcycler.simulation import Qualified
 
-from .models import (
-    BeaconConfiguration,
-    MachineEffects,
-    ModuleConfiguration,
-)
+from .beacons import calculate_distribution_effectivity
+from .models import MachineEffects
 
 
-def get_module_configuration_effects(
-    configuration: ModuleConfiguration,
+def get_module_effects(
+    modules: tuple[Qualified[Module], ...],
     effects: dict[str, ModuleEffect],
 ) -> MachineEffects:
     return MachineEffects(
         speed=round(
-            sum(
-                module.entity.effects.get(effects["speed"], 0.0)
-                for module in configuration.modules
-            ),
+            sum(module.entity.effects.get(effects["speed"], 0.0) for module in modules),
             10,
         ),
         productivity=round(
             sum(
                 module.entity.effects.get(effects["productivity"], 0.0)
-                for module in configuration.modules
+                for module in modules
             ),
             10,
         ),
         quality=round(
             sum(
-                module.entity.effects.get(effects["quality"], 0.0)
-                for module in configuration.modules
+                module.entity.effects.get(effects["quality"], 0.0) for module in modules
             ),
             10,
         ),
     )
 
 
-def get_beacon_configuration_effects(
-    configuration: BeaconConfiguration,
+def get_beacon_effects(
+    modules: tuple[Qualified[Module], ...],
+    num_beacons: int,
     effects: dict[str, ModuleEffect],
     beacon: Qualified[Beacon],
 ) -> MachineEffects:
 
-    module_effects = get_module_configuration_effects(configuration.modules, effects)
+    module_effects = get_module_effects(modules, effects)
 
-    effectivity = calculate_distribution_effectivity(beacon, configuration.num_beacons)
+    effectivity = calculate_distribution_effectivity(beacon, num_beacons)
 
     return MachineEffects(
         speed=round(module_effects.speed * effectivity, 10),
@@ -55,7 +48,7 @@ def get_beacon_configuration_effects(
     )
 
 
-def get_machine_configuration_effects(
+def get_machine_effects(
     module_effects: MachineEffects,
     beacon_effects: MachineEffects,
 ) -> MachineEffects:

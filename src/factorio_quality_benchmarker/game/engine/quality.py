@@ -9,15 +9,7 @@ from factorio_quality_benchmarker.game.models import (
 )
 from factorio_quality_benchmarker.upcycler.simulation import Qualified
 
-DEFAULT_QUALITY_SCALE = 0.3
-
-
-QUALITY_MODULE_SCALED_EFFECT = {
-    "speed": "speed",
-    "efficiency": "consumption",
-    "productivity": "productivity",
-    "quality": "quality",
-}
+from .constants import DEFAULT_QUALITY_SCALE, QUALITY_MODULE_SCALED_EFFECT
 
 
 def _quality_multiplier(
