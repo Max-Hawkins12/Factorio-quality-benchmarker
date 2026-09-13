@@ -1,8 +1,6 @@
-from typing import Protocol, TypeVar
+from typing import Protocol
 
 from .models import AllowedRecipeEffects, MachineEffects
-
-T = TypeVar("T")
 
 
 class HasMachineEffects(Protocol):

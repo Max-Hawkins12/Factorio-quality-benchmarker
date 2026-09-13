@@ -122,8 +122,8 @@ class SimulationContext:
         return self.modules_by_quality[self.run_config.entity_quality]
 
     @property
-    def beacons(self) -> Mapping[str, Qualified[Beacon]]:
-        return self.beacons_by_quality[self.run_config.entity_quality]
+    def beacon(self) -> Qualified[Beacon]:
+        return self.beacons_by_quality[self.run_config.entity_quality]["beacon"]
 
     @property
     def resources(self) -> Mapping[str, Resource]:

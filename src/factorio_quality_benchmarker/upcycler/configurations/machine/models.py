@@ -2,7 +2,7 @@ from collections.abc import Mapping
 from dataclasses import dataclass
 
 from factorio_quality_benchmarker.game.engine import MachineEffects
-from factorio_quality_benchmarker.game.models import Module
+from factorio_quality_benchmarker.game.models import Module, ModuleEffect
 from factorio_quality_benchmarker.upcycler.simulation import Qualified
 
 
@@ -32,10 +32,19 @@ class AllowedRecipeEffects:
     quality: bool
 
 
+@dataclass(frozen=True, slots=True)
+class BeaconConfigurationKey:
+    allowed_effects: frozenset[ModuleEffect]
+    max_beacons: int
+
+
+type BeaconConfigurationIndex = Mapping[
+    BeaconConfigurationKey, tuple[BeaconConfiguration, ...]
+]
+
 type ModuleConfigurationIndex = Mapping[
     AllowedRecipeEffects, tuple[ModuleConfiguration, ...]
 ]
-
 
 type MachineConfigurationIndex = Mapping[
     AllowedRecipeEffects, tuple[MachineConfiguration, ...]

@@ -8,14 +8,16 @@ from factorio_quality_benchmarker.game.models import (
 from factorio_quality_benchmarker.upcycler.configurations.machine import (
     MachineConfiguration,
 )
+from factorio_quality_benchmarker.upcycler.simulation import Qualified
 
 from .constants import MAXIMUM_PRODUCTIVITY
 from .models import QualityAmounts, RecipeMetrics
+from .quality import get_qualified_crafting_speed
 
 
 def _productivity_bonus(
     recipe: Recipe,
-    crafter: Crafter,
+    crafter: Qualified[Crafter],
     machine_configuration: MachineConfiguration,
     productivity_research_index: dict[Item, int],
 ) -> float:
@@ -29,7 +31,7 @@ def _productivity_bonus(
 
     return (
         machine_configuration.effects.productivity
-        + crafter.inherent_productivity
+        + crafter.entity.inherent_productivity
         + research_productivity
     )
 
@@ -88,7 +90,7 @@ def _quality_output(
 def _calculate_output_per_craft(
     recipe: Recipe,
     input_quality: Quality,
-    crafter: Crafter,
+    crafter: Qualified[Crafter],
     machine_configuration: MachineConfiguration,
     productivity_research_index: dict[Item, int],
     normal_quality: Quality,
@@ -120,12 +122,12 @@ def _calculate_output_per_craft(
 
 def _calculate_crafts_per_second(
     recipe: Recipe,
-    crafter: Crafter,
+    crafter: Qualified[Crafter],
     machine_configuration: MachineConfiguration,
 ) -> float:
 
     return (
-        crafter.crafting_speed
+        get_qualified_crafting_speed(crafter)
         * (1.0 + _speed_bonus(machine_configuration))
         / recipe.energy_required
     )
@@ -133,7 +135,7 @@ def _calculate_crafts_per_second(
 
 def _calculate_output_per_second(
     recipe: Recipe,
-    crafter: Crafter,
+    crafter: Qualified[Crafter],
     machine_configuration: MachineConfiguration,
     output_per_craft: dict[Material, QualityAmounts],
 ) -> dict[Material, QualityAmounts]:
@@ -151,7 +153,7 @@ def _calculate_output_per_second(
 def get_recipe_metrics(
     recipe: Recipe,
     input_quality: Quality,
-    crafter: Crafter,
+    crafter: Qualified[Crafter],
     machine_configuration: MachineConfiguration,
     productivity_research_index: dict[Item, int],
     normal_quality: Quality,
