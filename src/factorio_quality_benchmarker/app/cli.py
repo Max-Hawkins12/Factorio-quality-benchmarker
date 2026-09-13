@@ -54,6 +54,7 @@ def get_machine_configuration_index(
         BeaconConfigurationKey, tuple[BeaconConfiguration, ...]
     ],
     machine_configuration_cache: dict[QualifiedMachine, MachineConfigurationIndex],
+    is_2_1: bool,
 ) -> MachineConfigurationIndex:
 
     beacon_key = BeaconConfigurationKey(
@@ -75,9 +76,11 @@ def get_machine_configuration_index(
                     beacon=beacon,
                     modules=modules,
                     module_effects=module_effects,
+                    is_2_1=is_2_1,
                 ),
             ),
             module_effects=module_effects,
+            is_2_1=is_2_1,
         ),
     )
 
@@ -121,6 +124,7 @@ def dev() -> None:
             effects,
             beacon_configuration_cache,
             machine_configuration_cache,
+            simulation.game_data.is_2_1,
         )
 
         print(f"{machine.name}")

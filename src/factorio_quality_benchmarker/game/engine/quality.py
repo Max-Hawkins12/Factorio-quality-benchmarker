@@ -29,6 +29,10 @@ def get_qualified_module_effects(
     module: Qualified[Module],
     is_2_1: bool,
 ) -> dict[ModuleEffect, float]:
+
+    if module.entity.effects == {}:
+        return {}
+
     scaled_effect_name = QUALITY_MODULE_SCALED_EFFECT[module.entity.category.type]
 
     scaled_effect = next(

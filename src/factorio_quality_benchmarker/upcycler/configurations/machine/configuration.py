@@ -52,14 +52,12 @@ def _generate_module_configurations(
     modules: tuple[Qualified[Module], ...],
     num_module_slots: int,
     module_effects: dict[str, ModuleEffect],
+    is_2_1: bool,
 ) -> tuple[ModuleConfiguration, ...]:
     return tuple(
         ModuleConfiguration(
             modules=configuration,
-            effects=get_module_effects(
-                configuration,
-                module_effects,
-            ),
+            effects=get_module_effects(configuration, module_effects, is_2_1),
         )
         for configuration in combinations_with_replacement(
             modules,
@@ -72,6 +70,7 @@ def _generate_module_configuration_index(
     modules: tuple[Qualified[Module], ...],
     num_module_slots: int,
     module_effects: dict[str, ModuleEffect],
+    is_2_1: bool,
 ) -> ModuleConfigurationIndex:
     """Get a dict of Pareto frontier module configurations at every variation of allowed recipe effects."""
     return {
@@ -82,6 +81,7 @@ def _generate_module_configuration_index(
                 ),
                 num_module_slots=num_module_slots,
                 module_effects=module_effects,
+                is_2_1=is_2_1,
             ),
             allowed_recipe_effects,
         )
@@ -96,6 +96,7 @@ def _generate_beacon_configurations(
     max_beacons: int,
     module_effects: dict[str, ModuleEffect],
     machine_allowed_effects: frozenset[ModuleEffect],
+    is_2_1: bool,
 ) -> tuple[BeaconConfiguration, ...]:
     """
     Get a tuple of Pareto frontier beaon configurations.
@@ -109,10 +110,7 @@ def _generate_beacon_configurations(
                 num_beacons=num_beacons,
                 modules=configuration,
                 effects=get_beacon_effects(
-                    configuration,
-                    num_beacons,
-                    module_effects,
-                    beacon,
+                    beacon, configuration, num_beacons, module_effects, is_2_1
                 ),
             )
             for num_beacons in range(max_beacons + 1)
@@ -175,6 +173,7 @@ def generate_machine_configuration_index_for_machine(
     modules: tuple[Qualified[Module], ...],
     beacon_configurations: tuple[BeaconConfiguration, ...],
     module_effects: dict[str, ModuleEffect],
+    is_2_1: bool,
 ) -> MachineConfigurationIndex:
 
     return _generate_machine_configuration_index(
@@ -182,6 +181,7 @@ def generate_machine_configuration_index_for_machine(
             modules=get_allowed_modules(machine, modules, module_effects["quality"]),
             num_module_slots=machine.entity.module_slots,
             module_effects=module_effects,
+            is_2_1=is_2_1,
         ),
         beacon_configurations=beacon_configurations,
     )
@@ -192,6 +192,7 @@ def generate_beacon_configurations_for_key(
     beacon: Qualified[Beacon],
     modules: tuple[Qualified[Module], ...],
     module_effects: dict[str, ModuleEffect],
+    is_2_1: bool,
 ) -> tuple[BeaconConfiguration, ...]:
 
     return _generate_beacon_configurations(
@@ -200,4 +201,5 @@ def generate_beacon_configurations_for_key(
         max_beacons=key.max_beacons,
         module_effects=module_effects,
         machine_allowed_effects=key.allowed_effects,
+        is_2_1=is_2_1,
     )

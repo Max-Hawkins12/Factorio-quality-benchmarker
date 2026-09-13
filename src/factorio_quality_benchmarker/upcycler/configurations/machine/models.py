@@ -38,10 +38,6 @@ class BeaconConfigurationKey:
     max_beacons: int
 
 
-type BeaconConfigurationIndex = Mapping[
-    BeaconConfigurationKey, tuple[BeaconConfiguration, ...]
-]
-
 type ModuleConfigurationIndex = Mapping[
     AllowedRecipeEffects, tuple[ModuleConfiguration, ...]
 ]

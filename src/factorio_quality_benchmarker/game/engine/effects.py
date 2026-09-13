@@ -3,27 +3,38 @@ from factorio_quality_benchmarker.upcycler.simulation import Qualified
 
 from .beacons import calculate_distribution_effectivity
 from .models import MachineEffects
+from .quality import get_qualified_module_effects
 
 
 def get_module_effects(
     modules: tuple[Qualified[Module], ...],
     effects: dict[str, ModuleEffect],
+    is_2_1: bool,
 ) -> MachineEffects:
+
     return MachineEffects(
         speed=round(
-            sum(module.entity.effects.get(effects["speed"], 0.0) for module in modules),
+            sum(
+                get_qualified_module_effects(module, is_2_1).get(effects["speed"], 0.0)
+                for module in modules
+            ),
             10,
         ),
         productivity=round(
             sum(
-                module.entity.effects.get(effects["productivity"], 0.0)
+                get_qualified_module_effects(module, is_2_1).get(
+                    effects["productivity"], 0.0
+                )
                 for module in modules
             ),
             10,
         ),
         quality=round(
             sum(
-                module.entity.effects.get(effects["quality"], 0.0) for module in modules
+                get_qualified_module_effects(module, is_2_1).get(
+                    effects["quality"], 0.0
+                )
+                for module in modules
             ),
             10,
         ),
@@ -31,13 +42,14 @@ def get_module_effects(
 
 
 def get_beacon_effects(
+    beacon: Qualified[Beacon],
     modules: tuple[Qualified[Module], ...],
     num_beacons: int,
     effects: dict[str, ModuleEffect],
-    beacon: Qualified[Beacon],
+    is_2_1: bool,
 ) -> MachineEffects:
 
-    module_effects = get_module_effects(modules, effects)
+    module_effects = get_module_effects(modules, effects, is_2_1)
 
     effectivity = calculate_distribution_effectivity(beacon, num_beacons)
 
