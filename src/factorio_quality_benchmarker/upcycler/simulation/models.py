@@ -130,5 +130,9 @@ class SimulationContext:
         return self.game_data.resources
 
     @property
+    def qualities(self) -> Mapping[str, Quality]:
+        return self.game_data.qualities
+
+    @property
     def surfaces(self) -> Mapping[str, Surface]:
         return self.game_data.surfaces

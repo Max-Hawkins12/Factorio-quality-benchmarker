@@ -99,7 +99,7 @@ def _apply_quality_distribution(
         or input_quality.chain_probability is None
         or input_quality.next is None
     ):
-        return QualityAmounts({input_quality: product_amount})
+        return QualityAmounts({input_quality: round(product_amount, 12)})
 
     quality_chance = _quality_bonus(machine_configuration)
 
@@ -113,7 +113,9 @@ def _apply_quality_distribution(
     while next_quality is not None:
         if next_quality.next is None:
             # Highest quality: everything that reaches it stays here.
-            quality_amounts[next_quality] = product_amount * continuing_probability
+            quality_amounts[next_quality] = round(
+                product_amount * continuing_probability, 12
+            )
             break
 
         chain_probability = (
@@ -122,8 +124,8 @@ def _apply_quality_distribution(
             else 0.0
         )
 
-        quality_amounts[next_quality] = (
-            product_amount * continuing_probability * (1.0 - chain_probability)
+        quality_amounts[next_quality] = round(
+            product_amount * continuing_probability * (1.0 - chain_probability), 12
         )
 
         continuing_probability *= chain_probability
