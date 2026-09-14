@@ -1,44 +1,104 @@
-from factorio_quality_benchmarker.game.models import Item, Quality
+from factorio_quality_benchmarker.game.engine import (
+    calculate_recipe_objectives,
+)
+from factorio_quality_benchmarker.game.models import Crafter, Item, Recipe
+from factorio_quality_benchmarker.upcycler.configurations.machine import (
+    MachineConfiguration,
+)
+from factorio_quality_benchmarker.upcycler.simulation import Qualified
 
-from .models import RecipeConfiguration
+from .models import (
+    RecipeFrontierCandidate,
+)
 
 
 def _dominates(
-    left: RecipeConfiguration,
-    right: RecipeConfiguration,
-    product: Item,
-    input_quality: Quality,
+    a: tuple[float, ...],
+    b: tuple[float, ...],
 ) -> bool:
-    left_metrics = (
-        left.metrics.total_per_craft[product],
-        left.metrics.total_per_craft_above(input_quality)[product],
-        left.metrics.total_per_second[product],
-        left.metrics.total_per_second_above(input_quality)[product],
+    return all(x >= y for x, y in zip(a, b)) and any(x > y for x, y in zip(a, b))
+
+
+def get_frontier_recipe_candidates(
+    recipe: Recipe,
+    machine_configurations: dict[
+        Qualified[Crafter],
+        tuple[MachineConfiguration, ...],
+    ],
+    productivity_research_index: dict[Item, int],
+) -> tuple[RecipeFrontierCandidate, ...]:
+
+    frontier: list[RecipeFrontierCandidate] = []
+
+    for crafter, configurations in machine_configurations.items():
+        for configuration in configurations:
+            objectives = calculate_recipe_objectives(
+                recipe,
+                crafter,
+                configuration,
+                productivity_research_index,
+            )
+
+            if any(
+                existing.objectives == objectives
+                or _dominates(existing.objectives, objectives)
+                for existing in frontier
+            ):
+                continue
+
+            frontier = [
+                existing
+                for existing in frontier
+                if not _dominates(objectives, existing.objectives)
+            ]
+
+            frontier.append(
+                RecipeFrontierCandidate(
+                    crafter,
+                    configuration,
+                    objectives,
+                )
+            )
+
+    return tuple(frontier)
+
+
+def _legendary_objectives(
+    candidate: RecipeFrontierCandidate,
+) -> tuple[float, float]:
+    return (
+        candidate.objectives[0],
+        candidate.objectives[2],
     )
 
-    right_metrics = (
-        right.metrics.total_per_craft[product],
-        right.metrics.total_per_craft_above(input_quality)[product],
-        right.metrics.total_per_second[product],
-        right.metrics.total_per_second_above(input_quality)[product],
-    )
 
-    return all(
-        left >= right for left, right in zip(left_metrics, right_metrics)
-    ) and any(left > right for left, right in zip(left_metrics, right_metrics))
+def get_legendary_recipe_candidates(
+    candidates: tuple[RecipeFrontierCandidate, ...],
+) -> tuple[RecipeFrontierCandidate, ...]:
+    frontier: list[RecipeFrontierCandidate] = []
 
+    for candidate in candidates:
+        objectives = _legendary_objectives(candidate)
 
-def get_recipe_frontier(
-    configurations: tuple[RecipeConfiguration, ...],
-    product: Item,
-    input_quality: Quality,
-) -> tuple[RecipeConfiguration, ...]:
-    return tuple(
-        candidate
-        for candidate in configurations
-        if not any(
-            other is not candidate
-            and _dominates(other, candidate, product, input_quality)
-            for other in configurations
-        )
-    )
+        if any(
+            (existing.objectives[0], existing.objectives[2]) == objectives
+            or _dominates(
+                (existing.objectives[0], existing.objectives[2]),
+                objectives,
+            )
+            for existing in frontier
+        ):
+            continue
+
+        frontier = [
+            existing
+            for existing in frontier
+            if not _dominates(
+                objectives,
+                (existing.objectives[0], existing.objectives[2]),
+            )
+        ]
+
+        frontier.append(candidate)
+
+    return tuple(frontier)

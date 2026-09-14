@@ -18,3 +18,11 @@ class RecipeConfiguration:
 
 
 type RecipeConfigurationIndex = Mapping[Quality, tuple[RecipeConfiguration, ...]]
+
+
+@dataclass(frozen=True, slots=True)
+class RecipeFrontierCandidate:
+    crafter: Qualified[Crafter]
+    machine_configuration: MachineConfiguration
+
+    objectives: tuple[float, float, float, float]

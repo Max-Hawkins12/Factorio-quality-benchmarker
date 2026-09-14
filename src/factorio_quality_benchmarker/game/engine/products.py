@@ -207,3 +207,40 @@ def recalculate_recipe_metrics(
         machine_configuration,
         normal_quality,
     )
+
+
+def calculate_recipe_objectives(
+    recipe: Recipe,
+    crafter: Qualified[Crafter],
+    machine_configuration: MachineConfiguration,
+    productivity_research_index: dict[Item, int],
+) -> tuple[float, float, float, float]:
+    """This is a cheap operation for calculating an estimate of the recipe metrics"""
+    productivity = 1.0 + min(
+        _productivity_bonus(
+            recipe,
+            crafter,
+            machine_configuration,
+            productivity_research_index,
+        ),
+        MAXIMUM_PRODUCTIVITY,
+    )
+
+    total_per_craft = recipe.products[0].amount * productivity
+
+    crafts_per_second = (
+        get_qualified_crafting_speed(crafter)
+        * (1.0 + _speed_bonus(machine_configuration))
+        / recipe.energy_required
+    )
+
+    total_per_second = total_per_craft * crafts_per_second
+
+    quality = _quality_bonus(machine_configuration)
+
+    return (
+        round(total_per_craft, 12),
+        round(total_per_craft * quality, 12),
+        round(total_per_second, 12),
+        round(total_per_second * quality, 12),
+    )

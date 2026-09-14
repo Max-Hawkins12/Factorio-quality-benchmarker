@@ -1,24 +1,21 @@
-from collections.abc import Callable
-
 import typer
 
 from factorio_quality_benchmarker.data import load_game_data, perform_parsing
 from factorio_quality_benchmarker.game.engine import (
-    calculate_maximum_beacons,
     get_frontier_desired_modules,
 )
-from factorio_quality_benchmarker.game.models import Beacon, Module, ModuleEffect
 from factorio_quality_benchmarker.upcycler.configurations.machine import (
     ALL_RECIPE_EFFECTS,
     BeaconConfiguration,
     BeaconConfigurationKey,
     MachineConfigurationIndex,
-    generate_beacon_configurations_for_key,
-    generate_machine_configuration_index_for_machine,
 )
+from factorio_quality_benchmarker.upcycler.configurations.recipe import (
+    generate_recipe_configurations_for_recipe,
+)
+from factorio_quality_benchmarker.upcycler.graphs import get_machine_configuration_index
 from factorio_quality_benchmarker.upcycler.simulation import (
     NO_RESEARCH,
-    Qualified,
     QualifiedMachine,
     RunConfig,
     UpcyclerScope,
@@ -31,58 +28,6 @@ app = typer.Typer()
 @app.command()
 def parse() -> None:
     perform_parsing()
-
-
-# TEMP TO MOVE LATER
-def get_from_cache[K, V](
-    cache: dict[K, V],
-    key: K,
-    calculate: Callable[[], V],
-) -> V:
-    if key not in cache:
-        cache[key] = calculate()
-
-    return cache[key]
-
-
-def get_machine_configuration_index(
-    machine: QualifiedMachine,
-    beacon: Qualified[Beacon],
-    modules: tuple[Qualified[Module], ...],
-    module_effects: dict[str, ModuleEffect],
-    beacon_configuration_cache: dict[
-        BeaconConfigurationKey, tuple[BeaconConfiguration, ...]
-    ],
-    machine_configuration_cache: dict[QualifiedMachine, MachineConfigurationIndex],
-    is_2_1: bool,
-) -> MachineConfigurationIndex:
-
-    beacon_key = BeaconConfigurationKey(
-        allowed_effects=machine.entity.allowed_effects,
-        max_beacons=calculate_maximum_beacons(machine.entity, beacon.entity),
-    )
-
-    return get_from_cache(
-        cache=machine_configuration_cache,
-        key=machine,
-        calculate=lambda: generate_machine_configuration_index_for_machine(
-            machine=machine,
-            modules=modules,
-            beacon_configurations=get_from_cache(
-                cache=beacon_configuration_cache,
-                key=beacon_key,
-                calculate=lambda: generate_beacon_configurations_for_key(
-                    key=beacon_key,
-                    beacon=beacon,
-                    modules=modules,
-                    module_effects=module_effects,
-                    is_2_1=is_2_1,
-                ),
-            ),
-            module_effects=module_effects,
-            is_2_1=is_2_1,
-        ),
-    )
 
 
 @app.command()
@@ -132,3 +77,18 @@ def dev() -> None:
             print(
                 f"\tProductivity: {e.productivity} Quality: {e.quality} number of configs: {len(config_index[e])}"
             )
+
+    testing_recipe = simulation.recipes["iron-plate"]
+
+    print(testing_recipe.name)
+    testing_recipe_configs = generate_recipe_configurations_for_recipe(
+        testing_recipe,
+        dict(simulation.qualities),
+        dict(simulation.crafters),
+        machine_configuration_cache,
+        dict(simulation.productivity_research_index),
+    )
+
+    print(
+        f"Recipe configurations: Normal: {len(testing_recipe_configs[simulation.qualities['normal']])} Legendary: {len(testing_recipe_configs[simulation.qualities['legendary']])}"
+    )
