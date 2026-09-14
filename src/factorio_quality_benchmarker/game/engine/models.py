@@ -69,3 +69,15 @@ class RecipeMetrics:
             material: amount.above(quality)
             for material, amount in self.output_per_second.items()
         }
+
+
+@dataclass(frozen=True, slots=True)
+class MinerMetrics:
+    output_per_second: QualityAmounts
+
+    @property
+    def total_per_second(self) -> float:
+        return self.output_per_second.total
+
+    def total_per_second_above(self, quality: Quality) -> float:
+        return self.output_per_second.above(quality)

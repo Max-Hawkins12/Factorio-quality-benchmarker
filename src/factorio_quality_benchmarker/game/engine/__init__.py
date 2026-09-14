@@ -5,7 +5,6 @@ from .modules import get_allowed_modules, get_frontier_desired_modules
 from .products import (
     calculate_recipe_metrics,
     calculate_recipe_objectives,
-    recalculate_recipe_metrics,
 )
 from .quality import (
     get_qualified_beacon_distribution_effectivity,
@@ -29,5 +28,4 @@ __all__ = [
     "get_qualified_beacon_distribution_effectivity",
     "get_qualified_crafting_speed",
     "get_qualified_module_effects",
-    "recalculate_recipe_metrics",
 ]

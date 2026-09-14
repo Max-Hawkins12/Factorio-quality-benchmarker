@@ -1,6 +1,4 @@
-from factorio_quality_benchmarker.game.engine import (
-    calculate_recipe_metrics,
-)
+from factorio_quality_benchmarker.game.engine import calculate_recipe_metrics
 from factorio_quality_benchmarker.game.models import Crafter, Item, Quality, Recipe
 from factorio_quality_benchmarker.upcycler.configurations.machine import (
     AllowedRecipeEffects,
@@ -8,10 +6,7 @@ from factorio_quality_benchmarker.upcycler.configurations.machine import (
 )
 from factorio_quality_benchmarker.upcycler.simulation import Qualified, QualifiedMachine
 
-from .models import (
-    RecipeConfiguration,
-    RecipeConfigurationIndex,
-)
+from .models import RecipeConfiguration, RecipeConfigurationIndex
 from .pareto import get_frontier_recipe_candidates, get_legendary_recipe_candidates
 
 

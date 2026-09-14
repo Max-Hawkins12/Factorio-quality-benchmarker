@@ -1,15 +1,19 @@
-from factorio_quality_benchmarker.game.engine import (
-    calculate_recipe_objectives,
-)
+from dataclasses import dataclass
+
+from factorio_quality_benchmarker.game.engine import calculate_recipe_objectives
 from factorio_quality_benchmarker.game.models import Crafter, Item, Recipe
 from factorio_quality_benchmarker.upcycler.configurations.machine import (
     MachineConfiguration,
 )
 from factorio_quality_benchmarker.upcycler.simulation import Qualified
 
-from .models import (
-    RecipeFrontierCandidate,
-)
+
+@dataclass(frozen=True, slots=True)
+class RecipeFrontierCandidate:
+    crafter: Qualified[Crafter]
+    machine_configuration: MachineConfiguration
+
+    objectives: tuple[float, float, float, float]
 
 
 def _dominates(

@@ -193,22 +193,6 @@ def calculate_recipe_metrics(
     )
 
 
-def recalculate_recipe_metrics(
-    input_quality: Quality,
-    machine_configuration: MachineConfiguration,
-    recipe_metrics: RecipeMetrics,
-    normal_quality: Quality,
-) -> RecipeMetrics:
-
-    return _recipe_metrics(
-        recipe_metrics.total_per_craft,
-        recipe_metrics.total_per_second,
-        input_quality,
-        machine_configuration,
-        normal_quality,
-    )
-
-
 def calculate_recipe_objectives(
     recipe: Recipe,
     crafter: Qualified[Crafter],
