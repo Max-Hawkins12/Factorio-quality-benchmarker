@@ -3,6 +3,7 @@ from dataclasses import dataclass
 
 from factorio_quality_benchmarker.game.engine import (
     MAXIMUM_PRODUCTIVITY,
+    MachineEffects,
     get_qualified_crafting_speed,
     productivity_bonus,
     quality_bonus,
@@ -26,7 +27,7 @@ class RecipeFrontierCandidate:
 def calculate_recipe_objectives(
     recipe: Recipe,
     crafter: Qualified[Crafter],
-    machine_configuration: MachineConfiguration,
+    machine_effects: MachineEffects,
     productivity_research_index: Mapping[Item, int],
 ) -> tuple[float, float, float, float]:
     """This is a cheap operation for calculating an estimate of the recipe metrics"""
@@ -34,7 +35,7 @@ def calculate_recipe_objectives(
         productivity_bonus(
             recipe,
             crafter,
-            machine_configuration.effects,
+            machine_effects,
             productivity_research_index,
         ),
         MAXIMUM_PRODUCTIVITY,
@@ -44,13 +45,13 @@ def calculate_recipe_objectives(
 
     crafts_per_second = (
         get_qualified_crafting_speed(crafter)
-        * (1.0 + speed_bonus(machine_configuration.effects))
+        * (1.0 + speed_bonus(machine_effects))
         / recipe.energy_required
     )
 
     total_per_second = total_per_craft * crafts_per_second
 
-    quality = quality_bonus(machine_configuration.effects)
+    quality = quality_bonus(machine_effects)
 
     return (
         round(total_per_craft, 12),
@@ -83,7 +84,7 @@ def get_frontier_recipe_candidates(
             objectives = calculate_recipe_objectives(
                 recipe,
                 crafter,
-                configuration,
+                configuration.effects,
                 productivity_research_index,
             )
 
