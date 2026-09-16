@@ -7,7 +7,7 @@ from factorio_quality_benchmarker.game.models import (
     ModuleEffect,
     Quality,
 )
-from factorio_quality_benchmarker.upcycler.simulation import Qualified
+from factorio_quality_benchmarker.optimiser.simulation import Qualified
 
 from .constants import DEFAULT_QUALITY_SCALE, QUALITY_MODULE_SCALED_EFFECT
 

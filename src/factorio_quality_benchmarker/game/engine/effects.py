@@ -1,5 +1,5 @@
 from factorio_quality_benchmarker.game.models import Beacon, Module, ModuleEffect
-from factorio_quality_benchmarker.upcycler.simulation import Qualified
+from factorio_quality_benchmarker.optimiser.simulation import Qualified
 
 from .beacons import calculate_distribution_effectivity
 from .models import MachineEffects

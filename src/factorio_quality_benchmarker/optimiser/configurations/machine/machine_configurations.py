@@ -1,20 +1,28 @@
+from collections.abc import Mapping
+from dataclasses import dataclass, field
 from itertools import combinations_with_replacement, product
 
 from factorio_quality_benchmarker.game.engine import (
     MachineEffects,
     get_allowed_modules,
-    get_beacon_effects,
     get_machine_effects,
     get_module_effects,
 )
-from factorio_quality_benchmarker.game.models import Beacon, Module, ModuleEffect
-from factorio_quality_benchmarker.upcycler.simulation import Qualified, QualifiedMachine
+from factorio_quality_benchmarker.game.models import (
+    Module,
+    ModuleEffect,
+)
+from factorio_quality_benchmarker.optimiser.configurations.cache import get_from_cache
+from factorio_quality_benchmarker.optimiser.simulation import (
+    Qualified,
+    QualifiedMachine,
+)
 
-from .constants import ALL_RECIPE_EFFECTS, NO_EFFECTS, QUALITY
+from .beacon_configurations import BeaconConfigurationCache
+from .constants import ALL_RECIPE_EFFECTS
 from .models import (
     AllowedRecipeEffects,
     BeaconConfiguration,
-    BeaconConfigurationKey,
     MachineConfiguration,
     MachineConfigurationIndex,
     ModuleConfiguration,
@@ -89,42 +97,6 @@ def _generate_module_configuration_index(
     }
 
 
-# Beacon Configurations
-def _generate_beacon_configurations(
-    beacon: Qualified[Beacon],
-    modules: tuple[Qualified[Module], ...],
-    max_beacons: int,
-    module_effects: dict[str, ModuleEffect],
-    machine_allowed_effects: frozenset[ModuleEffect],
-    is_2_1: bool,
-) -> tuple[BeaconConfiguration, ...]:
-    """
-    Get a tuple of Pareto frontier beaon configurations.
-
-    Beacons only accept speed modules, so their configurations are independent of recipe productivity/quality permissions.
-    Quality is still included in the Pareto frontier when the machine supports it because speed modules can reduce quality.
-    """
-    return get_unique_pareto_frontier(
-        tuple(
-            BeaconConfiguration(
-                num_beacons=num_beacons,
-                modules=configuration,
-                effects=get_beacon_effects(
-                    beacon, configuration, num_beacons, module_effects, is_2_1
-                ),
-            )
-            for num_beacons in range(max_beacons + 1)
-            for configuration in combinations_with_replacement(
-                modules,
-                num_beacons * beacon.entity.module_slots,
-            )
-        ),
-        allowed_recipe_effects=QUALITY
-        if module_effects["quality"] in machine_allowed_effects
-        else NO_EFFECTS,
-    )
-
-
 # Machine Configurations
 def _generate_machine_configuration_index(
     module_configuration_index: ModuleConfigurationIndex,
@@ -167,14 +139,15 @@ def _generate_machine_configuration_index(
     }
 
 
-# Public API
-def generate_machine_configuration_index_for_machine(
+def _generate_machine_configuration_index_for_machine(
     machine: QualifiedMachine,
     modules: tuple[Qualified[Module], ...],
-    beacon_configurations: tuple[BeaconConfiguration, ...],
     module_effects: dict[str, ModuleEffect],
     is_2_1: bool,
+    beacon_configuration_cache: BeaconConfigurationCache,
 ) -> MachineConfigurationIndex:
+
+    beacon_configurations = beacon_configuration_cache.get(machine)
 
     return _generate_machine_configuration_index(
         module_configuration_index=_generate_module_configuration_index(
@@ -187,19 +160,29 @@ def generate_machine_configuration_index_for_machine(
     )
 
 
-def generate_beacon_configurations_for_key(
-    key: BeaconConfigurationKey,
-    beacon: Qualified[Beacon],
-    modules: tuple[Qualified[Module], ...],
-    module_effects: dict[str, ModuleEffect],
-    is_2_1: bool,
-) -> tuple[BeaconConfiguration, ...]:
+@dataclass(slots=True)
+class MachineConfigurationCache:
+    modules: tuple[Qualified[Module], ...]
+    module_effects: Mapping[str, ModuleEffect]
+    is_2_1: bool
 
-    return _generate_beacon_configurations(
-        beacon=beacon,
-        modules=get_allowed_modules(beacon, modules, module_effects["quality"]),
-        max_beacons=key.max_beacons,
-        module_effects=module_effects,
-        machine_allowed_effects=key.allowed_effects,
-        is_2_1=is_2_1,
-    )
+    beacon_cache: BeaconConfigurationCache
+
+    _cache: dict[
+        QualifiedMachine,
+        MachineConfigurationIndex,
+    ] = field(default_factory=dict)
+
+    def get(self, machine: QualifiedMachine) -> MachineConfigurationIndex:
+
+        return get_from_cache(
+            cache=self._cache,
+            key=machine,
+            calculate=lambda: _generate_machine_configuration_index_for_machine(
+                machine=machine,
+                modules=self.modules,
+                module_effects=dict(self.module_effects),
+                is_2_1=self.is_2_1,
+                beacon_configuration_cache=self.beacon_cache,
+            ),
+        )

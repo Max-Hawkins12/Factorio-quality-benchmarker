@@ -10,6 +10,7 @@ from .models import (
     Qualified,
     QualifiedMachine,
     RunConfig,
+    SimulationContext,
     UpcyclerScope,
 )
 from .simulate import build_simulation_context
@@ -24,6 +25,7 @@ __all__ = [
     "Qualified",
     "QualifiedMachine",
     "RunConfig",
+    "SimulationContext",
     "UpcyclerScope",
     "build_simulation_context",
 ]

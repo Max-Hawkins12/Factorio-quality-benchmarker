@@ -21,14 +21,16 @@ class QualityAmounts:
     def total(self) -> float:
         return sum(self.amounts.values())
 
-    def above(self, quality: Quality) -> float:
+    def above(self, quality: Quality) -> QualityAmounts:
         if quality.next is None:
-            return self.total
+            return QualityAmounts({quality: self.amounts[quality]})
 
-        return sum(
-            amount
-            for output_quality, amount in self.amounts.items()
-            if output_quality.level > quality.level
+        return QualityAmounts(
+            {
+                output_quality: amount
+                for output_quality, amount in self.amounts.items()
+                if output_quality.level > quality.level
+            }
         )
 
     def __getitem__(self, quality: Quality) -> float:
@@ -42,8 +44,30 @@ class QualityAmounts:
 
 @dataclass(frozen=True, slots=True)
 class RecipeMetrics:
+    quality_bonus: float
+    productivity_bonus: float
+
+    input_per_craft: Mapping[Material, float]
+    input_per_second: Mapping[Material, float]
+
     output_per_craft: Mapping[Material, QualityAmounts]
     output_per_second: Mapping[Material, QualityAmounts]
+
+    def output_per_craft_above(
+        self, quality: Quality
+    ) -> Mapping[Material, QualityAmounts]:
+        return {
+            material: amount.above(quality)
+            for material, amount in self.output_per_craft.items()
+        }
+
+    def output_per_second_above(
+        self, quality: Quality
+    ) -> Mapping[Material, QualityAmounts]:
+        return {
+            material: amount.above(quality)
+            for material, amount in self.output_per_second.items()
+        }
 
     @property
     def total_per_craft(self) -> Mapping[Material, float]:
@@ -60,13 +84,13 @@ class RecipeMetrics:
 
     def total_per_craft_above(self, quality: Quality) -> Mapping[Material, float]:
         return {
-            material: amount.above(quality)
+            material: amount.above(quality).total
             for material, amount in self.output_per_craft.items()
         }
 
     def total_per_second_above(self, quality: Quality) -> Mapping[Material, float]:
         return {
-            material: amount.above(quality)
+            material: amount.above(quality).total
             for material, amount in self.output_per_second.items()
         }
 
@@ -80,4 +104,4 @@ class MinerMetrics:
         return self.output_per_second.total
 
     def total_per_second_above(self, quality: Quality) -> float:
-        return self.output_per_second.above(quality)
+        return self.output_per_second.above(quality).total

@@ -3,7 +3,7 @@ from dataclasses import dataclass
 
 from factorio_quality_benchmarker.game.engine import MachineEffects
 from factorio_quality_benchmarker.game.models import Module, ModuleEffect
-from factorio_quality_benchmarker.upcycler.simulation import Qualified
+from factorio_quality_benchmarker.optimiser.simulation import Qualified
 
 
 @dataclass(frozen=True, slots=True)

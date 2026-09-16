@@ -2,11 +2,11 @@ from collections.abc import Mapping
 from dataclasses import dataclass
 
 from factorio_quality_benchmarker.game.engine import RecipeMetrics
-from factorio_quality_benchmarker.game.models import Crafter, Miner, Quality
-from factorio_quality_benchmarker.upcycler.configurations.machine import (
+from factorio_quality_benchmarker.game.models import Crafter, Quality
+from factorio_quality_benchmarker.optimiser.configurations.machine import (
     MachineConfiguration,
 )
-from factorio_quality_benchmarker.upcycler.simulation import Qualified
+from factorio_quality_benchmarker.optimiser.simulation import Qualified
 
 
 @dataclass(frozen=True, slots=True)
@@ -17,9 +17,3 @@ class RecipeConfiguration:
 
 
 type RecipeConfigurationIndex = Mapping[Quality, tuple[RecipeConfiguration, ...]]
-
-
-@dataclass(frozen=True, slots=True)
-class MinerConfiguration:
-    miner: Qualified[Miner]
-    machine_configuration: MachineConfiguration

@@ -93,6 +93,10 @@ class UpcyclingGraph(RecipeGraph):
 
         return None
 
+    @property
+    def is_self_recycling(self) -> bool:
+        return self.start_recipe == self.end_recipe
+
     @classmethod
     def is_valid(
         cls,

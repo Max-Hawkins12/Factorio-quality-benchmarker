@@ -1,7 +1,7 @@
 from math import floor
 
 from factorio_quality_benchmarker.game.models import Beacon, Machine
-from factorio_quality_benchmarker.upcycler.simulation import Qualified
+from factorio_quality_benchmarker.optimiser.simulation import Qualified
 
 from .quality import get_qualified_beacon_distribution_effectivity
 

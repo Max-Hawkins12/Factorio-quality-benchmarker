@@ -1,21 +1,25 @@
+from collections.abc import Mapping
+from dataclasses import dataclass, field
+
 from factorio_quality_benchmarker.game.engine import calculate_recipe_metrics
 from factorio_quality_benchmarker.game.models import Crafter, Item, Quality, Recipe
-from factorio_quality_benchmarker.upcycler.configurations.machine import (
+from factorio_quality_benchmarker.optimiser.configurations.cache import get_from_cache
+from factorio_quality_benchmarker.optimiser.configurations.machine import (
     AllowedRecipeEffects,
-    MachineConfigurationIndex,
+    MachineConfigurationCache,
 )
-from factorio_quality_benchmarker.upcycler.simulation import Qualified, QualifiedMachine
+from factorio_quality_benchmarker.optimiser.simulation import Qualified
 
 from .models import RecipeConfiguration, RecipeConfigurationIndex
 from .pareto import get_frontier_recipe_candidates, get_legendary_recipe_candidates
 
 
-def generate_recipe_configurations_for_recipe(
+def _generate_recipe_configurations_for_recipe(
     recipe: Recipe,
-    qualities: dict[str, Quality],
+    qualities: Mapping[str, Quality],
     crafters: dict[str, Qualified[Crafter]],
-    machine_configuration_cache: dict[QualifiedMachine, MachineConfigurationIndex],
     productivity_research_index: dict[Item, int],
+    machine_configuration_cache: MachineConfigurationCache,
 ) -> RecipeConfigurationIndex:
 
     recipe_effects = AllowedRecipeEffects(
@@ -24,10 +28,9 @@ def generate_recipe_configurations_for_recipe(
     )
 
     valid_machine_configurations = {
-        crafter: machine_configuration_cache[crafter][recipe_effects]
+        crafter: machine_configuration_cache.get(crafter)[recipe_effects]
         for crafter in crafters.values()
-        if crafter in machine_configuration_cache
-        and any(category in crafter.entity.categories for category in recipe.categories)
+        if any(category in crafter.entity.categories for category in recipe.categories)
     }
 
     normal_frontier = get_frontier_recipe_candidates(
@@ -61,3 +64,30 @@ def generate_recipe_configurations_for_recipe(
         )
 
     return index
+
+
+@dataclass(slots=True)
+class RecipeConfigurationCache:
+    qualities: Mapping[str, Quality]
+    crafters: dict[str, Qualified[Crafter]]
+    productivity_research_index: dict[Item, int]
+
+    machine_cache: MachineConfigurationCache
+
+    _cache: dict[
+        Recipe,
+        RecipeConfigurationIndex,
+    ] = field(default_factory=dict)
+
+    def get(self, recipe: Recipe) -> RecipeConfigurationIndex:
+        return get_from_cache(
+            cache=self._cache,
+            key=recipe,
+            calculate=lambda: _generate_recipe_configurations_for_recipe(
+                recipe=recipe,
+                qualities=self.qualities,
+                crafters=self.crafters,
+                productivity_research_index=self.productivity_research_index,
+                machine_configuration_cache=self.machine_cache,
+            ),
+        )

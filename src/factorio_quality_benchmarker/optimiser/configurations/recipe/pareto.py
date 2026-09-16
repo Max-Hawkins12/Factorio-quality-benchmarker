@@ -2,10 +2,10 @@ from dataclasses import dataclass
 
 from factorio_quality_benchmarker.game.engine import calculate_recipe_objectives
 from factorio_quality_benchmarker.game.models import Crafter, Item, Recipe
-from factorio_quality_benchmarker.upcycler.configurations.machine import (
+from factorio_quality_benchmarker.optimiser.configurations.machine import (
     MachineConfiguration,
 )
-from factorio_quality_benchmarker.upcycler.simulation import Qualified
+from factorio_quality_benchmarker.optimiser.simulation import Qualified
 
 
 @dataclass(frozen=True, slots=True)
