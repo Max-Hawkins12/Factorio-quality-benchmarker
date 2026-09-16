@@ -1,7 +1,9 @@
 import json
 import logging
 import shutil
+from collections.abc import Collection, Mapping
 from pathlib import Path
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
@@ -16,7 +18,7 @@ required_mods = {
 
 
 # Helper functions for reading and writing JSON files
-def _read_json_from_file(file_path: Path, error_message: str) -> dict:
+def _read_json_from_file(file_path: Path, error_message: str) -> dict[str, Any]:
     try:
         with file_path.open("r") as f:
             return json.load(f)
@@ -24,7 +26,11 @@ def _read_json_from_file(file_path: Path, error_message: str) -> dict:
         raise FileNotFoundError(error_message + f" (File path: {file_path})")
 
 
-def _write_json_to_file(data: dict, parser_output_path: Path, filename: str) -> None:
+def _write_json_to_file(
+    data: Mapping[str, Any],
+    parser_output_path: Path,
+    filename: str,
+) -> None:
     output_path = parser_output_path / filename
     output_path.parent.mkdir(parents=True, exist_ok=True)
 
@@ -33,7 +39,10 @@ def _write_json_to_file(data: dict, parser_output_path: Path, filename: str) -> 
 
 
 # Helper functions for the parsing process
-def _write_prototype_files(raw_data: dict, parser_output_path: Path) -> None:
+def _write_prototype_files(
+    raw_data: Mapping[str, Any],
+    parser_output_path: Path,
+) -> None:
     """Parses all the required data from the raw data and writes it to the output files."""
 
     parse_jobs = {
@@ -189,8 +198,10 @@ def _write_prototype_files(raw_data: dict, parser_output_path: Path) -> None:
 
 
 def _parse_prototypes(
-    raw_data: dict, prototype_types: list[str], fields: list[str]
-) -> dict:
+    raw_data: Mapping[str, Any],
+    prototype_types: Collection[str],
+    fields: Collection[str],
+) -> dict[str, Any]:
     """
     Parses the raw data for the specified prototype types and fields.
     Returns a dictionary containing the parsed data.
@@ -207,7 +218,7 @@ def _parse_prototypes(
 
 
 # Validation functions for metadata and raw data
-def _validate_metadata_fields(metadata: dict) -> None:
+def _validate_metadata_fields(metadata: Mapping[str, Any]) -> None:
     """
     Validates the metadata dictionary to ensure it contains the required fields. And checks if the required mods for the specified Factorio version are present in the active mods list.
     Raises a ValueError if any required field is missing.
@@ -235,7 +246,7 @@ def _validate_metadata_fields(metadata: dict) -> None:
         )
 
 
-def _validate_quality_and_recycler_present(raw_data: dict) -> None:
+def _validate_quality_and_recycler_present(raw_data: Mapping[str, Any]) -> None:
     """
     Validates that the Quality and Recycler mechanics are present in the raw data.
     Raises a ValueError if either is missing.

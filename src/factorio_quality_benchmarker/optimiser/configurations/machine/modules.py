@@ -1,3 +1,5 @@
+from collections.abc import Mapping
+
 from factorio_quality_benchmarker.game.engine import get_qualified_module_effects
 from factorio_quality_benchmarker.game.models import Module, ModuleEffect
 from factorio_quality_benchmarker.optimiser.simulation import EMPTY_MODULE, Qualified
@@ -6,7 +8,7 @@ from .constants import DESIRED_MODULE_EFFECTS
 
 
 def _get_desired_module_effects(
-    effects: dict[str, ModuleEffect],
+    effects: Mapping[str, ModuleEffect],
 ) -> tuple[ModuleEffect, ...]:
     return tuple(effects[effect] for effect in DESIRED_MODULE_EFFECTS)
 
@@ -32,7 +34,7 @@ def _module_dominates(
 
 def get_frontier_desired_modules(
     modules: tuple[Qualified[Module], ...],
-    effects: dict[str, ModuleEffect],
+    effects: Mapping[str, ModuleEffect],
     is_2_1: bool,
 ) -> tuple[Qualified[Module], ...]:
     """

@@ -5,17 +5,16 @@ from factorio_quality_benchmarker.optimiser.configurations.machine import (
 from factorio_quality_benchmarker.optimiser.configurations.recipe import (
     RecipeConfigurationCache,
 )
+from factorio_quality_benchmarker.optimiser.graphs import generate_recipe_graph_index
 from factorio_quality_benchmarker.optimiser.simulation import SimulationContext
 
 
 def run(simulation: SimulationContext):
-    """graphs = generate_recipe_graph_index(
-        dict(simulation.materials), dict(simulation.recipes)
-    )"""
+    graphs = generate_recipe_graph_index(simulation.materials, simulation.recipes)
 
     beacon = simulation.beacon
 
-    effects = dict(simulation.game_data.module_effects)
+    effects = simulation.game_data.module_effects
 
     modules = tuple(simulation.modules.values())
 
@@ -35,7 +34,7 @@ def run(simulation: SimulationContext):
 
     recipe_configuration_cache = RecipeConfigurationCache(
         qualities=simulation.qualities,
-        crafters=dict(simulation.crafters),
-        productivity_research_index=dict(simulation.productivity_research_index),
+        crafters=simulation.crafters,
+        productivity_research_index=simulation.productivity_research_index,
         machine_cache=machine_configuration_cache,
     )

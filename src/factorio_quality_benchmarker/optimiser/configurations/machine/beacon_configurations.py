@@ -24,7 +24,7 @@ def _generate_beacon_configurations_for_key(
     key: BeaconConfigurationKey,
     beacon: Qualified[Beacon],
     modules: tuple[Qualified[Module], ...],
-    module_effects: dict[str, ModuleEffect],
+    module_effects: Mapping[str, ModuleEffect],
     is_2_1: bool,
 ) -> tuple[BeaconConfiguration, ...]:
     """
@@ -84,7 +84,7 @@ class BeaconConfigurationCache:
                 key=key,
                 beacon=self.beacon,
                 modules=self.modules,
-                module_effects=dict(self.module_effects),
+                module_effects=self.module_effects,
                 is_2_1=self.is_2_1,
             ),
         )

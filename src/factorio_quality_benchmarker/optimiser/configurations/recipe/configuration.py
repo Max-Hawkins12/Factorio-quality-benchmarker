@@ -17,8 +17,8 @@ from .pareto import get_frontier_recipe_candidates, get_legendary_recipe_candida
 def _generate_recipe_configurations_for_recipe(
     recipe: Recipe,
     qualities: Mapping[str, Quality],
-    crafters: dict[str, Qualified[Crafter]],
-    productivity_research_index: dict[Item, int],
+    crafters: Mapping[str, Qualified[Crafter]],
+    productivity_research_index: Mapping[Item, int],
     machine_configuration_cache: MachineConfigurationCache,
 ) -> RecipeConfigurationIndex:
 
@@ -69,8 +69,8 @@ def _generate_recipe_configurations_for_recipe(
 @dataclass(slots=True)
 class RecipeConfigurationCache:
     qualities: Mapping[str, Quality]
-    crafters: dict[str, Qualified[Crafter]]
-    productivity_research_index: dict[Item, int]
+    crafters: Mapping[str, Qualified[Crafter]]
+    productivity_research_index: Mapping[Item, int]
 
     machine_cache: MachineConfigurationCache
 

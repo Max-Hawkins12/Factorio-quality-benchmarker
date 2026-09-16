@@ -1,4 +1,5 @@
 import logging
+from collections.abc import Mapping
 from collections.abc import Set as AbstractSet
 from time import perf_counter
 
@@ -51,7 +52,7 @@ def _make_recipe_graph(
 # Recursive recipe search
 def _find_recipe_graphs(
     item: Item,
-    producer_recipes: dict[Material, tuple[Recipe, ...]],
+    producer_recipes: Mapping[Material, tuple[Recipe, ...]],
     *,
     excluded_producers: AbstractSet[Recipe] = frozenset(),
     visiting: frozenset[Item] = frozenset(),
@@ -123,9 +124,9 @@ def _find_recipe_graphs(
 
 
 def _get_producer_recipes(
-    materials: dict[str, Material],
-    recipes: dict[str, Recipe],
-) -> dict[Material, tuple[Recipe, ...]]:
+    materials: Mapping[str, Material],
+    recipes: Mapping[str, Recipe],
+) -> Mapping[Material, tuple[Recipe, ...]]:
     """
     Returns an index of every recipe by the material they produce
     """
@@ -142,8 +143,8 @@ def _get_producer_recipes(
 
 # Public API
 def generate_recipe_graph_index(
-    materials: dict[str, Material],
-    recipes: dict[str, Recipe],
+    materials: Mapping[str, Material],
+    recipes: Mapping[str, Recipe],
 ) -> RecipeGraphIndex:
     """Returns an index of all upcycling and production graphs by the item they produce."""
     start_time = perf_counter()

@@ -1,3 +1,4 @@
+from collections.abc import Mapping
 from dataclasses import dataclass
 
 from factorio_quality_benchmarker.game.engine import (
@@ -26,7 +27,7 @@ def calculate_recipe_objectives(
     recipe: Recipe,
     crafter: Qualified[Crafter],
     machine_configuration: MachineConfiguration,
-    productivity_research_index: dict[Item, int],
+    productivity_research_index: Mapping[Item, int],
 ) -> tuple[float, float, float, float]:
     """This is a cheap operation for calculating an estimate of the recipe metrics"""
     productivity = 1.0 + min(
@@ -68,11 +69,11 @@ def _dominates(
 
 def get_frontier_recipe_candidates(
     recipe: Recipe,
-    machine_configurations: dict[
+    machine_configurations: Mapping[
         Qualified[Crafter],
         tuple[MachineConfiguration, ...],
     ],
-    productivity_research_index: dict[Item, int],
+    productivity_research_index: Mapping[Item, int],
 ) -> tuple[RecipeFrontierCandidate, ...]:
 
     frontier: list[RecipeFrontierCandidate] = []

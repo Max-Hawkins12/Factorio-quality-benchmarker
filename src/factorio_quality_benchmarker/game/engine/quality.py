@@ -1,3 +1,4 @@
+from collections.abc import Mapping
 from math import floor
 
 from factorio_quality_benchmarker.game.models import (
@@ -19,16 +20,14 @@ def _quality_multiplier(
     return 1 + scale * quality.level
 
 
-def get_qualified_crafting_speed(
-    crafter: Qualified[Crafter],
-) -> float:
+def get_qualified_crafting_speed(crafter: Qualified[Crafter]) -> float:
     return crafter.entity.crafting_speed * _quality_multiplier(crafter.quality)
 
 
 def get_qualified_module_effects(
     module: Qualified[Module],
     is_2_1: bool,
-) -> dict[ModuleEffect, float]:
+) -> Mapping[ModuleEffect, float]:
 
     if module.entity.effects == {}:
         return {}
@@ -58,9 +57,7 @@ def get_qualified_module_effects(
     }
 
 
-def get_qualified_beacon_distribution_effectivity(
-    beacon: Qualified[Beacon],
-) -> float:
+def get_qualified_beacon_distribution_effectivity(beacon: Qualified[Beacon]) -> float:
     return (
         beacon.entity.distribution_effectivity
         + beacon.entity.distribution_effectivity_bonus_per_quality_level

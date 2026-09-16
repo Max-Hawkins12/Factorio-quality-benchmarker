@@ -1,3 +1,5 @@
+from collections.abc import Mapping
+
 from factorio_quality_benchmarker.game.models import Beacon, Module, ModuleEffect
 from factorio_quality_benchmarker.optimiser.simulation import Qualified
 
@@ -8,7 +10,7 @@ from .quality import get_qualified_module_effects
 
 def get_module_effects(
     modules: tuple[Qualified[Module], ...],
-    effects: dict[str, ModuleEffect],
+    effects: Mapping[str, ModuleEffect],
     is_2_1: bool,
 ) -> MachineEffects:
 
@@ -45,7 +47,7 @@ def get_beacon_effects(
     beacon: Qualified[Beacon],
     modules: tuple[Qualified[Module], ...],
     num_beacons: int,
-    effects: dict[str, ModuleEffect],
+    effects: Mapping[str, ModuleEffect],
     is_2_1: bool,
 ) -> MachineEffects:
 

@@ -19,7 +19,7 @@ def productivity_bonus(
     recipe: Recipe,
     crafter: Qualified[Crafter],
     machine_effects: MachineEffects,
-    productivity_research_index: dict[Item, int],
+    productivity_research_index: Mapping[Item, int],
 ) -> float:
 
     research_productivity = 0.0
@@ -151,7 +151,7 @@ def calculate_recipe_metrics(
     input_quality: Quality,
     crafter: Qualified[Crafter],
     machine_effects: MachineEffects,
-    productivity_research_index: dict[Item, int],
+    productivity_research_index: Mapping[Item, int],
     normal_quality: Quality,
 ) -> RecipeMetrics:
 

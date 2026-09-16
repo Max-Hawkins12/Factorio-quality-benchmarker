@@ -1,6 +1,6 @@
 import json
 import logging
-from collections.abc import Callable
+from collections.abc import Callable, Mapping
 from math import ceil
 from pathlib import Path
 
@@ -204,8 +204,8 @@ def _load_fluids(data: ParsedGameData) -> dict[str, Fluid]:
 
 def _load_ingredient(
     ingredient: Prototype,
-    items: dict[str, Item],
-    fluids: dict[str, Fluid],
+    items: Mapping[str, Item],
+    fluids: Mapping[str, Fluid],
 ) -> Ingredient:
     """Resolves an ingredient's material name to its canonical model object."""
     name = ingredient["name"]
@@ -246,8 +246,8 @@ def _calculate_product_ammount(product: Prototype) -> float:
 
 def _load_product(
     product: Prototype,
-    items: dict[str, Item],
-    fluids: dict[str, Fluid],
+    items: Mapping[str, Item],
+    fluids: Mapping[str, Fluid],
 ) -> Product:
     """
     Resolves a product's material and converts its dump representation to its
@@ -275,10 +275,10 @@ def _load_product(
 
 def _load_recipes(
     data: ParsedGameData,
-    items: dict[str, Item],
-    fluids: dict[str, Fluid],
-    crafting_categories: dict[str, CraftingCategory],
-    surface_properties: dict[str, SurfaceProperty],
+    items: Mapping[str, Item],
+    fluids: Mapping[str, Fluid],
+    crafting_categories: Mapping[str, CraftingCategory],
+    surface_properties: Mapping[str, SurfaceProperty],
 ) -> dict[str, Recipe]:
     """Loads recipes and resolves all material, category, and surface references."""
 
@@ -337,8 +337,8 @@ def _get_inherent_productivity(machine: Prototype) -> float:
 
 def _load_crafters(
     data: ParsedGameData,
-    crafting_categories: dict[str, CraftingCategory],
-    module_effects: dict[str, ModuleEffect],
+    crafting_categories: Mapping[str, CraftingCategory],
+    module_effects: Mapping[str, ModuleEffect],
 ) -> dict[str, Crafter]:
     """Loads crafting machines and furnaces into one domain collection."""
 
@@ -387,8 +387,8 @@ def _load_crafters(
 
 def _load_miners(
     data: ParsedGameData,
-    resource_categories: dict[str, ResourceCategory],
-    module_effects: dict[str, ModuleEffect],
+    resource_categories: Mapping[str, ResourceCategory],
+    module_effects: Mapping[str, ModuleEffect],
 ) -> dict[str, Miner]:
     """Loads miners and resolves their categories and allowed effects."""
 
@@ -413,7 +413,7 @@ def _load_miners(
 
 def _load_beacons(
     data: ParsedGameData,
-    module_effects: dict[str, ModuleEffect],
+    module_effects: Mapping[str, ModuleEffect],
 ) -> dict[str, Beacon]:
     """Loads beacon prototypes and resolves their supported effects."""
 
@@ -439,8 +439,8 @@ def _load_beacons(
 
 def _load_modules(
     data: ParsedGameData,
-    module_categories: dict[str, ModuleCategory],
-    module_effects: dict[str, ModuleEffect],
+    module_categories: Mapping[str, ModuleCategory],
+    module_effects: Mapping[str, ModuleEffect],
 ) -> dict[str, Module]:
     """Loads modules and resolves their effect names to canonical objects."""
 
@@ -460,9 +460,9 @@ def _load_modules(
 
 def _load_resources(
     data: ParsedGameData,
-    resource_categories: dict[str, ResourceCategory],
-    items: dict[str, Item],
-    fluids: dict[str, Fluid],
+    resource_categories: Mapping[str, ResourceCategory],
+    items: Mapping[str, Item],
+    fluids: Mapping[str, Fluid],
 ) -> dict[str, Resource]:
     """Loads mineable resources and resolves their category and product."""
 
@@ -492,7 +492,7 @@ def _load_resources(
 
 def _load_surfaces(
     data: ParsedGameData,
-    surface_properties: dict[str, SurfaceProperty],
+    surface_properties: Mapping[str, SurfaceProperty],
 ) -> dict[str, Surface]:
     """Loads surfaces using the canonical SurfaceProperty objects."""
 

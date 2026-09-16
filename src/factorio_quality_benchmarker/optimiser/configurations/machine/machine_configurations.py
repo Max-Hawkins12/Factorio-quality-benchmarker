@@ -32,7 +32,7 @@ from .pareto import get_pareto_frontier, get_unique_pareto_frontier
 def _get_recipe_modules(
     modules: tuple[Qualified[Module], ...],
     allowed_recipe_effects: AllowedRecipeEffects,
-    module_effects: dict[str, ModuleEffect],
+    module_effects: Mapping[str, ModuleEffect],
 ) -> tuple[Qualified[Module], ...]:
     """Get the modules allowed by a recipe under the specific allowed effects"""
     productivity = module_effects["productivity"]
@@ -57,7 +57,7 @@ def _get_recipe_modules(
 def _generate_module_configurations(
     modules: tuple[Qualified[Module], ...],
     num_module_slots: int,
-    module_effects: dict[str, ModuleEffect],
+    module_effects: Mapping[str, ModuleEffect],
     is_2_1: bool,
 ) -> tuple[ModuleConfiguration, ...]:
     return tuple(
@@ -75,7 +75,7 @@ def _generate_module_configurations(
 def _generate_module_configuration_index(
     modules: tuple[Qualified[Module], ...],
     num_module_slots: int,
-    module_effects: dict[str, ModuleEffect],
+    module_effects: Mapping[str, ModuleEffect],
     is_2_1: bool,
 ) -> ModuleConfigurationIndex:
     """Get a dict of Pareto frontier module configurations at every variation of allowed recipe effects."""
@@ -140,7 +140,7 @@ def _generate_machine_configuration_index(
 def _generate_machine_configuration_index_for_machine(
     machine: QualifiedMachine,
     modules: tuple[Qualified[Module], ...],
-    module_effects: dict[str, ModuleEffect],
+    module_effects: Mapping[str, ModuleEffect],
     is_2_1: bool,
     beacon_configuration_cache: BeaconConfigurationCache,
 ) -> MachineConfigurationIndex:
@@ -183,7 +183,7 @@ class MachineConfigurationCache:
             calculate=lambda: _generate_machine_configuration_index_for_machine(
                 machine=machine,
                 modules=self.modules,
-                module_effects=dict(self.module_effects),
+                module_effects=self.module_effects,
                 is_2_1=self.is_2_1,
                 beacon_configuration_cache=self.beacon_cache,
             ),
