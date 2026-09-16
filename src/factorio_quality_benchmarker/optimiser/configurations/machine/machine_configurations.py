@@ -8,10 +8,7 @@ from factorio_quality_benchmarker.game.engine import (
     get_machine_effects,
     get_module_effects,
 )
-from factorio_quality_benchmarker.game.models import (
-    Module,
-    ModuleEffect,
-)
+from factorio_quality_benchmarker.game.models import Module, ModuleEffect
 from factorio_quality_benchmarker.optimiser.configurations.cache import get_from_cache
 from factorio_quality_benchmarker.optimiser.simulation import (
     Qualified,
@@ -28,6 +25,7 @@ from .models import (
     ModuleConfiguration,
     ModuleConfigurationIndex,
 )
+from .modules import get_frontier_desired_modules
 from .pareto import get_pareto_frontier, get_unique_pareto_frontier
 
 
@@ -151,7 +149,11 @@ def _generate_machine_configuration_index_for_machine(
 
     return _generate_machine_configuration_index(
         module_configuration_index=_generate_module_configuration_index(
-            modules=get_allowed_modules(machine, modules, module_effects["quality"]),
+            modules=get_frontier_desired_modules(
+                get_allowed_modules(machine, modules, module_effects["quality"]),
+                module_effects,
+                is_2_1,
+            ),
             num_module_slots=machine.entity.module_slots,
             module_effects=module_effects,
             is_2_1=is_2_1,

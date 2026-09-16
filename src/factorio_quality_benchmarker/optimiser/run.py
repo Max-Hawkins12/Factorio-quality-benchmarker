@@ -1,6 +1,3 @@
-from factorio_quality_benchmarker.game.engine import (
-    get_frontier_desired_modules,
-)
 from factorio_quality_benchmarker.optimiser.configurations.machine import (
     BeaconConfigurationCache,
     MachineConfigurationCache,
@@ -20,11 +17,7 @@ def run(simulation: SimulationContext):
 
     effects = dict(simulation.game_data.module_effects)
 
-    modules = get_frontier_desired_modules(
-        tuple(simulation.modules.values()),
-        effects,
-        simulation.game_data.is_2_1,
-    )
+    modules = tuple(simulation.modules.values())
 
     beacon_configuration_cache = BeaconConfigurationCache(
         beacon=beacon,

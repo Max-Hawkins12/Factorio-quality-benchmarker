@@ -1,5 +1,7 @@
 from .models import AllowedRecipeEffects
 
+DESIRED_MODULE_EFFECTS = ("productivity", "quality", "speed")
+
 NO_EFFECTS = AllowedRecipeEffects(productivity=False, quality=False)
 PRODUCTIVITY = AllowedRecipeEffects(productivity=True, quality=False)
 QUALITY = AllowedRecipeEffects(productivity=False, quality=True)

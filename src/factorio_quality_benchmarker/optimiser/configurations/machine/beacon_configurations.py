@@ -4,6 +4,7 @@ from itertools import combinations_with_replacement
 
 from factorio_quality_benchmarker.game.engine import (
     calculate_maximum_beacons,
+    get_allowed_modules,
     get_beacon_effects,
 )
 from factorio_quality_benchmarker.game.models import Beacon, Module, ModuleEffect
@@ -15,6 +16,7 @@ from factorio_quality_benchmarker.optimiser.simulation import (
 
 from .constants import NO_EFFECTS, QUALITY
 from .models import BeaconConfiguration, BeaconConfigurationKey
+from .modules import get_frontier_desired_modules
 from .pareto import get_unique_pareto_frontier
 
 
@@ -42,7 +44,11 @@ def _generate_beacon_configurations_for_key(
             )
             for num_beacons in range(key.max_beacons + 1)
             for configuration in combinations_with_replacement(
-                modules,
+                get_frontier_desired_modules(
+                    get_allowed_modules(beacon, modules, module_effects["quality"]),
+                    module_effects,
+                    is_2_1,
+                ),
                 num_beacons * beacon.entity.module_slots,
             )
         ),

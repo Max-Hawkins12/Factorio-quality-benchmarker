@@ -55,7 +55,7 @@ def _generate_recipe_configurations_for_recipe(
                     recipe=recipe,
                     input_quality=quality,
                     crafter=configuration.crafter,
-                    machine_configuration=configuration.machine_configuration,
+                    machine_effects=configuration.machine_configuration.effects,
                     productivity_research_index=productivity_research_index,
                     normal_quality=qualities["normal"],
                 ),

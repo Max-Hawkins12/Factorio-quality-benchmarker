@@ -8,5 +8,3 @@ QUALITY_MODULE_SCALED_EFFECT = {
     "productivity": "productivity",
     "quality": "quality",
 }
-
-DESIRED_MODULE_EFFECTS = ("productivity", "quality", "speed")

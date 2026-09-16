@@ -7,21 +7,18 @@ from factorio_quality_benchmarker.game.models import (
     Quality,
     Recipe,
 )
-from factorio_quality_benchmarker.optimiser.configurations.machine import (
-    MachineConfiguration,
-)
 from factorio_quality_benchmarker.optimiser.simulation import Qualified
 
 from .constants import MAXIMUM_PRODUCTIVITY
-from .models import QualityAmounts, RecipeMetrics
+from .models import MachineEffects, QualityAmounts, RecipeMetrics
 from .quality import get_qualified_crafting_speed
 
 
 # Determine overall bonuses
-def _productivity_bonus(
+def productivity_bonus(
     recipe: Recipe,
     crafter: Qualified[Crafter],
-    machine_configuration: MachineConfiguration,
+    machine_effects: MachineEffects,
     productivity_research_index: dict[Item, int],
 ) -> float:
 
@@ -33,18 +30,18 @@ def _productivity_bonus(
         research_productivity = productivity_research_index.get(product, 0.0) / 10
 
     return (
-        machine_configuration.effects.productivity
+        machine_effects.productivity
         + crafter.entity.inherent_productivity
         + research_productivity
     )
 
 
-def _quality_bonus(machine_configuration: MachineConfiguration) -> float:
-    return max(machine_configuration.effects.quality, 0.0)
+def quality_bonus(machine_effects: MachineEffects) -> float:
+    return max(machine_effects.quality, 0.0)
 
 
-def _speed_bonus(machine_configuration: MachineConfiguration) -> float:
-    return machine_configuration.effects.speed
+def speed_bonus(machine_effects: MachineEffects) -> float:
+    return machine_effects.speed
 
 
 # Output amount calculations
@@ -153,83 +150,44 @@ def calculate_recipe_metrics(
     recipe: Recipe,
     input_quality: Quality,
     crafter: Qualified[Crafter],
-    machine_configuration: MachineConfiguration,
+    machine_effects: MachineEffects,
     productivity_research_index: dict[Item, int],
     normal_quality: Quality,
 ) -> RecipeMetrics:
 
-    quality_bonus = _quality_bonus(machine_configuration)
-    speed_bonus = _speed_bonus(machine_configuration)
-    productivity_bonus = _productivity_bonus(
+    quality = quality_bonus(machine_effects)
+    speed = speed_bonus(machine_effects)
+    productivity = productivity_bonus(
         recipe,
         crafter,
-        machine_configuration,
+        machine_effects,
         productivity_research_index,
     )
 
-    total_per_craft = _calculate_total_output_per_craft(recipe, productivity_bonus)
+    total_per_craft = _calculate_total_output_per_craft(recipe, productivity)
 
     total_per_second = _calculate_total_output_per_second(
         recipe,
-        speed_bonus,
+        speed,
         crafter,
         total_per_craft,
     )
 
     return RecipeMetrics(
         output_per_craft={
-            material: _apply_quality_distribution(input_quality, quality_bonus, amount)
+            material: _apply_quality_distribution(input_quality, quality, amount)
             if isinstance(material, Item)
             else QualityAmounts({normal_quality: amount})
             for material, amount in total_per_craft.items()
         },
         output_per_second={
-            material: _apply_quality_distribution(input_quality, quality_bonus, amount)
+            material: _apply_quality_distribution(input_quality, quality, amount)
             if isinstance(material, Item)
             else QualityAmounts({normal_quality: amount})
             for material, amount in total_per_second.items()
         },
         input_per_craft=_calculate_total_input_per_craft(recipe),
-        input_per_second=_calculate_total_input_per_second(
-            recipe, speed_bonus, crafter
-        ),
-        quality_bonus=quality_bonus,
-        productivity_bonus=productivity_bonus,
-    )
-
-
-def calculate_recipe_objectives(
-    recipe: Recipe,
-    crafter: Qualified[Crafter],
-    machine_configuration: MachineConfiguration,
-    productivity_research_index: dict[Item, int],
-) -> tuple[float, float, float, float]:
-    """This is a cheap operation for calculating an estimate of the recipe metrics"""
-    productivity = 1.0 + min(
-        _productivity_bonus(
-            recipe,
-            crafter,
-            machine_configuration,
-            productivity_research_index,
-        ),
-        MAXIMUM_PRODUCTIVITY,
-    )
-
-    total_per_craft = recipe.products[0].amount * productivity
-
-    crafts_per_second = (
-        get_qualified_crafting_speed(crafter)
-        * (1.0 + _speed_bonus(machine_configuration))
-        / recipe.energy_required
-    )
-
-    total_per_second = total_per_craft * crafts_per_second
-
-    quality = _quality_bonus(machine_configuration)
-
-    return (
-        round(total_per_craft, 12),
-        round(total_per_craft * quality, 12),
-        round(total_per_second, 12),
-        round(total_per_second * quality, 12),
+        input_per_second=_calculate_total_input_per_second(recipe, speed, crafter),
+        quality_bonus=quality,
+        productivity_bonus=productivity,
     )
