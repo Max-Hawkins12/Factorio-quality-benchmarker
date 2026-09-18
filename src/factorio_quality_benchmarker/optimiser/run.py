@@ -1,5 +1,5 @@
 from factorio_quality_benchmarker.optimiser.configurations.graph.results import (
-    optimise_graph,
+    generate_graph_results,
 )
 from factorio_quality_benchmarker.optimiser.configurations.machine import (
     BeaconConfigurationCache,
@@ -46,11 +46,9 @@ def run(simulation: SimulationContext):
 
     iron = simulation.items["iron-plate"]
 
-    optimise_graph(
+    generate_graph_results(
         iron,
-        graphs.production_graphs_by_item[iron][1],
+        graphs.upcycling_graphs_by_item[iron][0],
         simulation.qualities,
         recipe_configuration_cache,
     )
-
-    """print(len(upcycler_configs))"""

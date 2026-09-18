@@ -1,6 +1,5 @@
 from collections.abc import Mapping
 from dataclasses import dataclass
-from enum import Enum, auto
 
 from factorio_quality_benchmarker.game.engine import QualityAmounts
 from factorio_quality_benchmarker.game.models import Item, Recipe
@@ -40,8 +39,3 @@ class UpcyclingResult:
 class GraphState:
     available: dict[Item, QualityAmounts]
     configurations: dict[Qualified[Recipe], RecipeConfiguration]
-
-
-class OptimisationObjective(Enum):
-    LEGENDARY_PER_INPUT = auto()
-    LEGENDARY_PER_SECOND = auto()
