@@ -2,6 +2,7 @@ from collections.abc import Mapping
 
 from factorio_quality_benchmarker.game.models import (
     Crafter,
+    Fluid,
     Item,
     Material,
     Quality,
@@ -58,19 +59,22 @@ def _calculate_total_output_per_craft(
     }
 
 
-def _calculate_total_output_per_second(
+def _calculate_crafts_per_second(
     recipe: Recipe,
     speed_bonus: float,
     crafter: Qualified[Crafter],
-    output_per_craft: Mapping[Material, float],
-) -> Mapping[Material, float]:
-
-    crafts_per_second = (
+) -> float:
+    return (
         get_qualified_crafting_speed(crafter)
         * (1.0 + speed_bonus)
         / recipe.energy_required
     )
 
+
+def _calculate_total_output_per_second(
+    crafts_per_second: float,
+    output_per_craft: Mapping[Material, float],
+) -> Mapping[Material, float]:
     return {
         material: amount * crafts_per_second
         for material, amount in output_per_craft.items()
@@ -123,26 +127,45 @@ def _apply_quality_distribution(
 
 
 # Input amount calculations
-def _calculate_total_input_per_craft(recipe: Recipe) -> Mapping[Material, float]:
-    return {ingredient.material: ingredient.amount for ingredient in recipe.ingredients}
+def _calculate_total_input_per_craft(
+    recipe: Recipe,
+    input_quality: Quality,
+    normal_quality: Quality,
+) -> Mapping[Material, QualityAmounts]:
+
+    inputs = {}
+
+    for ingredient in recipe.ingredients:
+        quality = input_quality
+
+        if isinstance(ingredient.material, Fluid):
+            quality = normal_quality
+
+        inputs[ingredient.material] = QualityAmounts({quality: ingredient.amount})
+
+    return inputs
 
 
 def _calculate_total_input_per_second(
     recipe: Recipe,
-    speed_bonus: float,
-    crafter: Qualified[Crafter],
-) -> Mapping[Material, float]:
+    crafts_per_second: float,
+    input_quality: Quality,
+    normal_quality: Quality,
+) -> Mapping[Material, QualityAmounts]:
 
-    crafts_per_second = (
-        get_qualified_crafting_speed(crafter)
-        * (1.0 + speed_bonus)
-        / recipe.energy_required
-    )
+    inputs = {}
 
-    return {
-        ingredient.material: ingredient.amount * crafts_per_second
-        for ingredient in recipe.ingredients
-    }
+    for ingredient in recipe.ingredients:
+        quality = input_quality
+
+        if isinstance(ingredient.material, Fluid):
+            quality = normal_quality
+
+        inputs[ingredient.material] = QualityAmounts(
+            {quality: ingredient.amount * crafts_per_second}
+        )
+
+    return inputs
 
 
 # Public API
@@ -164,12 +187,12 @@ def calculate_recipe_metrics(
         productivity_research_index,
     )
 
+    crafts_per_second = _calculate_crafts_per_second(recipe, speed, crafter)
+
     total_per_craft = _calculate_total_output_per_craft(recipe, productivity)
 
     total_per_second = _calculate_total_output_per_second(
-        recipe,
-        speed,
-        crafter,
+        crafts_per_second,
         total_per_craft,
     )
 
@@ -186,8 +209,13 @@ def calculate_recipe_metrics(
             else QualityAmounts({normal_quality: amount})
             for material, amount in total_per_second.items()
         },
-        input_per_craft=_calculate_total_input_per_craft(recipe),
-        input_per_second=_calculate_total_input_per_second(recipe, speed, crafter),
+        input_per_craft=_calculate_total_input_per_craft(
+            recipe, input_quality, normal_quality
+        ),
+        input_per_second=_calculate_total_input_per_second(
+            recipe, crafts_per_second, input_quality, normal_quality
+        ),
         quality_bonus=quality,
         productivity_bonus=productivity,
+        crafts_per_second=crafts_per_second,
     )

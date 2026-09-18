@@ -192,14 +192,11 @@ def generate_recipe_graph_index(
                         upcycling_graphs[output_item].append(graph)
                         excluded_recipes_by_item[output_item].add(graph.end_recipe)
 
-                intermediate_item = graph.intermediate_upcycled_item
+                recycled_item = graph.recycled_item
 
-                if (
-                    intermediate_item
-                    and graph not in upcycling_graphs[intermediate_item]
-                ):
-                    upcycling_graphs[intermediate_item].append(graph)
-                    excluded_recipes_by_item[intermediate_item].add(graph.end_recipe)
+                if recycled_item and graph not in upcycling_graphs[recycled_item]:
+                    upcycling_graphs[recycled_item].append(graph)
+                    excluded_recipes_by_item[recycled_item].add(graph.end_recipe)
 
         logger.debug(
             "%s: found %d graphs (%d production, %d upcycling), %d upcyclers already covered",

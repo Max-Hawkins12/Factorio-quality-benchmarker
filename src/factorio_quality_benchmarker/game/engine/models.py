@@ -3,7 +3,7 @@ from __future__ import annotations
 from collections.abc import Mapping
 from dataclasses import dataclass
 
-from factorio_quality_benchmarker.game.models import Material, Quality
+from factorio_quality_benchmarker.game.models import Item, Material, Quality
 
 
 @dataclass(frozen=True, slots=True)
@@ -23,7 +23,7 @@ class QualityAmounts:
 
     def above(self, quality: Quality) -> QualityAmounts:
         if quality.next is None:
-            return QualityAmounts({quality: self.amounts[quality]})
+            return QualityAmounts({})
 
         return QualityAmounts(
             {
@@ -33,12 +33,28 @@ class QualityAmounts:
             }
         )
 
-    def __getitem__(self, quality: Quality) -> float:
-        return self.amounts.get(quality, 0.0)
-
     def scale(self, factor: float) -> QualityAmounts:
         return QualityAmounts(
             {quality: amount * factor for quality, amount in self.amounts.items()}
+        )
+
+    def __getitem__(self, quality: Quality) -> float:
+        return self.amounts.get(quality, 0.0)
+
+    def __add__(self, other: QualityAmounts) -> QualityAmounts:
+        return QualityAmounts(
+            {
+                quality: self[quality] + other[quality]
+                for quality in set().union(*[self.amounts.keys(), other.amounts.keys()])
+            }
+        )
+
+    def __sub__(self, other: QualityAmounts) -> QualityAmounts:
+        return QualityAmounts(
+            {
+                quality: self[quality] - other[quality]
+                for quality in set().union(*[self.amounts.keys(), other.amounts.keys()])
+            }
         )
 
 
@@ -46,51 +62,45 @@ class QualityAmounts:
 class RecipeMetrics:
     quality_bonus: float
     productivity_bonus: float
+    crafts_per_second: float
 
-    input_per_craft: Mapping[Material, float]
-    input_per_second: Mapping[Material, float]
+    input_per_craft: Mapping[Material, QualityAmounts]
+    input_per_second: Mapping[Material, QualityAmounts]
 
     output_per_craft: Mapping[Material, QualityAmounts]
     output_per_second: Mapping[Material, QualityAmounts]
 
-    def output_per_craft_above(
-        self, quality: Quality
-    ) -> Mapping[Material, QualityAmounts]:
+    @property
+    def input_items_per_craft(self) -> Mapping[Item, QualityAmounts]:
         return {
-            material: amount.above(quality)
-            for material, amount in self.output_per_craft.items()
-        }
-
-    def output_per_second_above(
-        self, quality: Quality
-    ) -> Mapping[Material, QualityAmounts]:
-        return {
-            material: amount.above(quality)
-            for material, amount in self.output_per_second.items()
+            item: amounts
+            for item, amounts in self.input_per_craft.items()
+            if isinstance(item, Item)
         }
 
     @property
     def total_per_craft(self) -> Mapping[Material, float]:
         return {
-            material: amount.total for material, amount in self.output_per_craft.items()
+            material: round(amount.total, 10)
+            for material, amount in self.output_per_craft.items()
         }
 
     @property
     def total_per_second(self) -> Mapping[Material, float]:
         return {
-            material: amount.total
+            material: round(amount.total, 10)
             for material, amount in self.output_per_second.items()
         }
 
     def total_per_craft_above(self, quality: Quality) -> Mapping[Material, float]:
         return {
-            material: amount.above(quality).total
+            material: round(amount.above(quality).total, 10)
             for material, amount in self.output_per_craft.items()
         }
 
     def total_per_second_above(self, quality: Quality) -> Mapping[Material, float]:
         return {
-            material: amount.above(quality).total
+            material: round(amount.above(quality).total, 10)
             for material, amount in self.output_per_second.items()
         }
 

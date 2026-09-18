@@ -1,3 +1,6 @@
+from factorio_quality_benchmarker.optimiser.configurations.graph.results import (
+    optimise_upcycler,
+)
 from factorio_quality_benchmarker.optimiser.configurations.machine import (
     BeaconConfigurationCache,
     MachineConfigurationCache,
@@ -5,7 +8,9 @@ from factorio_quality_benchmarker.optimiser.configurations.machine import (
 from factorio_quality_benchmarker.optimiser.configurations.recipe import (
     RecipeConfigurationCache,
 )
-from factorio_quality_benchmarker.optimiser.graphs import generate_recipe_graph_index
+from factorio_quality_benchmarker.optimiser.graphs import (
+    generate_recipe_graph_index,
+)
 from factorio_quality_benchmarker.optimiser.simulation import SimulationContext
 
 
@@ -38,3 +43,14 @@ def run(simulation: SimulationContext):
         productivity_research_index=simulation.productivity_research_index,
         machine_cache=machine_configuration_cache,
     )
+
+    iron = simulation.items["iron-plate"]
+
+    optimise_upcycler(
+        iron,
+        graphs.upcycling_graphs_by_item[iron][2],
+        simulation.qualities,
+        recipe_configuration_cache,
+    )
+
+    """print(len(upcycler_configs))"""

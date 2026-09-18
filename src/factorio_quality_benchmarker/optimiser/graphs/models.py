@@ -23,6 +23,19 @@ class RecipeGraph(ABC):
     end_recipe: Recipe
 
     @property
+    def ordered_recipes(self) -> tuple[Recipe, ...]:
+        graph = self.graph.copy()
+
+        graph.remove_edges_from(
+            (self.end_recipe, successor)
+            for successor in tuple(graph.successors(self.end_recipe))
+        )
+
+        return tuple(
+            node for node in nx.topological_sort(graph) if isinstance(node, Recipe)
+        )
+
+    @property
     def input_materials(self) -> tuple[Material, ...]:
         """Materials consumed by the graph's start recipe."""
         return self.start_recipe.ingredient_materials
@@ -75,27 +88,22 @@ class UpcyclingGraph(RecipeGraph):
     """
 
     @property
-    def intermediate_upcycled_item(self) -> Item | None:
+    def recycled_item(self) -> Item:
         """
-        Return if there is an intermediate item craft in this upcyling graph
+        Return the item consumed by the recycling recipe.
         """
-        item_nodes = [node for node in self.graph.nodes if isinstance(node, Item)]
+        recycling_ingredients = self.end_recipe.ingredient_items
 
-        for item_node in item_nodes:
-            if any(
-                isinstance(predecessor, Recipe) and not predecessor.is_recycling
-                for predecessor in self.graph.predecessors(item_node)
-            ) and any(
-                isinstance(successor, Recipe) and successor.is_recycling
-                for successor in self.graph.successors(item_node)
-            ):
-                return item_node
+        if len(recycling_ingredients) != 1:
+            raise ValueError(
+                f"Expected recycling recipe to have exactly one item input, got {len(recycling_ingredients)}"
+            )
 
-        return None
+        return recycling_ingredients[0]
 
     @property
     def is_self_recycling(self) -> bool:
-        return self.start_recipe == self.end_recipe
+        return self.start_recipe is self.end_recipe
 
     @classmethod
     def is_valid(

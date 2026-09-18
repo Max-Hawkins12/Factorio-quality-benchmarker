@@ -558,7 +558,12 @@ def _load_qualities(
         len(qualities),
     )
 
-    return qualities
+    return dict(
+        sorted(
+            qualities.items(),
+            key=lambda item: item[1].level,
+        )
+    )
 
 
 def _load_metadata(data: ParsedGameData) -> PrototypeCollection:
