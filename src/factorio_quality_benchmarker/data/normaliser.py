@@ -7,14 +7,21 @@ logger = logging.getLogger(__name__)
 
 # Factorio defaults that are missing from the data dump
 DEFAULT_RECIPE_CATEGORIES = ["crafting"]
-DEFAULT_RESOURCE_CATEGORY = "basic-solid"
-DEFAULT_ALLOWED_EFFECTS = [
+DEFAULT_RECIPE_ENERGY = 0.5
+DEFAULT_RECIPE_ALLOW_PRODUCTIVITY = False
+DEFAULT_RECIPE_ALLOW_QUALITY = True
+
+DEFAULT_MODULE_SLOTS_COUNT = 0
+
+DEFAULT_MINER_ALLOWED_EFFECTS = [
     "consumption",
     "speed",
     "productivity",
     "pollution",
     "quality",
 ]
+
+DEFAULT_RESOURCE_CATEGORY = "basic-solid"
 NAUVIS_DEFAULT_SURFACE_PROPERTIES: Prototype = {
     "magnetic-field": 90,
     "solar-power": 100,
@@ -28,17 +35,29 @@ def _apply_factorio_defaults(game_data: ParsedGameData) -> None:
     Add missing default values, which would otherwise be added by the Factrio Engine.
     """
 
+    for crafter in game_data.get("crafters", {}).values():
+        if crafter.get("module_slots") is None:
+            crafter["module_slots"] = DEFAULT_MODULE_SLOTS_COUNT
+
+    for miner in game_data.get("miners", {}).values():
+        if miner.get("allowed_effects") is None:
+            miner["allowed_effects"] = DEFAULT_MINER_ALLOWED_EFFECTS
+        if miner.get("module_slots") is None:
+            miner["module_slots"] = DEFAULT_MODULE_SLOTS_COUNT
+
     for recipe in game_data.get("recipes", {}).values():
         if recipe.get("categories") is None:
             recipe["categories"] = DEFAULT_RECIPE_CATEGORIES.copy()
+        if recipe.get("energy_required") is None:
+            recipe["energy_required"] = DEFAULT_RECIPE_ENERGY
+        if recipe.get("allow_productivity") is None:
+            recipe["allow_productivity"] = DEFAULT_RECIPE_ALLOW_PRODUCTIVITY
+        if recipe.get("allow_quality") is None:
+            recipe["allow_quality"] = DEFAULT_RECIPE_ALLOW_QUALITY
 
     for resource in game_data.get("resources", {}).values():
         if resource.get("category") is None:
             resource["category"] = DEFAULT_RESOURCE_CATEGORY
-
-    for miner in game_data.get("miners", {}).values():
-        if miner.get("allowed_effects") is None:
-            miner["allowed_effects"] = DEFAULT_ALLOWED_EFFECTS
 
     for surface in game_data.get("surfaces", {}).values():
         properties = surface.setdefault("surface_properties", {})

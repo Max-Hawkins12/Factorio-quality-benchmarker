@@ -298,8 +298,8 @@ def _load_recipes(
                 _load_product(product, items, fluids) for product in recipe["results"]
             ),
             energy_required=recipe["energy_required"],
-            allow_productivity=recipe["allow_productivity"] is True,
-            allow_quality=recipe["allow_quality"] is not False,
+            allow_productivity=recipe["allow_productivity"],
+            allow_quality=recipe["allow_quality"],
             surface_conditions=tuple(
                 SurfaceCondition(
                     property=surface_properties[condition["property"]],
@@ -353,7 +353,7 @@ def _load_crafters(
                 for category in machine["crafting_categories"]
             ),
             crafting_speed=machine["crafting_speed"],
-            module_slots=machine["module_slots"] if machine["module_slots"] else 0,
+            module_slots=machine["module_slots"],
             allowed_effects=frozenset(
                 module_effects[effect] for effect in machine["allowed_effects"]
             ),
@@ -400,7 +400,7 @@ def _load_miners(
                 for category in miner["resource_categories"]
             ),
             mining_speed=miner["mining_speed"],
-            module_slots=miner["module_slots"] if miner["module_slots"] else 0,
+            module_slots=miner["module_slots"],
             allowed_effects=frozenset(
                 module_effects[effect] for effect in miner["allowed_effects"]
             ),
