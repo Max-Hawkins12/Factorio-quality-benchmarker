@@ -1,7 +1,9 @@
 from collections.abc import Mapping
 from dataclasses import dataclass
+from enum import Enum, auto
 
-from factorio_quality_benchmarker.game.models import Recipe
+from factorio_quality_benchmarker.game.engine import QualityAmounts
+from factorio_quality_benchmarker.game.models import Item, Recipe
 from factorio_quality_benchmarker.optimiser.configurations.recipe import (
     RecipeConfiguration,
 )
@@ -32,3 +34,14 @@ class GraphResult:
 class UpcyclingResult:
     upcyclers: tuple[GraphResult, ...]
     production_graphs: tuple[GraphResult, ...]
+
+
+@dataclass(slots=True)
+class GraphState:
+    available: dict[Item, QualityAmounts]
+    configurations: dict[Qualified[Recipe], RecipeConfiguration]
+
+
+class OptimisationObjective(Enum):
+    LEGENDARY_PER_INPUT = auto()
+    LEGENDARY_PER_SECOND = auto()
