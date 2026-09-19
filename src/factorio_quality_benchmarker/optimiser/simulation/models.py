@@ -72,11 +72,6 @@ class RunConfig:
     upcycler_scope: UpcyclerScope
 
     entity_quality: Quality
-    desired_quality: Quality
-
-    def __post_init__(self):
-        if self.desired_quality.name == "normal":
-            raise ValueError("An upcycler must produce a quality higher than normal.")
 
 
 @dataclass(frozen=True, slots=True)
@@ -92,6 +87,36 @@ class SimulationContext:
     miners_by_quality: QualifiedIndex[Qualified[Miner]]
     modules_by_quality: QualifiedIndex[Qualified[Module]]
     beacons_by_quality: QualifiedIndex[Qualified[Beacon]]
+
+    @property
+    def producer_recipes_by_material(self) -> Mapping[Material, tuple[Recipe, ...]]:
+        producer_recipes: dict[Material, list[Recipe]] = {
+            material: [] for material in self.materials.values()
+        }
+
+        for recipe in self.recipes.values():
+            for material in recipe.product_materials:
+                producer_recipes[material].append(recipe)
+
+        return {
+            material: tuple(recipe) for material, recipe in producer_recipes.items()
+        }
+
+    @property
+    def recycling_recipes_by_item(self) -> Mapping[Item, Recipe]:
+        recycling_recipes: dict[Item, Recipe] = {}
+
+        for recipe in self.recipes.values():
+            if recipe.is_recycling:
+                recycling_recipes[recipe.ingredient_items[0]] = recipe
+
+        return recycling_recipes
+
+    def item_recycling_recipe(self, item: Item) -> Recipe:
+        for recipe in self.producer_recipes_by_material[item]:
+            if recipe.is_recycling:
+                return recipe
+        raise ValueError(f"{item.name} has no recorded recycling recipe.")
 
     # "Overrides" of the parsed game data values
     items: Mapping[str, Item]

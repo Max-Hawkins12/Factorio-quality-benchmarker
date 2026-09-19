@@ -29,7 +29,6 @@ def dev() -> None:
             productivity_levels=NO_RESEARCH,
             upcycler_scope=UpcyclerScope.CURATED,
             entity_quality=game_data.qualities["legendary"],
-            desired_quality=game_data.qualities["legendary"],
         ),
     )
 
