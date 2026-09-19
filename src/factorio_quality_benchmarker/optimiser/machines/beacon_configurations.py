@@ -8,7 +8,7 @@ from factorio_quality_benchmarker.game.engine import (
     get_beacon_effects,
 )
 from factorio_quality_benchmarker.game.models import Beacon, Module, ModuleEffect
-from factorio_quality_benchmarker.optimiser.configurations.cache import get_from_cache
+from factorio_quality_benchmarker.optimiser.cache import get_from_cache
 from factorio_quality_benchmarker.optimiser.simulation import (
     Qualified,
     QualifiedMachine,

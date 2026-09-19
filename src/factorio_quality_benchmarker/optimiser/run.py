@@ -1,15 +1,15 @@
-from factorio_quality_benchmarker.optimiser.configurations.graph.results import (
+from factorio_quality_benchmarker.optimiser.graphs import (
+    generate_recipe_graph_index,
+)
+from factorio_quality_benchmarker.optimiser.graphs.results import (
     generate_graph_results,
 )
-from factorio_quality_benchmarker.optimiser.configurations.machine import (
+from factorio_quality_benchmarker.optimiser.machines import (
     BeaconConfigurationCache,
     MachineConfigurationCache,
 )
-from factorio_quality_benchmarker.optimiser.configurations.recipe import (
+from factorio_quality_benchmarker.optimiser.recipes import (
     RecipeConfigurationCache,
-)
-from factorio_quality_benchmarker.optimiser.graphs import (
-    generate_recipe_graph_index,
 )
 from factorio_quality_benchmarker.optimiser.simulation import SimulationContext
 

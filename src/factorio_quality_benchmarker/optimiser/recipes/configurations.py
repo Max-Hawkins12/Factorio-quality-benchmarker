@@ -3,8 +3,8 @@ from dataclasses import dataclass, field
 
 from factorio_quality_benchmarker.game.engine import calculate_recipe_metrics
 from factorio_quality_benchmarker.game.models import Crafter, Item, Quality, Recipe
-from factorio_quality_benchmarker.optimiser.configurations.cache import get_from_cache
-from factorio_quality_benchmarker.optimiser.configurations.machine import (
+from factorio_quality_benchmarker.optimiser.cache import get_from_cache
+from factorio_quality_benchmarker.optimiser.machines import (
     AllowedRecipeEffects,
     MachineConfigurationCache,
 )

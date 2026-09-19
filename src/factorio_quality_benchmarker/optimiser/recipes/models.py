@@ -3,9 +3,7 @@ from dataclasses import dataclass
 
 from factorio_quality_benchmarker.game.engine import RecipeMetrics
 from factorio_quality_benchmarker.game.models import Crafter, Quality
-from factorio_quality_benchmarker.optimiser.configurations.machine import (
-    MachineConfiguration,
-)
+from factorio_quality_benchmarker.optimiser.machines import MachineConfiguration
 from factorio_quality_benchmarker.optimiser.simulation import Qualified
 
 

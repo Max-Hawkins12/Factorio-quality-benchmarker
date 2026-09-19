@@ -4,12 +4,10 @@ from dataclasses import dataclass
 
 import networkx as nx
 
-from factorio_quality_benchmarker.game.models import (
-    Fluid,
-    Item,
-    Material,
-    Recipe,
-)
+from factorio_quality_benchmarker.game.engine import QualityAmounts
+from factorio_quality_benchmarker.game.models import Fluid, Item, Material, Recipe
+from factorio_quality_benchmarker.optimiser.recipes import RecipeConfiguration
+from factorio_quality_benchmarker.optimiser.simulation import Qualified
 
 
 @dataclass(frozen=True, slots=True)
@@ -156,3 +154,34 @@ class ProductionGraph(RecipeGraph):
 class RecipeGraphIndex:
     upcycling_graphs_by_item: Mapping[Item, tuple[UpcyclingGraph, ...]]
     production_graphs_by_item: Mapping[Item, tuple[ProductionGraph, ...]]
+
+
+@dataclass(frozen=True, slots=True)
+class GraphMetrics:
+    legendary_per_input: float
+    legendary_per_second: float
+
+
+@dataclass(frozen=True, slots=True)
+class GraphConfiguration:
+    recipe_configurations: Mapping[Qualified[Recipe], RecipeConfiguration]
+    metrics: GraphMetrics
+
+
+@dataclass(frozen=True, slots=True)
+class GraphResult:
+    graph: RecipeGraph
+    best_per_input: GraphConfiguration
+    best_per_second: GraphConfiguration
+
+
+@dataclass(frozen=True, slots=True)
+class UpcyclingResult:
+    upcyclers: tuple[GraphResult, ...]
+    production_graphs: tuple[GraphResult, ...]
+
+
+@dataclass(slots=True)
+class GraphState:
+    available: dict[Item, QualityAmounts]
+    configurations: dict[Qualified[Recipe], RecipeConfiguration]

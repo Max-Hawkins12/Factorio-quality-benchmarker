@@ -10,9 +10,7 @@ from factorio_quality_benchmarker.game.engine import (
     speed_bonus,
 )
 from factorio_quality_benchmarker.game.models import Crafter, Item, Recipe
-from factorio_quality_benchmarker.optimiser.configurations.machine import (
-    MachineConfiguration,
-)
+from factorio_quality_benchmarker.optimiser.machines import MachineConfiguration
 from factorio_quality_benchmarker.optimiser.simulation import Qualified
 
 

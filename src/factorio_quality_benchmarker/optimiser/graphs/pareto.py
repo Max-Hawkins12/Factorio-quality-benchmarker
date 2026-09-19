@@ -2,9 +2,7 @@ from collections.abc import Callable, Iterable
 from typing import TypeVar
 
 from factorio_quality_benchmarker.game.models import Quality
-from factorio_quality_benchmarker.optimiser.configurations.recipe import (
-    RecipeConfiguration,
-)
+from factorio_quality_benchmarker.optimiser.recipes import RecipeConfiguration
 
 from .constants import EMPTY_QUALITY_AMOUNTS
 from .models import GraphState

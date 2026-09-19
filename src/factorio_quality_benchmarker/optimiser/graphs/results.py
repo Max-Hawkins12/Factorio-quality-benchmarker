@@ -1,15 +1,21 @@
 from collections.abc import Mapping
 
 from factorio_quality_benchmarker.game.models import Item, Quality, Recipe
-from factorio_quality_benchmarker.optimiser.configurations.recipe import (
+from factorio_quality_benchmarker.optimiser.recipes import (
     RecipeConfiguration,
     RecipeConfigurationCache,
 )
-from factorio_quality_benchmarker.optimiser.graphs import RecipeGraph, UpcyclingGraph
 from factorio_quality_benchmarker.optimiser.simulation import Qualified
 
 from .constants import EMPTY_QUALITY_AMOUNTS
-from .models import GraphConfiguration, GraphMetrics, GraphResult, GraphState
+from .models import (
+    GraphConfiguration,
+    GraphMetrics,
+    GraphResult,
+    GraphState,
+    RecipeGraph,
+    UpcyclingGraph,
+)
 from .pareto import (
     add_state_to_frontier,
     get_frontier_recipe_configurations_throughput_ignored,
