@@ -1,9 +1,4 @@
-from .models import (
-    ProductionGraph,
-    RecipeGraph,
-    RecipeGraphIndex,
-    UpcyclingGraph,
-)
+from .models import ProductionGraph, RecipeGraph, RecipeGraphIndex, UpcyclingGraph
 from .search import generate_recipe_graph_index
 
 __all__ = [

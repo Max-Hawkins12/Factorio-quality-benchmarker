@@ -1,5 +1,5 @@
 from .constants import (
-    EMPTY_MODULE,
+    DESIRED_MODULE_EFFECTS,
     MAX_LEVEL,
     MAX_WITH_PROD_MODULES,
     MAX_WITHOUT_PROD_MODULES,
@@ -16,7 +16,7 @@ from .models import (
 from .simulate import build_simulation_context
 
 __all__ = [
-    "EMPTY_MODULE",
+    "DESIRED_MODULE_EFFECTS",
     "MAX_LEVEL",
     "MAX_WITHOUT_PROD_MODULES",
     "MAX_WITH_PROD_MODULES",

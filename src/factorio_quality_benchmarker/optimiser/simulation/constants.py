@@ -1,23 +1,4 @@
-from factorio_quality_benchmarker.game.models import Module, ModuleCategory, Quality
-
-from .models import ProductivityResearchLevels, Qualified
-
-# A Qualified module to act as a place holder for an empty module slot
-EMPTY_MODULE = Qualified(
-    Module(
-        name="empty",
-        tier=0,
-        category=ModuleCategory(type="empty"),
-        effects={},
-    ),
-    Quality(
-        name="unknown",
-        level=-1,
-        next=None,
-        next_probability=None,
-        chain_probability=None,
-    ),
-)
+from .models import ProductivityResearchLevels
 
 # Productivity research level presets
 NO_RESEARCH = ProductivityResearchLevels(
@@ -27,7 +8,6 @@ NO_RESEARCH = ProductivityResearchLevels(
     plastic_bar_level=0,
     rocket_fuel_level=0,
 )
-
 
 MAX_WITH_PROD_MODULES = ProductivityResearchLevels(
     # Minimum level to reach the productivity cap with legendary modules
@@ -57,6 +37,9 @@ MAX_LEVEL = ProductivityResearchLevels(
     plastic_bar_level=30,
     rocket_fuel_level=30,
 )
+
+# The only module effects relevent to the simulation
+DESIRED_MODULE_EFFECTS = ("productivity", "quality", "speed")
 
 # Items which have a valid recipe and/or recycling recipe, but are uncraftable ingame
 """

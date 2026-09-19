@@ -2,9 +2,12 @@ from collections.abc import Mapping
 
 from factorio_quality_benchmarker.game.engine import get_qualified_module_effects
 from factorio_quality_benchmarker.game.models import Module, ModuleEffect
-from factorio_quality_benchmarker.optimiser.simulation import EMPTY_MODULE, Qualified
+from factorio_quality_benchmarker.optimiser.simulation import (
+    DESIRED_MODULE_EFFECTS,
+    Qualified,
+)
 
-from .constants import DESIRED_MODULE_EFFECTS
+from .constants import EMPTY_MODULE
 
 
 def _get_desired_module_effects(
