@@ -151,9 +151,9 @@ class ProductionGraph(RecipeGraph):
 
 
 @dataclass(frozen=True, slots=True)
-class RecipeGraphIndex:
-    upcycling_graphs_by_item: Mapping[Item, tuple[UpcyclingGraph, ...]]
-    production_graphs_by_item: Mapping[Item, tuple[ProductionGraph, ...]]
+class UpcyclerSystem:
+    upcycler: UpcyclingGraph
+    production_graph: ProductionGraph | None = None
 
 
 @dataclass(frozen=True, slots=True)

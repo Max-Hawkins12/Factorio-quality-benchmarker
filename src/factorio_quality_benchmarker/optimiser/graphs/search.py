@@ -8,7 +8,7 @@ import networkx as nx
 
 from factorio_quality_benchmarker.game.models import Item, Material, Recipe
 
-from .models import ProductionGraph, RecipeGraph, UpcyclingGraph
+from .models import ProductionGraph, RecipeGraph, UpcyclerSystem, UpcyclingGraph
 
 logger = logging.getLogger(__name__)
 
@@ -51,7 +51,7 @@ def _make_recipe_graph(
 
 
 # Recursive recipe search
-def _find_recipe_graphs(
+def _discover_recipe_graphs(
     item: Item,
     producer_recipes: Mapping[Material, tuple[Recipe, ...]],
     *,
@@ -94,7 +94,7 @@ def _find_recipe_graphs(
             forbidden_items | {item} if recipe.is_recycling else forbidden_items
         )
 
-        for upstream in _find_recipe_graphs(
+        for upstream in _discover_recipe_graphs(
             ingredient,
             producer_recipes,
             visiting=visiting,
@@ -124,8 +124,9 @@ def _find_recipe_graphs(
     return tuple(graphs)
 
 
+# Public cache
 @dataclass(slots=True)
-class RecipeGraphCache:
+class UpcyclerSystemCache:
     producer_recipes: Mapping[Material, tuple[Recipe, ...]]
     recycling_recipes: Mapping[Item, Recipe]
 
@@ -134,21 +135,8 @@ class RecipeGraphCache:
     )
     _searched: set[Item] = field(default_factory=set)
 
-    def get(self, item: Item) -> tuple[RecipeGraph, ...]:
-        if item not in self._searched:
-            self._discover(item)
-
-            recycling_recipe = self.recycling_recipes[item]
-
-            if recycling_recipe.product_items != (item,):
-                self._discover(self.recycling_recipes[item].product_items[0])
-
-            self._searched.add(item)
-
-        return tuple(self._graphs.get(item, ()))
-
-    def _discover(self, item: Item):
-        raw_graphs = _find_recipe_graphs(
+    def _discover(self, item: Item) -> None:
+        raw_graphs = _discover_recipe_graphs(
             item,
             self.producer_recipes,
             excluded_producers={graph.end_recipe for graph in self._graphs[item]},
@@ -163,12 +151,48 @@ class RecipeGraphCache:
 
                 self._graphs[graph.recycled_item].add(graph)
 
-    def get_upcyclers(self, item: Item) -> tuple[UpcyclingGraph, ...]:
+    def _get(self, item: Item) -> tuple[RecipeGraph, ...]:
+        if item not in self._searched:
+            self._discover(item)
+
+            recycling_recipe = self.recycling_recipes[item]
+
+            if recycling_recipe.product_items != (item,):
+                self._discover(recycling_recipe.product_items[0])
+
+            self._searched.add(item)
+
+        return tuple(self._graphs.get(item, ()))
+
+    def _get_upcyclers(self, item: Item) -> tuple[UpcyclingGraph, ...]:
         return tuple(
-            graph for graph in self.get(item) if isinstance(graph, UpcyclingGraph)
+            graph for graph in self._get(item) if isinstance(graph, UpcyclingGraph)
         )
 
-    def get_producers(self, item: Item) -> tuple[ProductionGraph, ...]:
+    def _get_producers(self, item: Item) -> tuple[ProductionGraph, ...]:
         return tuple(
-            graph for graph in self.get(item) if isinstance(graph, ProductionGraph)
+            graph for graph in self._get(item) if isinstance(graph, ProductionGraph)
         )
+
+    def get_upcycler_systems(self, item: Item) -> tuple[UpcyclerSystem, ...]:
+        systems: list[UpcyclerSystem] = []
+
+        for upcycler in self._get_upcyclers(item):
+            systems.append(
+                UpcyclerSystem(
+                    upcycler=upcycler,
+                )
+            )
+
+            if len(upcycler.input_items) != 1:
+                continue
+
+            systems.extend(
+                UpcyclerSystem(
+                    upcycler=upcycler,
+                    production_graph=producer,
+                )
+                for producer in self._get_producers(upcycler.input_items[0])
+            )
+
+        return tuple(systems)

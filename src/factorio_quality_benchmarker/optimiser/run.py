@@ -1,4 +1,4 @@
-from factorio_quality_benchmarker.optimiser.graphs import RecipeGraphCache
+from factorio_quality_benchmarker.optimiser.graphs import UpcyclerSystemCache
 from factorio_quality_benchmarker.optimiser.machines import (
     BeaconConfigurationCache,
     MachineConfigurationCache,
@@ -10,18 +10,19 @@ from factorio_quality_benchmarker.optimiser.simulation import SimulationContext
 
 
 def run(simulation: SimulationContext):
-    recipe_graph_cache = RecipeGraphCache(
+    recipe_graph_cache = UpcyclerSystemCache(
         producer_recipes=simulation.producer_recipes_by_material,
         recycling_recipes=simulation.recycling_recipes_by_item,
     )
 
-    em_plants = recipe_graph_cache.get(simulation.items["electromagnetic-plant"])
+    em_plants = recipe_graph_cache.get_upcycler_systems(
+        simulation.items["electromagnetic-plant"]
+    )
 
     print(len(em_plants))
-    print([node.name for graph in em_plants for node in graph.graph.nodes])
 
-    recipe_graph_cache.get(simulation.items["holmium-plate"])
-    recipe_graph_cache.get(simulation.items["steel-plate"])
+    recipe_graph_cache.get_upcycler_systems(simulation.items["holmium-plate"])
+    recipe_graph_cache.get_upcycler_systems(simulation.items["steel-plate"])
 
     beacon = simulation.beacon
 

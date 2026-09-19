@@ -1,10 +1,9 @@
-from .models import ProductionGraph, RecipeGraph, RecipeGraphIndex, UpcyclingGraph
-from .search import RecipeGraphCache
+from .models import ProductionGraph, RecipeGraph, UpcyclingGraph
+from .search import UpcyclerSystemCache
 
 __all__ = [
     "ProductionGraph",
     "RecipeGraph",
-    "RecipeGraphCache",
-    "RecipeGraphIndex",
+    "UpcyclerSystemCache",
     "UpcyclingGraph",
 ]
