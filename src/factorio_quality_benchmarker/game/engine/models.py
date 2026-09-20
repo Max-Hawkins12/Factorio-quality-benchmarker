@@ -79,6 +79,10 @@ class RecipeMetrics:
         }
 
     @property
+    def input_materals_per_craft(self) -> Mapping[Material, QualityAmounts]:
+        return {material: amounts for material, amounts in self.input_per_craft.items()}
+
+    @property
     def total_per_craft(self) -> Mapping[Material, float]:
         return {
             material: round(amount.total, 10)

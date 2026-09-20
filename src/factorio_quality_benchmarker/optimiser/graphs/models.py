@@ -208,19 +208,24 @@ class GraphMetrics:
 
 
 @dataclass(frozen=True, slots=True)
-class GraphConfiguration:
-    recipe_configurations: Mapping[Qualified[Recipe], RecipeConfiguration]
-    metrics: GraphMetrics
-
-
-@dataclass(frozen=True, slots=True)
 class GraphResult:
     graph: RecipeGraph
     best_per_input: GraphConfiguration
     best_per_second: GraphConfiguration
 
 
+@dataclass(frozen=True, slots=True)
+class GraphConfiguration:
+    configurations: Mapping[Qualified[Recipe], RecipeConfiguration]
+
+
+@dataclass(frozen=True, slots=True)
+class GraphFrontiers:
+    per_input: tuple[GraphConfiguration, ...]
+    per_second: tuple[GraphConfiguration, ...]
+
+
 @dataclass(slots=True)
 class GraphState:
-    available: dict[Item, QualityAmounts]
+    available: dict[Material, QualityAmounts]
     configurations: dict[Qualified[Recipe], RecipeConfiguration]
