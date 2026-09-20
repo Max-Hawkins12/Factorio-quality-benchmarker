@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from abc import ABC, abstractmethod
 from collections.abc import Mapping
 from dataclasses import dataclass
@@ -19,6 +21,19 @@ class RecipeGraph(ABC):
     graph: nx.DiGraph
     start_recipe: Recipe
     end_recipe: Recipe
+
+    @property
+    def _identity(self) -> frozenset:
+        return frozenset(self.graph.edges)
+
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, RecipeGraph):
+            return NotImplemented
+
+        return self._identity == other._identity
+
+    def __hash__(self) -> int:
+        return hash(self._identity)
 
     @property
     def ordered_recipes(self) -> tuple[Recipe, ...]:
@@ -85,6 +100,12 @@ class UpcyclingGraph(RecipeGraph):
     A core upcycling graph which consists of a closed cycle
     """
 
+    def __eq__(self, value: object) -> bool:
+        return super().__eq__(value)
+
+    def __hash__(self) -> int:
+        return super().__hash__()
+
     @property
     def recycled_item(self) -> Item:
         """
@@ -94,7 +115,7 @@ class UpcyclingGraph(RecipeGraph):
 
         if len(recycling_ingredients) != 1:
             raise ValueError(
-                f"Expected recycling recipe to have exactly one item input, got {len(recycling_ingredients)}"
+                f"Expected recycling recipe to have exactly one item ingredient, got {len(recycling_ingredients)}"
             )
 
         return recycling_ingredients[0]
@@ -118,6 +139,12 @@ class ProductionGraph(RecipeGraph):
     """
     A graph of a recipe production chain
     """
+
+    def __eq__(self, value: object) -> bool:
+        return super().__eq__(value)
+
+    def __hash__(self) -> int:
+        return super().__hash__()
 
     @classmethod
     def is_valid(
@@ -153,7 +180,25 @@ class ProductionGraph(RecipeGraph):
 @dataclass(frozen=True, slots=True)
 class UpcyclerSystem:
     upcycler: UpcyclingGraph
-    production_graph: ProductionGraph | None = None
+
+    before_production_graph: ProductionGraph | None = None
+    after_production_graph: ProductionGraph | None = None
+
+    @property
+    def input_items(self) -> tuple[Item, ...]:
+        return (
+            self.upcycler.input_items
+            if self.before_production_graph is None
+            else self.before_production_graph.input_items
+        )
+
+    @property
+    def output_items(self) -> tuple[Item, ...]:
+        return (
+            self.upcycler.output_items
+            if self.after_production_graph is None
+            else self.after_production_graph.output_items
+        )
 
 
 @dataclass(frozen=True, slots=True)
@@ -173,12 +218,6 @@ class GraphResult:
     graph: RecipeGraph
     best_per_input: GraphConfiguration
     best_per_second: GraphConfiguration
-
-
-@dataclass(frozen=True, slots=True)
-class UpcyclingResult:
-    upcyclers: tuple[GraphResult, ...]
-    production_graphs: tuple[GraphResult, ...]
 
 
 @dataclass(slots=True)
