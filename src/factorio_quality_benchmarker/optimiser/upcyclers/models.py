@@ -202,19 +202,6 @@ class UpcyclerSystem:
 
 
 @dataclass(frozen=True, slots=True)
-class GraphMetrics:
-    legendary_per_input: float
-    legendary_per_second: float
-
-
-@dataclass(frozen=True, slots=True)
-class GraphResult:
-    graph: RecipeGraph
-    best_per_input: GraphConfiguration
-    best_per_second: GraphConfiguration
-
-
-@dataclass(frozen=True, slots=True)
 class GraphConfiguration:
     configurations: Mapping[Qualified[Recipe], RecipeConfiguration]
 
@@ -223,6 +210,39 @@ class GraphConfiguration:
 class GraphFrontiers:
     per_input: tuple[GraphConfiguration, ...]
     per_second: tuple[GraphConfiguration, ...]
+
+
+@dataclass(frozen=True, slots=True)
+class UpcyclerResult:
+    system: UpcyclerSystem
+    best_per_input: GraphConfiguration
+    best_per_second: GraphConfiguration
+
+    @property
+    def _identity(self) -> frozenset:
+
+        upcycler_edges = frozenset(self.system.upcycler.graph.edges)
+        before_edges = (
+            frozenset(self.system.before_production_graph.graph.edges)
+            if self.system.before_production_graph is not None
+            else frozenset()
+        )
+        after_edges = (
+            frozenset(self.system.after_production_graph.graph.edges)
+            if self.system.after_production_graph is not None
+            else frozenset()
+        )
+
+        return upcycler_edges | before_edges | after_edges
+
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, UpcyclerResult):
+            return NotImplemented
+
+        return self._identity == other._identity
+
+    def __hash__(self) -> int:
+        return hash(self._identity)
 
 
 @dataclass(slots=True)

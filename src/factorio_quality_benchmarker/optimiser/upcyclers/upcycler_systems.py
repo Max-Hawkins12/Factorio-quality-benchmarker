@@ -182,7 +182,7 @@ class UpcyclerSystemCache:
             graph for graph in self._get(item) if isinstance(graph, ProductionGraph)
         )
 
-    def get_upcycler_systems(self, item: Item) -> tuple[UpcyclerSystem, ...]:
+    def get(self, item: Item) -> tuple[UpcyclerSystem, ...]:
         systems: list[UpcyclerSystem] = []
 
         for upcycler in self._get_upcyclers(item):
