@@ -3,7 +3,7 @@ from __future__ import annotations
 from collections.abc import Mapping
 from dataclasses import dataclass
 
-from factorio_quality_benchmarker.game.models import Item, Material, Quality
+from factorio_quality_benchmarker.game.models import Fluid, Item, Material, Quality
 
 
 @dataclass(frozen=True, slots=True)
@@ -79,8 +79,12 @@ class RecipeMetrics:
         }
 
     @property
-    def input_materals_per_craft(self) -> Mapping[Material, QualityAmounts]:
-        return {material: amounts for material, amounts in self.input_per_craft.items()}
+    def input_fluids_per_craft(self) -> Mapping[Fluid, QualityAmounts]:
+        return {
+            fluid: amounts
+            for fluid, amounts in self.input_per_craft.items()
+            if isinstance(fluid, Fluid)
+        }
 
     @property
     def total_per_craft(self) -> Mapping[Material, float]:

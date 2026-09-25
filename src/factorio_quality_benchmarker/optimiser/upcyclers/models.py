@@ -193,6 +193,14 @@ class UpcyclerSystem:
         )
 
     @property
+    def input_materials(self) -> tuple[Material, ...]:
+        return (
+            self.upcycler.input_materials
+            if self.before_production_graph is None
+            else self.before_production_graph.input_materials
+        )
+
+    @property
     def output_items(self) -> tuple[Item, ...]:
         return (
             self.upcycler.output_items
@@ -207,16 +215,24 @@ class GraphConfiguration:
 
 
 @dataclass(frozen=True, slots=True)
-class GraphFrontiers:
-    per_input: tuple[GraphConfiguration, ...]
-    per_second: tuple[GraphConfiguration, ...]
+class ResultMetrics:
+    legendary_output: Mapping[Item, float]
+    material_inputs: Mapping[Material, QualityAmounts]
+    fluid_outputs: Mapping[Fluid, QualityAmounts]
+
+
+@dataclass(frozen=True, slots=True)
+class ConfigurationResult:
+    configuration: GraphConfiguration
+    legendary_per_input: ResultMetrics
+    legendary_per_second: ResultMetrics
 
 
 @dataclass(frozen=True, slots=True)
 class UpcyclerResult:
     system: UpcyclerSystem
-    best_per_input: GraphConfiguration
-    best_per_second: GraphConfiguration
+    per_input: ConfigurationResult
+    per_second: ConfigurationResult
 
     @property
     def _identity(self) -> frozenset:
@@ -249,3 +265,12 @@ class UpcyclerResult:
 class GraphState:
     available: dict[Material, QualityAmounts]
     configurations: dict[Qualified[Recipe], RecipeConfiguration]
+
+    item_inputs: Mapping[Item, QualityAmounts]
+    fluid_inputs: Mapping[Fluid, QualityAmounts]
+
+    fluid_outputs: Mapping[Fluid, QualityAmounts]
+
+    @property
+    def material_inputs(self) -> Mapping[Material, QualityAmounts]:
+        return {**self.item_inputs, **self.fluid_inputs}

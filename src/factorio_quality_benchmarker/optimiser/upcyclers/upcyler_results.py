@@ -1,9 +1,15 @@
 from collections import defaultdict
 from collections.abc import Callable, Mapping
 from dataclasses import dataclass, field
+from itertools import product
 
 from factorio_quality_benchmarker.game.engine import QualityAmounts
-from factorio_quality_benchmarker.game.models import Item, Quality, Recipe
+from factorio_quality_benchmarker.game.models import (
+    Fluid,
+    Item,
+    Quality,
+    Recipe,
+)
 from factorio_quality_benchmarker.optimiser.cache import get_from_cache
 from factorio_quality_benchmarker.optimiser.recipes import (
     RecipeConfiguration,
@@ -13,12 +19,14 @@ from factorio_quality_benchmarker.optimiser.simulation import Qualified
 
 from .constants import EMPTY_QUALITY_AMOUNTS
 from .models import (
+    ConfigurationResult,
     GraphConfiguration,
-    GraphFrontiers,
     GraphState,
     ProductionGraph,
     RecipeGraph,
+    ResultMetrics,
     UpcyclerResult,
+    UpcyclerSystem,
     UpcyclingGraph,
 )
 from .pareto import (
@@ -61,16 +69,33 @@ def _advance_state(
 
     materials = state.available.keys() | consumes.keys() | produces.keys()
 
+    fluid_inputs = dict(state.fluid_inputs)
+    fluid_outputs = dict(state.fluid_outputs)
+
+    for material, amounts in consumes.items():
+        if isinstance(material, Fluid):
+            fluid_inputs[material] = (
+                fluid_inputs.get(material, EMPTY_QUALITY_AMOUNTS) + amounts
+            )
+
+    for material, amounts in produces.items():
+        if isinstance(material, Fluid):
+            fluid_outputs[material] = (
+                fluid_outputs.get(material, EMPTY_QUALITY_AMOUNTS) + amounts
+            )
+
     return GraphState(
         available={
             material: state.available.get(material, EMPTY_QUALITY_AMOUNTS)
             - consumes.get(material, EMPTY_QUALITY_AMOUNTS)
             + produces.get(material, EMPTY_QUALITY_AMOUNTS)
             for material in materials
-            if isinstance(material, Item)
         },
         configurations=state.configurations
         | {Qualified(recipe, quality): configuration},
+        item_inputs=state.item_inputs,
+        fluid_inputs=fluid_inputs,
+        fluid_outputs=fluid_outputs,
     )
 
 
@@ -89,7 +114,7 @@ def _get_frontier_states(
     ],
 ) -> list[GraphState]:
     for recipe in recipes:
-        if not recipe.ingredient_items:
+        if not recipe.ingredient_materials:
             continue
 
         next_states: list[GraphState] = []
@@ -177,13 +202,41 @@ def _graph_frontier(
     )
 
 
-# Legendary/input Methods
+# Legendary/input Frontier Methods
+def _get_unlimited_throughput(
+    state: GraphState,
+    configuration: RecipeConfiguration,
+    quality: Quality,
+) -> float:
+    inputs = configuration.metrics.input_per_craft
+    outputs = configuration.metrics.output_per_craft
+
+    relevant_inputs = {
+        material: amounts
+        for material, amounts in inputs.items()
+        if isinstance(material, Item) and amounts[quality] > 0
+    }
+
+    if not relevant_inputs:
+        return 1.0
+
+    return min(
+        state.available.get(material, EMPTY_QUALITY_AMOUNTS)[quality]
+        / (amounts[quality] - outputs.get(material, EMPTY_QUALITY_AMOUNTS)[quality])
+        for material, amounts in relevant_inputs.items()
+    )
+
+
 def _initial_state_throughput_ignored(
-    recipe_configuration: RecipeConfiguration,
+    configuration: RecipeConfiguration,
 ) -> GraphState:
+
     return GraphState(
-        available=dict(recipe_configuration.metrics.input_materals_per_craft),
+        available=dict(configuration.metrics.input_per_craft),
         configurations={},
+        item_inputs=configuration.metrics.input_items_per_craft,
+        fluid_inputs=configuration.metrics.input_fluids_per_craft,
+        fluid_outputs={},
     )
 
 
@@ -206,18 +259,13 @@ def _advance_state_throughput_ignored(
     recipe: Recipe,
 ) -> GraphState:
 
-    item_inputs = configuration.metrics.input_items_per_craft
-
-    throughput = (
-        min(
-            state.available[material][quality] / item_inputs[material][quality]
-            for material in item_inputs
-        )
-        if item_inputs
-        else 1.0
+    return _advance_state(
+        state,
+        configuration,
+        _get_unlimited_throughput(state, configuration, quality),
+        quality,
+        recipe,
     )
-
-    return _advance_state(state, configuration, throughput, quality, recipe)
 
 
 def _graph_per_input_frontier(
@@ -238,23 +286,14 @@ def _graph_per_input_frontier(
     )
 
 
-# Legendary/second Methods
-def _get_throughput(
+# Legendary/second Frontier Methods
+def _get_speed_limited_throughput(
     state: GraphState,
     configuration: RecipeConfiguration,
     quality: Quality,
 ) -> float:
-    item_inputs = configuration.metrics.input_items_per_craft
-
     return min(
-        (
-            min(
-                state.available[material][quality] / item_inputs[material][quality]
-                for material in item_inputs
-            )
-            if item_inputs
-            else 1.0
-        ),
+        _get_unlimited_throughput(state, configuration, quality),
         configuration.metrics.crafts_per_second,
     )
 
@@ -262,14 +301,24 @@ def _get_throughput(
 def _initial_state_throughput_observed(
     configuration: RecipeConfiguration,
 ) -> GraphState:
+
     throughput = configuration.metrics.crafts_per_second
 
     return GraphState(
         available={
             material: amounts.scale(throughput)
-            for material, amounts in configuration.metrics.input_materals_per_craft.items()
+            for material, amounts in configuration.metrics.input_per_craft.items()
         },
         configurations={},
+        item_inputs={
+            item: amounts.scale(throughput)
+            for item, amounts in configuration.metrics.input_items_per_craft.items()
+        },
+        fluid_inputs={
+            fluid: amounts.scale(throughput)
+            for fluid, amounts in configuration.metrics.input_fluids_per_craft.items()
+        },
+        fluid_outputs={},
     )
 
 
@@ -282,7 +331,9 @@ def _get_configurations_throughput_observed(
     configurations = recipe_configuration_cache.get(recipe)[quality]
 
     limited_crafts_per_second = (
-        None if state is None else _get_throughput(state, configurations[0], quality)
+        None
+        if state is None
+        else _get_speed_limited_throughput(state, configurations[0], quality)
     )
 
     return get_frontier_recipe_configurations_throughput_observed(
@@ -302,7 +353,7 @@ def _advance_state_throughput_observed(
     return _advance_state(
         state,
         configuration,
-        _get_throughput(state, configuration, quality),
+        _get_speed_limited_throughput(state, configuration, quality),
         quality,
         recipe,
     )
@@ -326,62 +377,14 @@ def _graph_per_second_frontier(
     )
 
 
-# Graph evaluation
-def _legendary_per_input(
-    state: GraphState,
-    target: Item,
-    graph: RecipeGraph,
-    qualities: Mapping[str, Quality],
-) -> float:
-
-    legendary_output = state.available[target][qualities["legendary"]]
-
-    if isinstance(graph, UpcyclingGraph) and graph.is_self_recycling:
-        net_input = 1.0 - state.available[target][qualities["normal"]]
-        return legendary_output / net_input
-
-    return legendary_output
-
-
-def _legendary_per_second(
-    state: GraphState,
-    target: Item,
-    graph: RecipeGraph,
-    qualities: Mapping[str, Quality],
-) -> float:
-    return state.available[target][qualities["legendary"]]
-
-
-def _next_state(
-    state: GraphState | None,
-    next_graph: RecipeGraph,
-    next_graph_qualities: tuple[Quality, ...],
-) -> GraphState:
-
-    return GraphState(
-        available={
-            material: QualityAmounts(
-                {
-                    quality: amount
-                    for quality, amount in quality_amounts.amounts.items()
-                    if quality in next_graph_qualities
-                }
-            )
-            for material, quality_amounts in state.available.items()
-            for material in next_graph.input_items
-        },
-        configurations={},
-    )
-
-
+# Graph Evaluation Method
 def _evaluate_graph(
     state: GraphState,
     graph: RecipeGraph,
     qualities: Mapping[str, Quality],
     configurations: Mapping[Qualified[Recipe], RecipeConfiguration],
     advance_state: Callable[
-        [GraphState, RecipeConfiguration, Quality, Recipe],
-        GraphState,
+        [GraphState, RecipeConfiguration, Quality, Recipe], GraphState
     ],
 ) -> GraphState:
     for quality in qualities.values():
@@ -405,36 +408,200 @@ def _evaluate_graph(
     return state
 
 
-def _evaluate_per_input(
-    state: GraphState | None,
+# System Evaluation Methods
+def _legendary_output(
+    state: GraphState,
     graph: RecipeGraph,
     qualities: Mapping[str, Quality],
-    configurations: Mapping[Qualified[Recipe], RecipeConfiguration],
+) -> Mapping[Item, float]:
+    return {
+        product: state.available.get(product, EMPTY_QUALITY_AMOUNTS)[
+            qualities["legendary"]
+        ]
+        for product in graph.end_recipe.product_items
+    }
+
+
+def _next_state_for_system(
+    state: GraphState,
+    next_graph: RecipeGraph,
+    pass_through_qualities: tuple[Quality, ...],
 ) -> GraphState:
-    return _evaluate_graph(
-        state=state,
-        graph=graph,
-        qualities=qualities,
-        configurations=configurations,
-        advance_state=_advance_state_throughput_ignored,
+    return GraphState(
+        available={
+            material: QualityAmounts(
+                {
+                    quality: amount
+                    for quality, amount in quality_amounts.amounts.items()
+                    if quality in pass_through_qualities
+                }
+            )
+            for material, quality_amounts in state.available.items()
+            if material in next_graph.input_materials
+        },
+        configurations={},
+        item_inputs=state.item_inputs,
+        fluid_inputs=state.fluid_inputs,
+        fluid_outputs=state.fluid_outputs,
     )
 
 
-def _evaluate_per_second(
-    target: Item,
+def _initial_state_for_system(
     graph: RecipeGraph,
+    configuration: GraphConfiguration,
     qualities: Mapping[str, Quality],
-    configurations: Mapping[Qualified[Recipe], RecipeConfiguration],
-) -> float:
-    return _evaluate_graph(
-        target=target,
-        graph=graph,
-        qualities=qualities,
-        configurations=configurations,
-        initial_state=_initial_state_throughput_observed,
-        advance_state=_advance_state_throughput_observed,
-        metric=_legendary_per_second,
+    initial_state: Callable[[RecipeConfiguration], GraphState],
+) -> GraphState:
+
+    return initial_state(
+        configuration.configurations[Qualified(graph.start_recipe, qualities["normal"])]
     )
+
+
+@dataclass(frozen=True, slots=True)
+class _SystemResult:
+    whole_configuration: GraphConfiguration
+    upcycler_configuration: GraphConfiguration
+    before_configuration: GraphConfiguration | None
+    after_configuration: GraphConfiguration | None
+
+    metrics: ResultMetrics
+
+
+def _evaluate_system_configuration(
+    system: UpcyclerSystem,
+    upcycler: GraphConfiguration,
+    before: GraphConfiguration | None,
+    after: GraphConfiguration | None,
+    qualities: Mapping[str, Quality],
+    initial_state: Callable[[RecipeConfiguration], GraphState],
+    advance_state: Callable[
+        [GraphState, RecipeConfiguration, Quality, Recipe],
+        GraphState,
+    ],
+) -> _SystemResult:
+
+    if before is not None:
+        assert system.before_production_graph is not None
+
+        state = _initial_state_for_system(
+            system.before_production_graph, before, qualities, initial_state
+        )
+
+        state = _evaluate_graph(
+            graph=system.before_production_graph,
+            qualities=qualities,
+            configurations=before.configurations,
+            state=state,
+            advance_state=advance_state,
+        )
+
+        state = _next_state_for_system(
+            state, system.upcycler, tuple(qualities.values())
+        )
+    else:
+        state = _initial_state_for_system(
+            system.upcycler, upcycler, qualities, initial_state
+        )
+
+    state = _evaluate_graph(
+        graph=system.upcycler,
+        qualities=qualities,
+        configurations=upcycler.configurations,
+        state=state,
+        advance_state=advance_state,
+    )
+
+    final_graph: RecipeGraph = system.upcycler
+
+    if after is not None:
+        assert system.after_production_graph is not None
+
+        state = _next_state_for_system(
+            state, system.after_production_graph, (qualities["legendary"],)
+        )
+
+        state = _evaluate_graph(
+            graph=system.after_production_graph,
+            qualities=qualities,
+            configurations=after.configurations,
+            state=state,
+            advance_state=advance_state,
+        )
+
+        final_graph = system.after_production_graph
+
+    whole_configuration = {}
+
+    if before is not None:
+        whole_configuration.update(before.configurations)
+
+    whole_configuration.update(upcycler.configurations)
+
+    if after is not None:
+        whole_configuration.update(after.configurations)
+
+    return _SystemResult(
+        whole_configuration=GraphConfiguration(configurations=whole_configuration),
+        upcycler_configuration=upcycler,
+        before_configuration=before,
+        after_configuration=after,
+        metrics=ResultMetrics(
+            legendary_output=_legendary_output(state, final_graph, qualities),
+            material_inputs=state.material_inputs,
+            fluid_outputs=state.fluid_outputs,
+        ),
+    )
+
+
+def _evaluate_system(
+    target: Item,
+    system: UpcyclerSystem,
+    upcycler: tuple[GraphConfiguration, ...],
+    before: tuple[GraphConfiguration, ...] | None,
+    after: tuple[GraphConfiguration, ...] | None,
+    qualities: Mapping[str, Quality],
+    initial_state: Callable[[RecipeConfiguration], GraphState],
+    advance_state: Callable[
+        [GraphState, RecipeConfiguration, Quality, Recipe],
+        GraphState,
+    ],
+) -> _SystemResult:
+    before_configurations = before or (None,)
+    after_configurations = after or (None,)
+
+    best: _SystemResult | None = None
+
+    for before_config, upcycler_config, after_config in product(
+        before_configurations,
+        upcycler,
+        after_configurations,
+    ):
+        result = _evaluate_system_configuration(
+            system=system,
+            before=before_config,
+            upcycler=upcycler_config,
+            after=after_config,
+            qualities=qualities,
+            initial_state=initial_state,
+            advance_state=advance_state,
+        )
+
+        if (
+            best is None
+            or result.metrics.legendary_output[target]
+            > best.metrics.legendary_output[target]
+        ):
+            best = result
+
+    assert best is not None
+    return best
+
+
+@dataclass(frozen=True, slots=True)
+class _GraphFrontiers:
+    per_input: tuple[GraphConfiguration, ...]
+    per_second: tuple[GraphConfiguration, ...]
 
 
 @dataclass(slots=True)
@@ -443,19 +610,13 @@ class UpcyclerResultsCache:
     recipe_cache: RecipeConfigurationCache
     upcycler_system_cache: UpcyclerSystemCache
 
-    _upcycler_frontiers: dict[UpcyclingGraph, GraphFrontiers] = field(
+    _upcycler_frontiers: dict[UpcyclingGraph, _GraphFrontiers] = field(
         default_factory=dict
     )
-    _production_frontiers: dict[ProductionGraph, GraphFrontiers] = field(
-        default_factory=dict
-    )
-
-    _production_before_frontiers: dict[ProductionGraph, GraphFrontiers] = field(
-        default_factory=dict
-    )
-    _production_after_frontiers: dict[ProductionGraph, GraphFrontiers] = field(
-        default_factory=dict
-    )
+    _production_frontiers: dict[
+        tuple[ProductionGraph, tuple[Quality, ...]],
+        _GraphFrontiers,
+    ] = field(default_factory=dict)
 
     _results_cache: dict[Item, set[UpcyclerResult]] = field(
         default_factory=lambda: defaultdict(set)
@@ -463,73 +624,107 @@ class UpcyclerResultsCache:
     _searched: set[Item] = field(default_factory=set)
 
     def _discover(self, item: Item) -> None:
-
-        upcycler_frontiers = self._load_upcycler(
-            self.upcycler_system_cache.get(item)[0].upcycler
-        )
-        print(f"Per input frontiers: {len(upcycler_frontiers.per_input)}")
-        for recipe, config in upcycler_frontiers.per_input[0].configurations.items():
-            print(f"Recipe: {recipe.name}")
-            print(
-                f"Config: Modules: {[module.name for module in config.machine_configuration.modules.modules]} Beacons: {[module.name for module in config.machine_configuration.beacons.modules]}"
-            )
-        print()
-        print(f"Per second frontiers: {len(upcycler_frontiers.per_second)}")
-        for recipe, config in upcycler_frontiers.per_second[0].configurations.items():
-            print(f"Recipe: {recipe.name}")
-            print(
-                f"Config: Modules: {[module.name for module in config.machine_configuration.modules.modules]} Beacons: {[module.name for module in config.machine_configuration.beacons.modules]}"
-            )
-
         for system in self.upcycler_system_cache.get(item):
             upcycler_frontiers = self._load_upcycler(system.upcycler)
 
-            if system.before_production_graph is not None:
-                before = self._load_production(system.before_production_graph)
-
-                state = _evaluate_graph(
-                    state=_initial_state_throughput_ignored(
-                        self.recipe_cache.get(
-                            system.before_production_graph.start_recipe
-                        ),
-                    ),
-                    graph=system.before_production_graph,
-                    qualities=self.qualities,
-                    configurations=before.per_second[0].configurations,
-                    advance_state=_advance_state_throughput_ignored,
+            before_frontiers = (
+                self._load_production(
+                    system.before_production_graph,
+                    (self.qualities["normal"],),
                 )
+                if system.before_production_graph is not None
+                else None
+            )
 
-            if system.after_production_graph is not None:
-                after = self._load_production(system.after_production_graph)
+            after_frontiers = (
+                self._load_production(
+                    system.after_production_graph,
+                    (self.qualities["legendary"],),
+                )
+                if system.after_production_graph is not None
+                else None
+            )
 
-            # Graphs must be scaled and evaluated
+            per_input = _evaluate_system(
+                target=item,
+                system=system,
+                upcycler=upcycler_frontiers.per_input,
+                before=(
+                    before_frontiers.per_input if before_frontiers is not None else None
+                ),
+                after=(
+                    after_frontiers.per_input if after_frontiers is not None else None
+                ),
+                qualities=self.qualities,
+                initial_state=_initial_state_throughput_ignored,
+                advance_state=_advance_state_throughput_ignored,
+            )
 
-            # If before -> ucycler.inputs = before.outputs
-            #   Need to be careful. state.available may contain buffered items -> need to evaluate output items: {qualified[item] -> amount} or {item -> QualifiedAmount}
-            # If after -> after.inputs = upcycler.outputs
-            #   Just use state.available in legendary.
+            per_second = _evaluate_system(
+                target=item,
+                system=system,
+                upcycler=upcycler_frontiers.per_second,
+                before=(
+                    before_frontiers.per_second
+                    if before_frontiers is not None
+                    else None
+                ),
+                after=(
+                    after_frontiers.per_second if after_frontiers is not None else None
+                ),
+                qualities=self.qualities,
+                initial_state=_initial_state_throughput_observed,
+                advance_state=_advance_state_throughput_observed,
+            )
 
-            # Then final output:
-            #   If after: after.available[legendary target]
-            #   else: upcycler.available[legendary target] unless self recycling, then upcycler.available[legendary target]/1.0 - available[normal target]
-
-            # Store results for every result of the graph (caching)
-
-        self._searched.add(item)
+            for output in system.output_items:
+                self._results_cache[output].add(
+                    UpcyclerResult(
+                        system=system,
+                        per_input=ConfigurationResult(
+                            configuration=per_input.whole_configuration,
+                            legendary_per_input=per_input.metrics,
+                            legendary_per_second=_evaluate_system_configuration(
+                                system=system,
+                                upcycler=per_input.upcycler_configuration,
+                                before=per_input.before_configuration,
+                                after=per_input.after_configuration,
+                                qualities=self.qualities,
+                                initial_state=_initial_state_throughput_observed,
+                                advance_state=_advance_state_throughput_observed,
+                            ).metrics,
+                        ),
+                        per_second=ConfigurationResult(
+                            configuration=per_second.whole_configuration,
+                            legendary_per_input=_evaluate_system_configuration(
+                                system=system,
+                                upcycler=per_second.upcycler_configuration,
+                                before=per_second.before_configuration,
+                                after=per_second.after_configuration,
+                                qualities=self.qualities,
+                                initial_state=_initial_state_throughput_ignored,
+                                advance_state=_advance_state_throughput_ignored,
+                            ).metrics,
+                            legendary_per_second=per_second.metrics,
+                        ),
+                    )
+                )
 
     def get(self, item: Item) -> tuple[UpcyclerResult, ...]:
         if item not in self._searched:
             self._discover(item)
 
+            self._searched.add(item)
+
         return tuple(self._results_cache[item])
 
-    def _load_upcycler(self, upcycler: UpcyclingGraph) -> GraphFrontiers:
+    def _load_upcycler(self, upcycler: UpcyclingGraph) -> _GraphFrontiers:
         initial_qualities = tuple(self.qualities.values())
 
         return get_from_cache(
             cache=self._upcycler_frontiers,
             key=upcycler,
-            calculate=lambda: GraphFrontiers(
+            calculate=lambda: _GraphFrontiers(
                 per_input=_graph_per_input_frontier(
                     graph=upcycler,
                     qualities=self.qualities,
@@ -545,68 +740,26 @@ class UpcyclerResultsCache:
             ),
         )
 
-    def _load_production(self, production_graph: ProductionGraph) -> GraphFrontiers:
-        initial_qualities = tuple(self.qualities.values())
-
+    def _load_production(
+        self,
+        production_graph: ProductionGraph,
+        initial_qualities: tuple[Quality, ...],
+    ) -> _GraphFrontiers:
         return get_from_cache(
             cache=self._production_frontiers,
-            key=production_graph,
-            calculate=lambda: GraphFrontiers(
+            key=(production_graph, initial_qualities),
+            calculate=lambda: _GraphFrontiers(
                 per_input=_graph_per_input_frontier(
-                    graph=production_graph,
-                    qualities=self.qualities,
-                    initial_qualities=initial_qualities,
-                    recipe_configuration_cache=self.recipe_cache,
+                    production_graph,
+                    self.qualities,
+                    initial_qualities,
+                    self.recipe_cache,
                 ),
                 per_second=_graph_per_second_frontier(
-                    graph=production_graph,
-                    qualities=self.qualities,
-                    initial_qualities=initial_qualities,
-                    recipe_configuration_cache=self.recipe_cache,
-                ),
-            ),
-        )
-
-    def _load_before(self, production_graph: ProductionGraph) -> GraphFrontiers:
-        initial_qualities = (self.qualities["normal"],)
-
-        return get_from_cache(
-            cache=self._production_before_frontiers,
-            key=production_graph,
-            calculate=lambda: GraphFrontiers(
-                per_input=_graph_per_input_frontier(
-                    graph=production_graph,
-                    qualities=self.qualities,
-                    initial_qualities=initial_qualities,
-                    recipe_configuration_cache=self.recipe_cache,
-                ),
-                per_second=_graph_per_second_frontier(
-                    graph=production_graph,
-                    qualities=self.qualities,
-                    initial_qualities=initial_qualities,
-                    recipe_configuration_cache=self.recipe_cache,
-                ),
-            ),
-        )
-
-    def _load_after(self, production_graph: ProductionGraph) -> GraphFrontiers:
-        initial_qualities = (self.qualities["legendary"],)
-
-        return get_from_cache(
-            cache=self._production_after_frontiers,
-            key=production_graph,
-            calculate=lambda: GraphFrontiers(
-                per_input=_graph_per_input_frontier(
-                    graph=production_graph,
-                    qualities=self.qualities,
-                    initial_qualities=initial_qualities,
-                    recipe_configuration_cache=self.recipe_cache,
-                ),
-                per_second=_graph_per_second_frontier(
-                    graph=production_graph,
-                    qualities=self.qualities,
-                    initial_qualities=initial_qualities,
-                    recipe_configuration_cache=self.recipe_cache,
+                    production_graph,
+                    self.qualities,
+                    initial_qualities,
+                    self.recipe_cache,
                 ),
             ),
         )

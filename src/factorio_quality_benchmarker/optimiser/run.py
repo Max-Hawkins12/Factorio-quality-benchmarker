@@ -14,8 +14,6 @@ from factorio_quality_benchmarker.optimiser.upcyclers import (
 
 def run(simulation: SimulationContext):
 
-    print([q.name for q in simulation.qualities.values()])
-
     upcycler_results_cache = UpcyclerResultsCache(
         qualities=simulation.qualities,
         recipe_cache=RecipeConfigurationCache(
@@ -40,4 +38,58 @@ def run(simulation: SimulationContext):
         ),
     )
 
-    upcycler_results_cache.get(simulation.items["iron-plate"])
+    holmium_results = upcycler_results_cache.get(simulation.items["tungsten-plate"])
+
+    print(f"Total Results: {len(holmium_results)}")
+
+    for result in holmium_results:
+        print(f"Input Items: {[item.name for item in result.system.input_materials]}")
+        print(f"Output Items: {[item.name for item in result.system.output_items]}")
+
+        print(
+            f"Best Legendary/Input: {result.per_input.legendary_per_input.legendary_output} has Legendary/Second {result.per_input.legendary_per_second.legendary_output}"
+        )
+        """for recipe, config in result.per_input.configuration.configurations.items():
+            print(f"Recipe: {recipe.name}")
+            print(
+                f"Config: Modules: {[module.name for module in config.machine_configuration.modules.modules]} Beacons: {[module.name for module in config.machine_configuration.beacons.modules]}"
+            )"""
+
+        print(
+            f"Best Legendary/Second: {result.per_second.legendary_per_second.legendary_output} has Legendary/Input {result.per_second.legendary_per_input.legendary_output}"
+        )
+        """for recipe, config in result.per_second.configuration.configurations.items():
+            print(f"Recipe: {recipe.name}")
+            print(
+                f"Config: Modules: {[module.name for module in config.machine_configuration.modules.modules]} Beacons: {[module.name for module in config.machine_configuration.beacons.modules]}"
+            )"""
+
+        print()
+
+    holmium_results = upcycler_results_cache.get(simulation.items["holmium-plate"])
+
+    print(f"Total Results: {len(holmium_results)}")
+
+    for result in holmium_results:
+        print(f"Input Items: {[item.name for item in result.system.input_materials]}")
+        print(f"Output Items: {[item.name for item in result.system.output_items]}")
+
+        print(
+            f"Best Legendary/Input: {result.per_input.legendary_per_input.legendary_output} has Legendary/Second {result.per_input.legendary_per_second.legendary_output}"
+        )
+        """for recipe, config in result.per_input.configuration.configurations.items():
+            print(f"Recipe: {recipe.name}")
+            print(
+                f"Config: Modules: {[module.name for module in config.machine_configuration.modules.modules]} Beacons: {[module.name for module in config.machine_configuration.beacons.modules]}"
+            )"""
+
+        print(
+            f"Best Legendary/Second: {result.per_second.legendary_per_second.legendary_output} has Legendary/Input {result.per_second.legendary_per_input.legendary_output}"
+        )
+        """for recipe, config in result.per_second.configuration.configurations.items():
+            print(f"Recipe: {recipe.name}")
+            print(
+                f"Config: Modules: {[module.name for module in config.machine_configuration.modules.modules]} Beacons: {[module.name for module in config.machine_configuration.beacons.modules]}"
+            )"""
+
+        print()
