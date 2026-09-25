@@ -1,0 +1,132 @@
+{
+    "iron-ore": {
+        "name": "iron-ore",
+        "category": null,
+        "minable": {
+            "mining_particle": "iron-ore-particle",
+            "mining_time": 1,
+            "result": "iron-ore"
+        }
+    },
+    "copper-ore": {
+        "name": "copper-ore",
+        "category": null,
+        "minable": {
+            "mining_particle": "copper-ore-particle",
+            "mining_time": 1,
+            "result": "copper-ore"
+        }
+    },
+    "coal": {
+        "name": "coal",
+        "category": null,
+        "minable": {
+            "mining_particle": "coal-particle",
+            "mining_time": 1,
+            "result": "coal"
+        }
+    },
+    "stone": {
+        "name": "stone",
+        "category": null,
+        "minable": {
+            "mining_particle": "stone-particle",
+            "mining_time": 1,
+            "result": "stone"
+        }
+    },
+    "uranium-ore": {
+        "name": "uranium-ore",
+        "category": null,
+        "minable": {
+            "mining_particle": "stone-particle",
+            "mining_time": 2,
+            "result": "uranium-ore",
+            "fluid_amount": 10,
+            "required_fluid": "sulfuric-acid"
+        }
+    },
+    "crude-oil": {
+        "name": "crude-oil",
+        "category": "basic-fluid",
+        "minable": {
+            "mining_time": 1,
+            "results": [
+                {
+                    "type": "fluid",
+                    "name": "crude-oil",
+                    "amount": 10
+                }
+            ]
+        }
+    },
+    "tungsten-ore": {
+        "name": "tungsten-ore",
+        "category": "hard-solid",
+        "minable": {
+            "mining_particle": "tungsten-ore-particle",
+            "mining_time": 5,
+            "result": "tungsten-ore"
+        }
+    },
+    "calcite": {
+        "name": "calcite",
+        "category": null,
+        "minable": {
+            "mining_particle": "calcite-particle",
+            "mining_time": 1,
+            "result": "calcite"
+        }
+    },
+    "sulfuric-acid-geyser": {
+        "name": "sulfuric-acid-geyser",
+        "category": "basic-fluid",
+        "minable": {
+            "mining_time": 1,
+            "results": [
+                {
+                    "type": "fluid",
+                    "name": "sulfuric-acid",
+                    "amount": 10
+                }
+            ]
+        }
+    },
+    "scrap": {
+        "name": "scrap",
+        "category": null,
+        "minable": {
+            "mining_particle": "scrap-particle",
+            "mining_time": 0.5,
+            "result": "scrap"
+        }
+    },
+    "lithium-brine": {
+        "name": "lithium-brine",
+        "category": "basic-fluid",
+        "minable": {
+            "mining_time": 1,
+            "results": [
+                {
+                    "type": "fluid",
+                    "name": "lithium-brine",
+                    "amount": 1
+                }
+            ]
+        }
+    },
+    "fluorine-vent": {
+        "name": "fluorine-vent",
+        "category": "basic-fluid",
+        "minable": {
+            "mining_time": 1,
+            "results": [
+                {
+                    "type": "fluid",
+                    "name": "fluorine",
+                    "amount": 1
+                }
+            ]
+        }
+    }
+}

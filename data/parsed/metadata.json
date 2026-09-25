@@ -1,10 +1,12 @@
 {
-    "source_file": "data-raw-dump.json",
-    "factorio_version": "2.1.14",
-    "active_mods": [
-        "Elevated Rails",
-        "Quality",
-        "Recycler",
-        "Space Age"
-    ]
+    "metadata": {
+        "source_file": "data-raw-dump.json",
+        "factorio_version": "2.1.14",
+        "active_mods": [
+            "Elevated Rails",
+            "Quality",
+            "Recycler",
+            "Space Age"
+        ]
+    }
 }

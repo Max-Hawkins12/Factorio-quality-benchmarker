@@ -5,43 +5,43 @@
     },
     "parameter-0": {
         "name": "parameter-0",
-        "type": "fluid"
+        "type": "item"
     },
     "parameter-1": {
         "name": "parameter-1",
-        "type": "fluid"
+        "type": "item"
     },
     "parameter-2": {
         "name": "parameter-2",
-        "type": "fluid"
+        "type": "item"
     },
     "parameter-3": {
         "name": "parameter-3",
-        "type": "fluid"
+        "type": "item"
     },
     "parameter-4": {
         "name": "parameter-4",
-        "type": "fluid"
+        "type": "item"
     },
     "parameter-5": {
         "name": "parameter-5",
-        "type": "fluid"
+        "type": "item"
     },
     "parameter-6": {
         "name": "parameter-6",
-        "type": "fluid"
+        "type": "item"
     },
     "parameter-7": {
         "name": "parameter-7",
-        "type": "fluid"
+        "type": "item"
     },
     "parameter-8": {
         "name": "parameter-8",
-        "type": "fluid"
+        "type": "item"
     },
     "parameter-9": {
         "name": "parameter-9",
-        "type": "fluid"
+        "type": "item"
     },
     "stone-brick": {
         "name": "stone-brick",
@@ -1019,96 +1019,320 @@
         "name": "fluoroketone-hot-barrel",
         "type": "item"
     },
-    "fluid-unknown": {
-        "name": "fluid-unknown",
-        "type": "fluid"
+    "uranium-rounds-magazine": {
+        "name": "uranium-rounds-magazine",
+        "type": "ammo"
     },
-    "water": {
-        "name": "water",
-        "type": "fluid"
+    "flamethrower-ammo": {
+        "name": "flamethrower-ammo",
+        "type": "ammo"
     },
-    "steam": {
-        "name": "steam",
-        "type": "fluid"
+    "rocket": {
+        "name": "rocket",
+        "type": "ammo"
     },
-    "sulfuric-acid": {
-        "name": "sulfuric-acid",
-        "type": "fluid"
+    "explosive-rocket": {
+        "name": "explosive-rocket",
+        "type": "ammo"
     },
-    "crude-oil": {
-        "name": "crude-oil",
-        "type": "fluid"
+    "atomic-bomb": {
+        "name": "atomic-bomb",
+        "type": "ammo"
     },
-    "heavy-oil": {
-        "name": "heavy-oil",
-        "type": "fluid"
+    "piercing-shotgun-shell": {
+        "name": "piercing-shotgun-shell",
+        "type": "ammo"
     },
-    "light-oil": {
-        "name": "light-oil",
-        "type": "fluid"
+    "cannon-shell": {
+        "name": "cannon-shell",
+        "type": "ammo"
     },
-    "petroleum-gas": {
-        "name": "petroleum-gas",
-        "type": "fluid"
+    "explosive-cannon-shell": {
+        "name": "explosive-cannon-shell",
+        "type": "ammo"
     },
-    "lubricant": {
-        "name": "lubricant",
-        "type": "fluid"
+    "uranium-cannon-shell": {
+        "name": "uranium-cannon-shell",
+        "type": "ammo"
     },
-    "ammoniacal-solution": {
-        "name": "ammoniacal-solution",
-        "type": "fluid"
+    "explosive-uranium-cannon-shell": {
+        "name": "explosive-uranium-cannon-shell",
+        "type": "ammo"
     },
-    "ammonia": {
-        "name": "ammonia",
-        "type": "fluid"
+    "artillery-shell": {
+        "name": "artillery-shell",
+        "type": "ammo"
     },
-    "fluorine": {
-        "name": "fluorine",
-        "type": "fluid"
+    "firearm-magazine": {
+        "name": "firearm-magazine",
+        "type": "ammo"
     },
-    "fluoroketone-cold": {
-        "name": "fluoroketone-cold",
-        "type": "fluid"
+    "piercing-rounds-magazine": {
+        "name": "piercing-rounds-magazine",
+        "type": "ammo"
     },
-    "fluoroketone-hot": {
-        "name": "fluoroketone-hot",
-        "type": "fluid"
+    "shotgun-shell": {
+        "name": "shotgun-shell",
+        "type": "ammo"
     },
-    "holmium-solution": {
-        "name": "holmium-solution",
-        "type": "fluid"
+    "railgun-ammo": {
+        "name": "railgun-ammo",
+        "type": "ammo"
     },
-    "electrolyte": {
-        "name": "electrolyte",
-        "type": "fluid"
+    "capture-robot-rocket": {
+        "name": "capture-robot-rocket",
+        "type": "ammo"
     },
-    "lithium-brine": {
-        "name": "lithium-brine",
-        "type": "fluid"
+    "tesla-ammo": {
+        "name": "tesla-ammo",
+        "type": "ammo"
     },
-    "lava": {
-        "name": "lava",
-        "type": "fluid"
+    "modular-armor": {
+        "name": "modular-armor",
+        "type": "armor"
     },
-    "molten-iron": {
-        "name": "molten-iron",
-        "type": "fluid"
+    "power-armor": {
+        "name": "power-armor",
+        "type": "armor"
     },
-    "molten-copper": {
-        "name": "molten-copper",
-        "type": "fluid"
+    "power-armor-mk2": {
+        "name": "power-armor-mk2",
+        "type": "armor"
     },
-    "thruster-fuel": {
-        "name": "thruster-fuel",
-        "type": "fluid"
+    "light-armor": {
+        "name": "light-armor",
+        "type": "armor"
     },
-    "thruster-oxidizer": {
-        "name": "thruster-oxidizer",
-        "type": "fluid"
+    "heavy-armor": {
+        "name": "heavy-armor",
+        "type": "armor"
     },
-    "fusion-plasma": {
-        "name": "fusion-plasma",
-        "type": "fluid"
+    "mech-armor": {
+        "name": "mech-armor",
+        "type": "armor"
+    },
+    "raw-fish": {
+        "name": "raw-fish",
+        "type": "capsule"
+    },
+    "grenade": {
+        "name": "grenade",
+        "type": "capsule"
+    },
+    "defender-capsule": {
+        "name": "defender-capsule",
+        "type": "capsule"
+    },
+    "cluster-grenade": {
+        "name": "cluster-grenade",
+        "type": "capsule"
+    },
+    "poison-capsule": {
+        "name": "poison-capsule",
+        "type": "capsule"
+    },
+    "slowdown-capsule": {
+        "name": "slowdown-capsule",
+        "type": "capsule"
+    },
+    "distractor-capsule": {
+        "name": "distractor-capsule",
+        "type": "capsule"
+    },
+    "destroyer-capsule": {
+        "name": "destroyer-capsule",
+        "type": "capsule"
+    },
+    "cliff-explosives": {
+        "name": "cliff-explosives",
+        "type": "capsule"
+    },
+    "discharge-defense-remote": {
+        "name": "discharge-defense-remote",
+        "type": "capsule"
+    },
+    "artillery-targeting-remote": {
+        "name": "artillery-targeting-remote",
+        "type": "capsule"
+    },
+    "yumako": {
+        "name": "yumako",
+        "type": "capsule"
+    },
+    "jellynut": {
+        "name": "jellynut",
+        "type": "capsule"
+    },
+    "yumako-mash": {
+        "name": "yumako-mash",
+        "type": "capsule"
+    },
+    "jelly": {
+        "name": "jelly",
+        "type": "capsule"
+    },
+    "bioflux": {
+        "name": "bioflux",
+        "type": "capsule"
+    },
+    "flamethrower": {
+        "name": "flamethrower",
+        "type": "gun"
+    },
+    "tank-machine-gun": {
+        "name": "tank-machine-gun",
+        "type": "gun"
+    },
+    "tank-flamethrower": {
+        "name": "tank-flamethrower",
+        "type": "gun"
+    },
+    "rocket-launcher": {
+        "name": "rocket-launcher",
+        "type": "gun"
+    },
+    "combat-shotgun": {
+        "name": "combat-shotgun",
+        "type": "gun"
+    },
+    "tank-cannon": {
+        "name": "tank-cannon",
+        "type": "gun"
+    },
+    "artillery-wagon-cannon": {
+        "name": "artillery-wagon-cannon",
+        "type": "gun"
+    },
+    "spidertron-rocket-launcher-1": {
+        "name": "spidertron-rocket-launcher-1",
+        "type": "gun"
+    },
+    "spidertron-rocket-launcher-2": {
+        "name": "spidertron-rocket-launcher-2",
+        "type": "gun"
+    },
+    "spidertron-rocket-launcher-3": {
+        "name": "spidertron-rocket-launcher-3",
+        "type": "gun"
+    },
+    "spidertron-rocket-launcher-4": {
+        "name": "spidertron-rocket-launcher-4",
+        "type": "gun"
+    },
+    "pistol": {
+        "name": "pistol",
+        "type": "gun"
+    },
+    "submachine-gun": {
+        "name": "submachine-gun",
+        "type": "gun"
+    },
+    "vehicle-machine-gun": {
+        "name": "vehicle-machine-gun",
+        "type": "gun"
+    },
+    "shotgun": {
+        "name": "shotgun",
+        "type": "gun"
+    },
+    "railgun": {
+        "name": "railgun",
+        "type": "gun"
+    },
+    "teslagun": {
+        "name": "teslagun",
+        "type": "gun"
+    },
+    "car": {
+        "name": "car",
+        "type": "item-with-entity-data"
+    },
+    "locomotive": {
+        "name": "locomotive",
+        "type": "item-with-entity-data"
+    },
+    "cargo-wagon": {
+        "name": "cargo-wagon",
+        "type": "item-with-entity-data"
+    },
+    "fluid-wagon": {
+        "name": "fluid-wagon",
+        "type": "item-with-entity-data"
+    },
+    "artillery-wagon": {
+        "name": "artillery-wagon",
+        "type": "item-with-entity-data"
+    },
+    "tank": {
+        "name": "tank",
+        "type": "item-with-entity-data"
+    },
+    "spidertron": {
+        "name": "spidertron",
+        "type": "item-with-entity-data"
+    },
+    "speed-module": {
+        "name": "speed-module",
+        "type": "module"
+    },
+    "speed-module-2": {
+        "name": "speed-module-2",
+        "type": "module"
+    },
+    "speed-module-3": {
+        "name": "speed-module-3",
+        "type": "module"
+    },
+    "efficiency-module": {
+        "name": "efficiency-module",
+        "type": "module"
+    },
+    "efficiency-module-2": {
+        "name": "efficiency-module-2",
+        "type": "module"
+    },
+    "efficiency-module-3": {
+        "name": "efficiency-module-3",
+        "type": "module"
+    },
+    "productivity-module": {
+        "name": "productivity-module",
+        "type": "module"
+    },
+    "productivity-module-2": {
+        "name": "productivity-module-2",
+        "type": "module"
+    },
+    "productivity-module-3": {
+        "name": "productivity-module-3",
+        "type": "module"
+    },
+    "quality-module": {
+        "name": "quality-module",
+        "type": "module"
+    },
+    "quality-module-2": {
+        "name": "quality-module-2",
+        "type": "module"
+    },
+    "quality-module-3": {
+        "name": "quality-module-3",
+        "type": "module"
+    },
+    "rail": {
+        "name": "rail",
+        "type": "rail-planner"
+    },
+    "rail-ramp": {
+        "name": "rail-ramp",
+        "type": "rail-planner"
+    },
+    "repair-pack": {
+        "name": "repair-pack",
+        "type": "repair-tool"
+    },
+    "space-platform-starter-pack": {
+        "name": "space-platform-starter-pack",
+        "type": "space-platform-starter-pack"
     }
 }

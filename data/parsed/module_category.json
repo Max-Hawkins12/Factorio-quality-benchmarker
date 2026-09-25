@@ -1,0 +1,14 @@
+{
+    "productivity": {
+        "name": "productivity"
+    },
+    "speed": {
+        "name": "speed"
+    },
+    "efficiency": {
+        "name": "efficiency"
+    },
+    "quality": {
+        "name": "quality"
+    }
+}

@@ -121,7 +121,6 @@
                 1.5
             ]
         ],
-        "supply_area_distance": 3,
-        "energy_usage": "480kW"
+        "supply_area_distance": 3
     }
 }

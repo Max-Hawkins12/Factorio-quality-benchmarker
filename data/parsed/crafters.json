@@ -26,8 +26,7 @@
                 1.5,
                 1.5
             ]
-        ],
-        "energy_usage": "75kW"
+        ]
     },
     "assembling-machine-2": {
         "name": "assembling-machine-2",
@@ -55,8 +54,7 @@
                 1.5,
                 1.5
             ]
-        ],
-        "energy_usage": "150kW"
+        ]
     },
     "assembling-machine-3": {
         "name": "assembling-machine-3",
@@ -84,8 +82,7 @@
                 1.5,
                 1.5
             ]
-        ],
-        "energy_usage": "375kW"
+        ]
     },
     "oil-refinery": {
         "name": "oil-refinery",
@@ -110,8 +107,7 @@
                 2.5,
                 2.5
             ]
-        ],
-        "energy_usage": "420kW"
+        ]
     },
     "chemical-plant": {
         "name": "chemical-plant",
@@ -137,8 +133,7 @@
                 1.5,
                 1.5
             ]
-        ],
-        "energy_usage": "210kW"
+        ]
     },
     "centrifuge": {
         "name": "centrifuge",
@@ -164,8 +159,7 @@
                 1.5,
                 1.5
             ]
-        ],
-        "energy_usage": "350kW"
+        ]
     },
     "biochamber": {
         "name": "biochamber",
@@ -195,8 +189,7 @@
                 1.5,
                 1.5
             ]
-        ],
-        "energy_usage": "500kW"
+        ]
     },
     "crusher": {
         "name": "crusher",
@@ -222,8 +215,7 @@
                 1,
                 1.5
             ]
-        ],
-        "energy_usage": "540kW"
+        ]
     },
     "foundry": {
         "name": "foundry",
@@ -253,8 +245,7 @@
                 2.5,
                 2.5
             ]
-        ],
-        "energy_usage": "2500kW"
+        ]
     },
     "captive-biter-spawner": {
         "name": "captive-biter-spawner",
@@ -274,8 +265,7 @@
                 2.5,
                 2.5
             ]
-        ],
-        "energy_usage": "100kW"
+        ]
     },
     "electromagnetic-plant": {
         "name": "electromagnetic-plant",
@@ -305,8 +295,7 @@
                 2,
                 2
             ]
-        ],
-        "energy_usage": "2000kW"
+        ]
     },
     "cryogenic-plant": {
         "name": "cryogenic-plant",
@@ -332,118 +321,6 @@
                 2.5,
                 2.5
             ]
-        ],
-        "energy_usage": "1500kW"
-    },
-    "stone-furnace": {
-        "name": "stone-furnace",
-        "crafting_categories": [
-            "smelting"
-        ],
-        "crafting_speed": 1,
-        "effect_receiver": {
-            "uses_module_effects": false,
-            "uses_beacon_effects": false,
-            "uses_surface_effects": true
-        },
-        "module_slots": null,
-        "allowed_effects": [
-            "speed",
-            "consumption",
-            "pollution"
-        ],
-        "selection_box": [
-            [
-                -0.8,
-                -1
-            ],
-            [
-                0.8,
-                1
-            ]
-        ],
-        "energy_usage": "90kW"
-    },
-    "electric-furnace": {
-        "name": "electric-furnace",
-        "crafting_categories": [
-            "smelting"
-        ],
-        "crafting_speed": 2,
-        "effect_receiver": null,
-        "module_slots": 2,
-        "allowed_effects": [
-            "consumption",
-            "speed",
-            "productivity",
-            "pollution",
-            "quality"
-        ],
-        "selection_box": [
-            [
-                -1.5,
-                -1.5
-            ],
-            [
-                1.5,
-                1.5
-            ]
-        ],
-        "energy_usage": "180kW"
-    },
-    "steel-furnace": {
-        "name": "steel-furnace",
-        "crafting_categories": [
-            "smelting"
-        ],
-        "crafting_speed": 2,
-        "effect_receiver": {
-            "uses_module_effects": false,
-            "uses_beacon_effects": false,
-            "uses_surface_effects": true
-        },
-        "module_slots": null,
-        "allowed_effects": [
-            "speed",
-            "consumption",
-            "pollution"
-        ],
-        "selection_box": [
-            [
-                -0.8,
-                -1
-            ],
-            [
-                0.8,
-                1
-            ]
-        ],
-        "energy_usage": "90kW"
-    },
-    "recycler": {
-        "name": "recycler",
-        "crafting_categories": [
-            "recycling"
-        ],
-        "crafting_speed": 0.5,
-        "effect_receiver": null,
-        "module_slots": 4,
-        "allowed_effects": [
-            "consumption",
-            "speed",
-            "pollution",
-            "quality"
-        ],
-        "selection_box": [
-            [
-                -0.9,
-                -1.85
-            ],
-            [
-                0.9,
-                1.85
-            ]
-        ],
-        "energy_usage": "180kW"
+        ]
     }
 }

@@ -1,5 +1,11 @@
 import json
+import logging
+import shutil
+from collections.abc import Collection, Mapping
 from pathlib import Path
+from typing import Any
+
+logger = logging.getLogger(__name__)
 
 """
 The system requires the recycler and quality mechanics to be present in the data dump to work. 
@@ -12,7 +18,7 @@ required_mods = {
 
 
 # Helper functions for reading and writing JSON files
-def _read_json_from_file(file_path: Path, error_message: str) -> dict:
+def _read_json_from_file(file_path: Path, error_message: str) -> dict[str, Any]:
     try:
         with file_path.open("r") as f:
             return json.load(f)
@@ -20,7 +26,11 @@ def _read_json_from_file(file_path: Path, error_message: str) -> dict:
         raise FileNotFoundError(error_message + f" (File path: {file_path})")
 
 
-def _write_json_to_file(data: dict, parser_output_path: Path, filename: str) -> None:
+def _write_json_to_file(
+    data: Mapping[str, Any],
+    parser_output_path: Path,
+    filename: str,
+) -> None:
     output_path = parser_output_path / filename
     output_path.parent.mkdir(parents=True, exist_ok=True)
 
@@ -29,11 +39,35 @@ def _write_json_to_file(data: dict, parser_output_path: Path, filename: str) -> 
 
 
 # Helper functions for the parsing process
-def _parse_data_into_files(raw_data: dict, parser_output_path: Path) -> None:
+def _write_prototype_files(
+    raw_data: Mapping[str, Any],
+    parser_output_path: Path,
+) -> None:
     """Parses all the required data from the raw data and writes it to the output files."""
 
     parse_jobs = {
-        "materials.json": (["item", "fluid"], ["name", "type"]),
+        "items.json": (
+            [
+                "item",
+                "ammo",
+                "armor",
+                "capsule",
+                "gun",
+                "item-with-entity-data",
+                "module",
+                "rail-planner",
+                "repair-tool",
+                "space-platform-starter-pack",
+            ],
+            ["name", "type"],
+        ),
+        "fluids.json": (
+            ["fluid"],
+            [
+                "name",
+                "type",
+            ],
+        ),
         "recipes.json": (
             ["recipe"],
             [
@@ -47,8 +81,8 @@ def _parse_data_into_files(raw_data: dict, parser_output_path: Path) -> None:
                 "surface_conditions",
             ],
         ),
-        "crafting_machines.json": (
-            ["assembling-machine", "furnace"],
+        "crafters.json": (
+            ["assembling-machine"],
             [
                 "name",
                 "crafting_categories",
@@ -57,7 +91,18 @@ def _parse_data_into_files(raw_data: dict, parser_output_path: Path) -> None:
                 "module_slots",
                 "allowed_effects",
                 "selection_box",
-                "energy_usage",
+            ],
+        ),
+        "furnaces.json": (
+            ["furnace"],
+            [
+                "name",
+                "crafting_categories",
+                "crafting_speed",
+                "effect_receiver",
+                "module_slots",
+                "allowed_effects",
+                "selection_box",
             ],
         ),
         "miners.json": (
@@ -69,10 +114,17 @@ def _parse_data_into_files(raw_data: dict, parser_output_path: Path) -> None:
                 "module_slots",
                 "allowed_effects",
                 "selection_box",
-                "energy_usage",
             ],
         ),
-        "modules.json": (["module"], ["name", "category", "tier", "effect"]),
+        "modules.json": (
+            ["module"],
+            [
+                "name",
+                "category",
+                "tier",
+                "effect",
+            ],
+        ),
         "qualities.json": (
             ["quality"],
             [
@@ -82,8 +134,6 @@ def _parse_data_into_files(raw_data: dict, parser_output_path: Path) -> None:
                 "next",
                 "next_probability",
                 "chain_probability",
-                "beacon_power_usage_multiplier",
-                "mining_drill_resource_drain_multiplier",
             ],
         ),
         "beacons.json": (
@@ -97,23 +147,61 @@ def _parse_data_into_files(raw_data: dict, parser_output_path: Path) -> None:
                 "allowed_effects",
                 "selection_box",
                 "supply_area_distance",
-                "energy_usage",
             ],
         ),
-        "surfaces.json": (["planet", "surface"], ["name", "surface_properties"]),
+        "surfaces.json": (
+            [
+                "planet",
+                "surface",
+            ],
+            [
+                "name",
+                "surface_properties",
+            ],
+        ),
+        "resources.json": (
+            ["resource"],
+            [
+                "name",
+                "category",
+                "minable",
+            ],
+        ),
+        "crafting_category.json": (["recipe-category"], ["name"]),
+        "module_category.json": (["module-category"], ["name"]),
+        "resource_category.json": (["resource-category"], ["name"]),
     }
 
+    total_parsed = 0
+
     for filename, (prototype_types, fields) in parse_jobs.items():
+        parsed = _parse_prototypes(raw_data, prototype_types, fields)
+
         _write_json_to_file(
-            _parse_prototypes(raw_data, prototype_types, fields),
+            parsed,
             parser_output_path,
             filename,
         )
 
+        total_parsed += len(parsed)
+
+        logger.debug(
+            "Parsed %d prototypes into %s",
+            len(parsed),
+            filename,
+        )
+
+    logger.info(
+        "Prototype parsing complete: %d prototypes written",
+        total_parsed,
+    )
+
 
 def _parse_prototypes(
-    raw_data: dict, prototype_types: list[str], fields: list[str]
-) -> dict:
+    raw_data: Mapping[str, Any],
+    prototype_types: Collection[str],
+    fields: Collection[str],
+) -> dict[str, Any]:
     """
     Parses the raw data for the specified prototype types and fields.
     Returns a dictionary containing the parsed data.
@@ -130,7 +218,7 @@ def _parse_prototypes(
 
 
 # Validation functions for metadata and raw data
-def _validate_metadata_fields(metadata: dict) -> None:
+def _validate_metadata_fields(metadata: Mapping[str, Any]) -> None:
     """
     Validates the metadata dictionary to ensure it contains the required fields. And checks if the required mods for the specified Factorio version are present in the active mods list.
     Raises a ValueError if any required field is missing.
@@ -158,7 +246,7 @@ def _validate_metadata_fields(metadata: dict) -> None:
         )
 
 
-def _validate_quality_and_recycler_present(raw_data: dict) -> None:
+def _validate_quality_and_recycler_present(raw_data: Mapping[str, Any]) -> None:
     """
     Validates that the Quality and Recycler mechanics are present in the raw data.
     Raises a ValueError if either is missing.
@@ -183,17 +271,48 @@ def perform_parsing() -> None:
     raw_path = Path("data/raw")
     parser_output_path = Path("data/parsed")
 
+    logger.info("Starting Factorio data parsing...")
+
+    if parser_output_path.exists():
+        shutil.rmtree(parser_output_path)
+
+    parser_output_path.mkdir(parents=True, exist_ok=True)
+
+    logger.info("Loading metadata...")
     metadata = _read_json_from_file(
-        raw_path / "metadata.json", "Metadata file not found."
+        raw_path / "metadata.json",
+        "Metadata file not found.",
     )
 
-    _validate_metadata_fields(metadata)
-    _write_json_to_file(metadata, parser_output_path, "metadata.json")
+    logger.debug("Validating metadata...")
+    _validate_metadata_fields(metadata["metadata"])
 
+    logger.info(
+        "Metadata validated for Factorio %s",
+        metadata["metadata"]["factorio_version"],
+    )
+
+    _write_json_to_file(
+        metadata,
+        parser_output_path,
+        "metadata.json",
+    )
+
+    logger.info("Loading raw Factorio data...")
     raw_data = _read_json_from_file(
-        raw_path / metadata["source_file"], "Raw data file not found."
+        raw_path / metadata["metadata"]["source_file"],
+        "Raw data file not found.",
     )
 
+    logger.debug("Validating Quality and Recycler mechanics...")
     _validate_quality_and_recycler_present(raw_data)
 
-    _parse_data_into_files(raw_data, parser_output_path)
+    logger.info("Raw Factorio data validated")
+
+    logger.info("Parsing prototypes...")
+    _write_prototype_files(raw_data, parser_output_path)
+
+    logger.info(
+        "Parsing complete. Output written to %s",
+        parser_output_path,
+    )

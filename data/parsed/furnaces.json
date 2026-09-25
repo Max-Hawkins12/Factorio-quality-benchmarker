@@ -1,0 +1,109 @@
+{
+    "stone-furnace": {
+        "name": "stone-furnace",
+        "crafting_categories": [
+            "smelting"
+        ],
+        "crafting_speed": 1,
+        "effect_receiver": {
+            "uses_module_effects": false,
+            "uses_beacon_effects": false,
+            "uses_surface_effects": true
+        },
+        "module_slots": null,
+        "allowed_effects": [
+            "speed",
+            "consumption",
+            "pollution"
+        ],
+        "selection_box": [
+            [
+                -0.8,
+                -1
+            ],
+            [
+                0.8,
+                1
+            ]
+        ]
+    },
+    "electric-furnace": {
+        "name": "electric-furnace",
+        "crafting_categories": [
+            "smelting"
+        ],
+        "crafting_speed": 2,
+        "effect_receiver": null,
+        "module_slots": 2,
+        "allowed_effects": [
+            "consumption",
+            "speed",
+            "productivity",
+            "pollution",
+            "quality"
+        ],
+        "selection_box": [
+            [
+                -1.5,
+                -1.5
+            ],
+            [
+                1.5,
+                1.5
+            ]
+        ]
+    },
+    "steel-furnace": {
+        "name": "steel-furnace",
+        "crafting_categories": [
+            "smelting"
+        ],
+        "crafting_speed": 2,
+        "effect_receiver": {
+            "uses_module_effects": false,
+            "uses_beacon_effects": false,
+            "uses_surface_effects": true
+        },
+        "module_slots": null,
+        "allowed_effects": [
+            "speed",
+            "consumption",
+            "pollution"
+        ],
+        "selection_box": [
+            [
+                -0.8,
+                -1
+            ],
+            [
+                0.8,
+                1
+            ]
+        ]
+    },
+    "recycler": {
+        "name": "recycler",
+        "crafting_categories": [
+            "recycling"
+        ],
+        "crafting_speed": 0.5,
+        "effect_receiver": null,
+        "module_slots": 4,
+        "allowed_effects": [
+            "consumption",
+            "speed",
+            "pollution",
+            "quality"
+        ],
+        "selection_box": [
+            [
+                -0.9,
+                -1.85
+            ],
+            [
+                0.9,
+                1.85
+            ]
+        ]
+    }
+}
