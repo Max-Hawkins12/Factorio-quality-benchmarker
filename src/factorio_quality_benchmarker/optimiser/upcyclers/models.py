@@ -63,27 +63,6 @@ class RecipeGraph(ABC):
         """Items produced by the end recipe of the graph"""
         return self.end_recipe.product_items
 
-    @property
-    def required_fluids(self) -> tuple[Fluid, ...]:
-        """Unique fluids consumed by recipes anywhere in the graph."""
-        fluids: set[Fluid] = set()
-
-        for node in self.graph.nodes:
-            if isinstance(node, Recipe):
-                fluids.update(node.ingredient_fluids)
-
-        return tuple(fluids)
-
-    @property
-    def produced_fluids(self) -> tuple[Fluid, ...]:
-        fluids: set[Fluid] = set()
-
-        for node in self.graph.nodes:
-            if isinstance(node, Recipe):
-                fluids.update(node.product_fluids)
-
-        return tuple(fluids)
-
     @classmethod
     @abstractmethod
     def is_valid(

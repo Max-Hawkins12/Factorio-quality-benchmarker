@@ -10,6 +10,7 @@ from factorio_quality_benchmarker.optimiser.upcyclers import (
     UpcyclerResultsCache,
     UpcyclerSystemCache,
 )
+from factorio_quality_benchmarker.optimiser.upcyclers.models import UpcyclerResult
 
 
 def run(simulation: SimulationContext):
@@ -38,58 +39,72 @@ def run(simulation: SimulationContext):
         ),
     )
 
-    holmium_results = upcycler_results_cache.get(simulation.items["tungsten-plate"])
+    print_result(
+        upcycler_results_cache.get(simulation.items["tungsten-plate"]), "tungsten-plate"
+    )
 
-    print(f"Total Results: {len(holmium_results)}")
+    print_result(
+        upcycler_results_cache.get(simulation.items["processing-unit"]),
+        "processing-unit",
+    )
 
-    for result in holmium_results:
-        print(f"Input Items: {[item.name for item in result.system.input_materials]}")
-        print(f"Output Items: {[item.name for item in result.system.output_items]}")
+    print_result(
+        upcycler_results_cache.get(simulation.items["electromagnetic-plant"]),
+        "electromagnetic-plant",
+    )
 
+
+def print_result(results: tuple[UpcyclerResult, ...], target: str) -> None:
+    print(target)
+    for n, result in enumerate(results):
+        if n > 0:
+            print()
+
+        print(f"BEST PER INPUT: {result.system.upcycler.recycled_item.name}")
+        print("\tPer Input:")
         print(
-            f"Best Legendary/Input: {result.per_input.legendary_per_input.legendary_output} has Legendary/Second {result.per_input.legendary_per_second.legendary_output}"
+            f"\tInputs: {[{material.name: (quality.name, amount) for material, qualities in result.per_input.legendary_per_input.material_inputs.items() for quality, amount in qualities.amounts.items()}]}"
         )
-        """for recipe, config in result.per_input.configuration.configurations.items():
-            print(f"Recipe: {recipe.name}")
-            print(
-                f"Config: Modules: {[module.name for module in config.machine_configuration.modules.modules]} Beacons: {[module.name for module in config.machine_configuration.beacons.modules]}"
-            )"""
-
         print(
-            f"Best Legendary/Second: {result.per_second.legendary_per_second.legendary_output} has Legendary/Input {result.per_second.legendary_per_input.legendary_output}"
+            f"\tLegendary: {[{material.name: amount for material, amount in result.per_input.legendary_per_input.legendary_output.items()}]}"
         )
-        """for recipe, config in result.per_second.configuration.configurations.items():
-            print(f"Recipe: {recipe.name}")
+        if result.per_input.legendary_per_input.fluid_outputs:
             print(
-                f"Config: Modules: {[module.name for module in config.machine_configuration.modules.modules]} Beacons: {[module.name for module in config.machine_configuration.beacons.modules]}"
-            )"""
-
-        print()
-
-    holmium_results = upcycler_results_cache.get(simulation.items["holmium-plate"])
-
-    print(f"Total Results: {len(holmium_results)}")
-
-    for result in holmium_results:
-        print(f"Input Items: {[item.name for item in result.system.input_materials]}")
-        print(f"Output Items: {[item.name for item in result.system.output_items]}")
-
+                f"\tFluid Output : {[{material.name: (quality.name, amount) for material, qualities in result.per_input.legendary_per_input.fluid_outputs.items() for quality, amount in qualities.amounts.items()}]}"
+            )
+        print("\tPer Second:")
         print(
-            f"Best Legendary/Input: {result.per_input.legendary_per_input.legendary_output} has Legendary/Second {result.per_input.legendary_per_second.legendary_output}"
+            f"\tInputs: {[{material.name: (quality.name, amount) for material, qualities in result.per_input.legendary_per_second.material_inputs.items() for quality, amount in qualities.amounts.items()}]}"
         )
-        """for recipe, config in result.per_input.configuration.configurations.items():
-            print(f"Recipe: {recipe.name}")
-            print(
-                f"Config: Modules: {[module.name for module in config.machine_configuration.modules.modules]} Beacons: {[module.name for module in config.machine_configuration.beacons.modules]}"
-            )"""
-
         print(
-            f"Best Legendary/Second: {result.per_second.legendary_per_second.legendary_output} has Legendary/Input {result.per_second.legendary_per_input.legendary_output}"
+            f"\tLegendary: {[{material.name: amount for material, amount in result.per_input.legendary_per_second.legendary_output.items()}]}"
         )
-        """for recipe, config in result.per_second.configuration.configurations.items():
-            print(f"Recipe: {recipe.name}")
+        if result.per_input.legendary_per_second.fluid_outputs:
             print(
-                f"Config: Modules: {[module.name for module in config.machine_configuration.modules.modules]} Beacons: {[module.name for module in config.machine_configuration.beacons.modules]}"
-            )"""
+                f"\tFluid Output : {[{material.name: (quality.name, amount) for material, qualities in result.per_input.legendary_per_second.fluid_outputs.items() for quality, amount in qualities.amounts.items()}]}"
+            )
+        print(f"BEST PER SECOND: {result.system.upcycler.recycled_item.name}")
+        print("\tPer Input:")
+        print(
+            f"\tInputs: {[{material.name: (quality.name, amount) for material, qualities in result.per_second.legendary_per_input.material_inputs.items() for quality, amount in qualities.amounts.items()}]}"
+        )
+        print(
+            f"\tLegendary: {[{material.name: amount for material, amount in result.per_second.legendary_per_input.legendary_output.items()}]}"
+        )
+        if result.per_second.legendary_per_input.fluid_outputs:
+            print(
+                f"\tFluid Output : {[{material.name: (quality.name, amount) for material, qualities in result.per_second.legendary_per_input.fluid_outputs.items() for quality, amount in qualities.amounts.items()}]}"
+            )
+        print("\tPer Second:")
+        print(
+            f"\tInputs: {[{material.name: (quality.name, amount) for material, qualities in result.per_second.legendary_per_second.material_inputs.items() for quality, amount in qualities.amounts.items()}]}"
+        )
+        print(
+            f"\tLegendary: {[{material.name: amount for material, amount in result.per_second.legendary_per_second.legendary_output.items()}]}"
+        )
+        if result.per_second.legendary_per_second.fluid_outputs:
+            print(
+                f"\tFluid Output : {[{material.name: (quality.name, amount) for material, qualities in result.per_second.legendary_per_second.fluid_outputs.items() for quality, amount in qualities.amounts.items()}]}"
+            )
 
-        print()
+    print()
