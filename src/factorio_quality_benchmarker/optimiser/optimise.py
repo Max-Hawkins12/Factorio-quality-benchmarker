@@ -1,5 +1,5 @@
 import logging
-from collections.abc import Mapping
+from collections.abc import Mapping, Sequence
 
 from factorio_quality_benchmarker.game.models import Item
 from factorio_quality_benchmarker.optimiser.machines import (
@@ -20,7 +20,7 @@ logger = logging.getLogger(__name__)
 def optimise(
     simulation: SimulationContext,
     items: tuple[Item, ...],
-) -> Mapping[Item, set[UpcyclerResult]]:
+) -> Mapping[Item, Sequence[UpcyclerResult]]:
 
     upcycler_results_cache = UpcyclerResultsCache(
         qualities=simulation.qualities,
@@ -46,12 +46,15 @@ def optimise(
         ),
     )
 
+    results: Mapping[Item, Sequence[UpcyclerResult]] = {}
+
     for item in items:
         logger.info("Optimising upcycler systems for %s", item.name)
+        results[item] = upcycler_results_cache.get(item)
         logger.info(
             "Found optimal configurations for %d upcycler systems of %s",
-            len(upcycler_results_cache.get(item)),
+            len(results[item]),
             item.name,
         )
 
-    return upcycler_results_cache.all_results
+    return results

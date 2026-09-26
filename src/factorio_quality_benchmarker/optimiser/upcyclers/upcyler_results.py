@@ -52,7 +52,7 @@ def _recipes_at_legendary(target: Item, graph: RecipeGraph) -> tuple[Recipe, ...
     return tuple(
         recipe
         for recipe in graph.ordered_recipes
-        if recipe.is_recycling and terminal_item not in recipe.ingredient_items
+        if not (recipe.is_recycling and terminal_item in recipe.ingredient_items)
     )
 
 
@@ -819,7 +819,3 @@ class UpcyclerResultsCache:
                 key=lambda result: system_order[result.system],
             )
         )
-
-    @property
-    def all_results(self) -> Mapping[Item, set[UpcyclerResult]]:
-        return self._results_cache.copy()

@@ -1,0 +1,38 @@
+from typing import TypedDict
+
+
+class ResultRow(TypedDict):
+    result_id: int
+    target: str
+
+    upcycler: str
+    upcycler_graph: str
+    before_graph: str | None
+    after_graph: str | None
+
+    per_input_configuration_id: int
+    per_input_legendary_per_input: str
+    per_input_material_inputs_per_input: str
+    per_input_fluid_outputs_per_input: str
+    per_input_legendary_per_second: str
+    per_input_material_inputs_per_second: str
+    per_input_fluid_outputs_per_second: str
+
+    per_second_configuration_id: int
+    per_second_legendary_per_input: str
+    per_second_material_inputs_per_input: str
+    per_second_fluid_outputs_per_input: str
+    per_second_legendary_per_second: str
+    per_second_material_inputs_per_second: str
+    per_second_fluid_outputs_per_second: str
+
+
+class ConfigurationRow(TypedDict):
+    configuration_id: int
+    recipe: str
+    recipe_quality: str
+    crafter: str
+    crafter_quality: str
+    machine_modules: str
+    num_beacons: int
+    beacon_modules: str

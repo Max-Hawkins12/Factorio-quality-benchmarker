@@ -1,8 +1,11 @@
+from pathlib import Path
+
 import typer
 
 from factorio_quality_benchmarker.data import load_game_data, perform_parsing
 from factorio_quality_benchmarker.optimiser import optimise
 from factorio_quality_benchmarker.optimiser.simulation import build_simulation_context
+from factorio_quality_benchmarker.results import export_results
 
 app = typer.Typer()
 
@@ -22,4 +25,4 @@ def run() -> None:
         simulation.items["electromagnetic-plant"],
     )
 
-    results = optimise(simulation, demo_items)
+    export_results(optimise(simulation, demo_items), Path("data/results"))
