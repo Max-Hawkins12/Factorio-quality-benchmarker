@@ -1,13 +1,8 @@
 import typer
 
 from factorio_quality_benchmarker.data import load_game_data, perform_parsing
-from factorio_quality_benchmarker.optimiser.run import run
-from factorio_quality_benchmarker.optimiser.simulation import (
-    NO_RESEARCH,
-    RunConfig,
-    UpcyclerScope,
-    build_simulation_context,
-)
+from factorio_quality_benchmarker.optimiser import optimise
+from factorio_quality_benchmarker.optimiser.simulation import build_simulation_context
 
 app = typer.Typer()
 
@@ -18,18 +13,13 @@ def parse() -> None:
 
 
 @app.command()
-def dev() -> None:
-    # Temp command
+def run() -> None:
+    simulation = build_simulation_context(game_data=load_game_data())
 
-    game_data = load_game_data()
-
-    simulation = build_simulation_context(
-        game_data,
-        RunConfig(
-            productivity_levels=NO_RESEARCH,
-            upcycler_scope=UpcyclerScope.CURATED,
-            entity_quality=game_data.qualities["legendary"],
-        ),
+    demo_items = (
+        simulation.items["tungsten-plate"],
+        simulation.items["processing-unit"],
+        simulation.items["electromagnetic-plant"],
     )
 
-    run(simulation)
+    results = optimise(simulation, demo_items)

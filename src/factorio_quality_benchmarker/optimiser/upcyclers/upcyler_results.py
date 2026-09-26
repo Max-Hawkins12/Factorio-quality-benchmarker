@@ -802,20 +802,6 @@ class UpcyclerResultsCache:
             ),
         )
 
-    def _system_sort_key(self, result: UpcyclerResult) -> int:
-        system = result.system
-
-        has_before = system.before_production_graph is not None
-        has_after = system.after_production_graph is not None
-
-        if not has_before and not has_after:
-            return 0
-        if has_before and not has_after:
-            return 1
-        if not has_before and has_after:
-            return 2
-        return 3
-
     def get(self, item: Item) -> tuple[UpcyclerResult, ...]:
         if item not in self._searched:
             self._discover(item)
@@ -833,3 +819,7 @@ class UpcyclerResultsCache:
                 key=lambda result: system_order[result.system],
             )
         )
+
+    @property
+    def all_results(self) -> Mapping[Item, set[UpcyclerResult]]:
+        return self._results_cache.copy()

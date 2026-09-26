@@ -42,14 +42,6 @@ MAX_LEVEL = ProductivityResearchLevels(
 DESIRED_MODULE_EFFECTS = ("productivity", "quality", "speed")
 
 # Items which have a valid recipe and/or recycling recipe, but are uncraftable ingame
-"""
-NOTE:
-INFO: Generating recipe graph index for 307 items from 644 recipes 
-INFO: Generated recipe graph index in 2.91s: 744 production graph references, 968 upcycling graph references 
-
-INFO: Generating recipe graph index for 283 items from 613 recipes 
-INFO: Generated recipe graph index in 2.86s: 737 production graph references, 927 upcycling graph references
-"""
 UNCRAFTABLE_ITEMS = frozenset(
     {
         "bottomless-chest",
