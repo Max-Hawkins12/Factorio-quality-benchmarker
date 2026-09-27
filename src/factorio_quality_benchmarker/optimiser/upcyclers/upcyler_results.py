@@ -98,6 +98,8 @@ def _advance_state(
         configurations=state.configurations
         | {Qualified(recipe, quality): configuration},
         initial_inputs=state.initial_inputs,
+        initial_products=state.initial_products,
+        initial_input_utilisation=state.initial_input_utilisation,
         upstream_fluid_inputs=fluid_inputs,
         fluid_outputs=fluid_outputs,
     )
@@ -240,6 +242,8 @@ def _initial_state_throughput_ignored(
         available=dict(configuration.metrics.input_per_craft),
         configurations={},
         initial_inputs=configuration.metrics.input_per_craft,
+        initial_products=configuration.metrics.output_items_per_craft,
+        initial_input_utilisation=None,
         upstream_fluid_inputs={},
         fluid_outputs={},
     )
@@ -315,10 +319,17 @@ def _initial_state_throughput_observed(
         for material, amounts in configuration.metrics.input_per_craft.items()
     }
 
+    products = {
+        item: amounts.scale(throughput)
+        for item, amounts in configuration.metrics.output_items_per_craft.items()
+    }
+
     return GraphState(
         available=inputs,
         configurations={},
         initial_inputs=inputs,
+        initial_products=products,
+        initial_input_utilisation=None,
         upstream_fluid_inputs={},
         fluid_outputs={},
     )
@@ -435,6 +446,34 @@ def _legendary_output(
     }
 
 
+def _calcualte_input_utilisation(state: GraphState) -> GraphState:
+    assert state.initial_input_utilisation is None
+
+    utilisations: list[float] = []
+
+    for item, initial_amounts in state.initial_products.items():
+        available_amounts = state.available.get(item, EMPTY_QUALITY_AMOUNTS)
+
+        for quality, initial_amount in initial_amounts.amounts.items():
+            if initial_amount == 0:
+                continue
+
+            remaining_amount = available_amounts[quality]
+
+            consumed_amount = initial_amount - remaining_amount
+
+            utilisations.append(
+                max(
+                    0.0,
+                    min(1.0, consumed_amount / initial_amount),
+                )
+            )
+
+    state.initial_input_utilisation = max(utilisations, default=1.0)
+
+    return state
+
+
 def _first_recipe_utilisation(
     configurations: Mapping[Qualified[Recipe], RecipeConfiguration],
     recipes: tuple[Recipe, ...],
@@ -506,6 +545,8 @@ def _next_state_for_system(
         },
         configurations={},
         initial_inputs=state.initial_inputs,
+        initial_products=state.initial_products,
+        initial_input_utilisation=state.initial_input_utilisation,
         upstream_fluid_inputs=state.upstream_fluid_inputs,
         fluid_outputs=state.fluid_outputs,
     )
@@ -528,7 +569,6 @@ def _evaluate_system_configuration(
     before: GraphConfiguration | None,
     after: GraphConfiguration | None,
     qualities: Mapping[str, Quality],
-    throughput_observed: bool,
     initial_state: Callable[[RecipeConfiguration], GraphState],
     advance_state: Callable[
         [GraphState, RecipeConfiguration, Quality, Recipe],
@@ -552,6 +592,9 @@ def _evaluate_system_configuration(
             advance_state=advance_state,
         )
 
+        if len(system.before_production_graph.ordered_recipes) > 1:
+            _calcualte_input_utilisation(state)
+
         state = _next_state_for_system(
             state, system.upcycler, tuple(qualities.values())
         )
@@ -568,6 +611,9 @@ def _evaluate_system_configuration(
         state=state,
         advance_state=advance_state,
     )
+
+    if state.initial_input_utilisation is None:
+        _calcualte_input_utilisation(state)
 
     final_graph: RecipeGraph = system.upcycler
 
@@ -599,6 +645,7 @@ def _evaluate_system_configuration(
     if after is not None:
         whole_configuration.update(after.configurations)
 
+    assert state.initial_input_utilisation is not None
     return _SystemResult(
         whole_configuration=GraphConfiguration(configurations=whole_configuration),
         upcycler_configuration=upcycler,
@@ -607,13 +654,7 @@ def _evaluate_system_configuration(
         metrics=ResultMetrics(
             legendary_output=_legendary_output(target, state, final_graph, qualities),
             initial_inputs=state.initial_inputs,
-            initial_input_utilisation=_first_recipe_utilisation(
-                configurations=whole_configuration,
-                recipes=system.ordered_recipes,
-                qualities=qualities,
-            )
-            if throughput_observed
-            else 1.0,
+            initial_input_utilisation=state.initial_input_utilisation,
             upstream_fluid_inputs=state.upstream_fluid_inputs,
             fluid_outputs=state.fluid_outputs,
         ),
@@ -627,7 +668,6 @@ def _evaluate_system(
     before: tuple[GraphConfiguration, ...] | None,
     after: tuple[GraphConfiguration, ...] | None,
     qualities: Mapping[str, Quality],
-    throughput_observed: bool,
     initial_state: Callable[[RecipeConfiguration], GraphState],
     advance_state: Callable[
         [GraphState, RecipeConfiguration, Quality, Recipe],
@@ -651,7 +691,6 @@ def _evaluate_system(
             upcycler=upcycler_config,
             after=after_config,
             qualities=qualities,
-            throughput_observed=throughput_observed,
             initial_state=initial_state,
             advance_state=advance_state,
         )
@@ -712,7 +751,6 @@ class UpcyclerResultsCache:
                         before=per_input.before_configuration,
                         after=per_input.after_configuration,
                         qualities=self.qualities,
-                        throughput_observed=True,
                         initial_state=_initial_state_throughput_observed,
                         advance_state=_advance_state_throughput_observed,
                     ).metrics,
@@ -726,7 +764,6 @@ class UpcyclerResultsCache:
                         before=per_second.before_configuration,
                         after=per_second.after_configuration,
                         qualities=self.qualities,
-                        throughput_observed=False,
                         initial_state=_initial_state_throughput_ignored,
                         advance_state=_advance_state_throughput_ignored,
                     ).metrics,
@@ -767,7 +804,6 @@ class UpcyclerResultsCache:
             ),
             after=(after_frontiers.per_input if after_frontiers is not None else None),
             qualities=self.qualities,
-            throughput_observed=False,
             initial_state=_initial_state_throughput_ignored,
             advance_state=_advance_state_throughput_ignored,
         )
@@ -781,7 +817,6 @@ class UpcyclerResultsCache:
             ),
             after=(after_frontiers.per_second if after_frontiers is not None else None),
             qualities=self.qualities,
-            throughput_observed=True,
             initial_state=_initial_state_throughput_observed,
             advance_state=_advance_state_throughput_observed,
         )

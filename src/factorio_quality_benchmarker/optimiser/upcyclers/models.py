@@ -264,5 +264,8 @@ class GraphState:
     configurations: dict[Qualified[Recipe], RecipeConfiguration]
 
     initial_inputs: Mapping[Material, QualityAmounts]
+    initial_products: Mapping[Item, QualityAmounts]
+    initial_input_utilisation: float | None
+
     upstream_fluid_inputs: Mapping[Fluid, QualityAmounts]
     fluid_outputs: Mapping[Fluid, QualityAmounts]
