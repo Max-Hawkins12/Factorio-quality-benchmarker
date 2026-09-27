@@ -83,7 +83,9 @@ def serialise_metrics(
 ) -> dict[str, str]:
     return {
         "legendary_output": serialise_legendary_output(metrics.legendary_output),
-        "material_inputs": serialise_materials(metrics.material_inputs),
+        "initial_inputs": serialise_materials(metrics.initial_inputs),
+        "initial_input_utilisation": str(metrics.initial_input_utilisation),
+        "upstream_fluid_inputs": serialise_fluids(metrics.upstream_fluid_inputs),
         "fluid_outputs": serialise_fluids(metrics.fluid_outputs),
     }
 
@@ -113,17 +115,33 @@ def result_row(
         after_graph=serialise_graph(system.after_production_graph),
         per_input_configuration_id=per_input_configuration_id,
         per_input_legendary_per_input=pi_pi["legendary_output"],
-        per_input_material_inputs_per_input=pi_pi["material_inputs"],
+        per_input_initial_inputs_per_input=pi_pi["initial_inputs"],
+        per_input_initial_input_utilisation_per_input=pi_pi[
+            "initial_input_utilisation"
+        ],
+        per_input_upstream_fluid_inputs_per_input=pi_pi["upstream_fluid_inputs"],
         per_input_fluid_outputs_per_input=pi_pi["fluid_outputs"],
         per_input_legendary_per_second=pi_ps["legendary_output"],
-        per_input_material_inputs_per_second=pi_ps["material_inputs"],
+        per_input_initial_inputs_per_second=pi_ps["initial_inputs"],
+        per_input_initial_input_utilisation_per_second=pi_ps[
+            "initial_input_utilisation"
+        ],
+        per_input_upstream_fluid_inputs_per_second=pi_ps["upstream_fluid_inputs"],
         per_input_fluid_outputs_per_second=pi_ps["fluid_outputs"],
         per_second_configuration_id=per_second_configuration_id,
         per_second_legendary_per_input=ps_pi["legendary_output"],
-        per_second_material_inputs_per_input=ps_pi["material_inputs"],
+        per_second_initial_inputs_per_input=ps_pi["initial_inputs"],
+        per_second_initial_input_utilisation_per_input=ps_pi[
+            "initial_input_utilisation"
+        ],
+        per_second_upstream_fluid_inputs_per_input=ps_pi["upstream_fluid_inputs"],
         per_second_fluid_outputs_per_input=ps_pi["fluid_outputs"],
         per_second_legendary_per_second=ps_ps["legendary_output"],
-        per_second_material_inputs_per_second=ps_ps["material_inputs"],
+        per_second_initial_inputs_per_second=ps_ps["initial_inputs"],
+        per_second_initial_input_utilisation_per_second=ps_ps[
+            "initial_input_utilisation"
+        ],
+        per_second_upstream_fluid_inputs_per_second=ps_ps["upstream_fluid_inputs"],
         per_second_fluid_outputs_per_second=ps_ps["fluid_outputs"],
     )
 

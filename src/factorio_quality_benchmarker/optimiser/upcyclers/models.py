@@ -187,6 +187,22 @@ class UpcyclerSystem:
             else self.after_production_graph.output_items
         )
 
+    @property
+    def ordered_recipes(self) -> tuple[Recipe, ...]:
+        before_reipes: tuple[Recipe, ...] = (
+            self.before_production_graph.ordered_recipes
+            if self.before_production_graph
+            else ()
+        )
+        after_recipes: tuple[Recipe, ...] = (
+            self.after_production_graph.ordered_recipes
+            if self.after_production_graph
+            else ()
+        )
+        upcycler_recipes = self.upcycler.ordered_recipes
+
+        return before_reipes + upcycler_recipes + after_recipes
+
 
 @dataclass(frozen=True, slots=True)
 class GraphConfiguration:
@@ -196,7 +212,9 @@ class GraphConfiguration:
 @dataclass(frozen=True, slots=True)
 class ResultMetrics:
     legendary_output: Mapping[Item, float]
-    material_inputs: Mapping[Material, QualityAmounts]
+    initial_inputs: Mapping[Material, QualityAmounts]
+    initial_input_utilisation: float
+    upstream_fluid_inputs: Mapping[Fluid, QualityAmounts]
     fluid_outputs: Mapping[Fluid, QualityAmounts]
 
 
@@ -245,11 +263,6 @@ class GraphState:
     available: dict[Material, QualityAmounts]
     configurations: dict[Qualified[Recipe], RecipeConfiguration]
 
-    item_inputs: Mapping[Item, QualityAmounts]
-    fluid_inputs: Mapping[Fluid, QualityAmounts]
-
+    initial_inputs: Mapping[Material, QualityAmounts]
+    upstream_fluid_inputs: Mapping[Fluid, QualityAmounts]
     fluid_outputs: Mapping[Fluid, QualityAmounts]
-
-    @property
-    def material_inputs(self) -> Mapping[Material, QualityAmounts]:
-        return {**self.item_inputs, **self.fluid_inputs}

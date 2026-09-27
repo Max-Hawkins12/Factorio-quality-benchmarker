@@ -7,23 +7,31 @@ class ResultRow(TypedDict):
 
     upcycler: str
     upcycler_graph: str
-    before_graph: str | None
-    after_graph: str | None
+    before_graph: str
+    after_graph: str
 
     per_input_configuration_id: int
     per_input_legendary_per_input: str
-    per_input_material_inputs_per_input: str
+    per_input_initial_inputs_per_input: str
+    per_input_initial_input_utilisation_per_input: str
+    per_input_upstream_fluid_inputs_per_input: str
     per_input_fluid_outputs_per_input: str
     per_input_legendary_per_second: str
-    per_input_material_inputs_per_second: str
+    per_input_initial_inputs_per_second: str
+    per_input_initial_input_utilisation_per_second: str
+    per_input_upstream_fluid_inputs_per_second: str
     per_input_fluid_outputs_per_second: str
 
     per_second_configuration_id: int
     per_second_legendary_per_input: str
-    per_second_material_inputs_per_input: str
+    per_second_initial_inputs_per_input: str
+    per_second_initial_input_utilisation_per_input: str
+    per_second_upstream_fluid_inputs_per_input: str
     per_second_fluid_outputs_per_input: str
     per_second_legendary_per_second: str
-    per_second_material_inputs_per_second: str
+    per_second_initial_inputs_per_second: str
+    per_second_initial_input_utilisation_per_second: str
+    per_second_upstream_fluid_inputs_per_second: str
     per_second_fluid_outputs_per_second: str
 
 
