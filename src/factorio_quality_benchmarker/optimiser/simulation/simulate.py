@@ -3,13 +3,12 @@ from collections.abc import Mapping
 from factorio_quality_benchmarker.game import GameData
 from factorio_quality_benchmarker.game.models import Item, Quality, Recipe
 
-from .constants import UNCRAFTABLE_ITEMS
+from .constants import NO_RESEARCH, UNCRAFTABLE_ITEMS
 from .models import (
     Named,
     ProductivityResearchLevels,
     Qualified,
     QualifiedIndex,
-    RunConfig,
     SimulationContext,
 )
 
@@ -50,23 +49,18 @@ def _get_productivity_level_index(
     }
 
 
-def build_simulation_context(
-    game_data: GameData,
-    run_config: RunConfig,
-) -> SimulationContext:
-
-    # TODO Implement hard-coded Curated and Essentials lists of items
+def build_simulation_context(game_data: GameData) -> SimulationContext:
 
     qualities = tuple(game_data.qualities.values())
     valid_items = _remove_uncraftable_items(game_data.items)
 
     return SimulationContext(
         game_data=game_data,
-        run_config=run_config,
         productivity_research_index=_get_productivity_level_index(
             valid_items,
-            run_config.productivity_levels,
+            NO_RESEARCH,
         ),
+        entity_quality=game_data.qualities["legendary"],
         items=valid_items,
         recipes=_remove_uncraftable_recipes(game_data.recipes),
         items_by_quality=_apply_quality(valid_items, qualities),

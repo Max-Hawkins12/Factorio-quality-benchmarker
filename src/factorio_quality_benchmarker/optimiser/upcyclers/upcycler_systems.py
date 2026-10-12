@@ -185,40 +185,59 @@ class UpcyclerSystemCache:
     def get(self, item: Item) -> tuple[UpcyclerSystem, ...]:
         systems: list[UpcyclerSystem] = []
 
+        # Direct upcyclers of the target item
         for upcycler in self._get_upcyclers(item):
-            systems.append(UpcyclerSystem(upcycler=upcycler))
+            before_producers = (
+                self._get_producers(upcycler.input_items[0])
+                if len(upcycler.input_items) == 1
+                else ()
+            )
 
-            if len(upcycler.input_items) == 1:
-                systems.extend(
-                    UpcyclerSystem(
-                        upcycler=upcycler,
-                        before_production_graph=producer,
-                    )
-                    for producer in self._get_producers(upcycler.input_items[0])
+            systems.append(
+                UpcyclerSystem(
+                    upcycler=upcycler,
                 )
+            )
 
-        for after_producer in self._get_producers(item):
-            if len(after_producer.input_items) != 1:
+            systems.extend(
+                UpcyclerSystem(
+                    upcycler=upcycler,
+                    before_production_graph=before,
+                )
+                for before in before_producers
+            )
+
+        # Upcyclers feeding a production graph which produces the target item
+        for after in self._get_producers(item):
+            if len(after.input_items) != 1:
                 continue
 
-            for upcycler in self._get_upcyclers(after_producer.input_items[0]):
+            for upcycler in self._get_upcyclers(after.input_items[0]):
+                before_producers = (
+                    self._get_producers(upcycler.input_items[0])
+                    if len(upcycler.input_items) == 1
+                    else ()
+                )
+
                 systems.append(
                     UpcyclerSystem(
                         upcycler=upcycler,
-                        after_production_graph=after_producer,
+                        after_production_graph=after,
                     )
                 )
 
-                if len(upcycler.input_items) == 1:
-                    systems.extend(
-                        UpcyclerSystem(
-                            upcycler=upcycler,
-                            before_production_graph=before_producer,
-                            after_production_graph=after_producer,
-                        )
-                        for before_producer in self._get_producers(
-                            upcycler.input_items[0]
-                        )
+                systems.extend(
+                    UpcyclerSystem(
+                        upcycler=upcycler,
+                        before_production_graph=before,
+                        after_production_graph=after,
                     )
+                    for before in before_producers
+                )
 
-        return tuple(systems)
+        return tuple(
+            sorted(
+                systems,
+                key=lambda system: system.upcycler.recycled_item != item,
+            )
+        )

@@ -63,27 +63,6 @@ class RecipeGraph(ABC):
         """Items produced by the end recipe of the graph"""
         return self.end_recipe.product_items
 
-    @property
-    def required_fluids(self) -> tuple[Fluid, ...]:
-        """Unique fluids consumed by recipes anywhere in the graph."""
-        fluids: set[Fluid] = set()
-
-        for node in self.graph.nodes:
-            if isinstance(node, Recipe):
-                fluids.update(node.ingredient_fluids)
-
-        return tuple(fluids)
-
-    @property
-    def produced_fluids(self) -> tuple[Fluid, ...]:
-        fluids: set[Fluid] = set()
-
-        for node in self.graph.nodes:
-            if isinstance(node, Recipe):
-                fluids.update(node.product_fluids)
-
-        return tuple(fluids)
-
     @classmethod
     @abstractmethod
     def is_valid(
@@ -208,6 +187,22 @@ class UpcyclerSystem:
             else self.after_production_graph.output_items
         )
 
+    @property
+    def ordered_recipes(self) -> tuple[Recipe, ...]:
+        before_reipes: tuple[Recipe, ...] = (
+            self.before_production_graph.ordered_recipes
+            if self.before_production_graph
+            else ()
+        )
+        after_recipes: tuple[Recipe, ...] = (
+            self.after_production_graph.ordered_recipes
+            if self.after_production_graph
+            else ()
+        )
+        upcycler_recipes = self.upcycler.ordered_recipes
+
+        return before_reipes + upcycler_recipes + after_recipes
+
 
 @dataclass(frozen=True, slots=True)
 class GraphConfiguration:
@@ -217,7 +212,9 @@ class GraphConfiguration:
 @dataclass(frozen=True, slots=True)
 class ResultMetrics:
     legendary_output: Mapping[Item, float]
-    material_inputs: Mapping[Material, QualityAmounts]
+    initial_inputs: Mapping[Material, QualityAmounts]
+    initial_input_utilisation: float
+    upstream_fluid_inputs: Mapping[Fluid, QualityAmounts]
     fluid_outputs: Mapping[Fluid, QualityAmounts]
 
 
@@ -266,11 +263,9 @@ class GraphState:
     available: dict[Material, QualityAmounts]
     configurations: dict[Qualified[Recipe], RecipeConfiguration]
 
-    item_inputs: Mapping[Item, QualityAmounts]
-    fluid_inputs: Mapping[Fluid, QualityAmounts]
+    initial_inputs: Mapping[Material, QualityAmounts]
+    initial_products: Mapping[Item, QualityAmounts]
+    initial_input_utilisation: float | None
 
+    upstream_fluid_inputs: Mapping[Fluid, QualityAmounts]
     fluid_outputs: Mapping[Fluid, QualityAmounts]
-
-    @property
-    def material_inputs(self) -> Mapping[Material, QualityAmounts]:
-        return {**self.item_inputs, **self.fluid_inputs}

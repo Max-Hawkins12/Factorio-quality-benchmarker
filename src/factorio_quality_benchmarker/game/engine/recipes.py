@@ -30,9 +30,13 @@ def productivity_bonus(
 
         research_productivity = productivity_research_index.get(product, 0.0) / 10
 
+    # Inherent machine productivity is intentionally disabled for now.
+    # It substantially expands graph-state frontiers in recycling loops.
+    # Re-enable as part of generalized baseline productivity support,
+    # alongside productivity research.
     return (
         machine_effects.productivity
-        + crafter.entity.inherent_productivity
+        # + crafter.entity.inherent_productivity
         + research_productivity
     )
 

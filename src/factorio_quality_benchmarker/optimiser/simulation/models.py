@@ -1,6 +1,5 @@
 from collections.abc import Mapping
 from dataclasses import dataclass
-from enum import StrEnum
 from typing import Protocol
 
 from factorio_quality_benchmarker.game import GameData
@@ -39,7 +38,7 @@ type QualifiedIndex[T] = Mapping[Quality, Mapping[str, T]]
 type QualifiedMachine = Qualified[Crafter] | Qualified[Miner]
 
 
-# Configurable simulation runtime settings
+# Simulation runtime settings
 @dataclass(frozen=True, slots=True)
 class ProductivityResearchLevels:
     processing_unit_level: int
@@ -60,26 +59,12 @@ class ProductivityResearchLevels:
         self.validate_level(self.rocket_fuel_level)
 
 
-class UpcyclerScope(StrEnum):
-    CURATED = "curated"
-    ESSENTIALS = "essentials"
-    COMPLETE = "complete"
-
-
-@dataclass(frozen=True, slots=True)
-class RunConfig:
-    productivity_levels: ProductivityResearchLevels
-    upcycler_scope: UpcyclerScope
-
-    entity_quality: Quality
-
-
 @dataclass(frozen=True, slots=True)
 class SimulationContext:
     game_data: GameData
-    run_config: RunConfig
 
     productivity_research_index: Mapping[Item, int]
+    entity_quality: Quality
 
     # Index entities by all quality versions
     items_by_quality: QualifiedIndex[Qualified[Item]]
@@ -88,6 +73,51 @@ class SimulationContext:
     modules_by_quality: QualifiedIndex[Qualified[Module]]
     beacons_by_quality: QualifiedIndex[Qualified[Beacon]]
 
+    # "Overrides" of the parsed game data values
+    items: Mapping[str, Item]
+    recipes: Mapping[str, Recipe]
+
+    @property
+    def fluids(self) -> Mapping[str, Fluid]:
+        return self.game_data.fluids
+
+    @property
+    def materials(self) -> Mapping[str, Material]:
+        return {**self.items, **self.fluids}
+
+    @property
+    def crafters(self) -> Mapping[str, Qualified[Crafter]]:
+        return self.crafters_by_quality[self.entity_quality]
+
+    @property
+    def miners(self) -> Mapping[str, Qualified[Miner]]:
+        return self.miners_by_quality[self.entity_quality]
+
+    @property
+    def machines(self) -> Mapping[str, QualifiedMachine]:
+        return {**self.crafters, **self.miners}
+
+    @property
+    def modules(self) -> Mapping[str, Qualified[Module]]:
+        return self.modules_by_quality[self.entity_quality]
+
+    @property
+    def beacon(self) -> Qualified[Beacon]:
+        return self.beacons_by_quality[self.entity_quality]["beacon"]
+
+    @property
+    def resources(self) -> Mapping[str, Resource]:
+        return self.game_data.resources
+
+    @property
+    def qualities(self) -> Mapping[str, Quality]:
+        return self.game_data.qualities
+
+    @property
+    def surfaces(self) -> Mapping[str, Surface]:
+        return self.game_data.surfaces
+
+    # Helper properties for recipe maps
     @property
     def producer_recipes_by_material(self) -> Mapping[Material, tuple[Recipe, ...]]:
         producer_recipes: dict[Material, list[Recipe]] = {
@@ -111,53 +141,3 @@ class SimulationContext:
                 recycling_recipes[recipe.ingredient_items[0]] = recipe
 
         return recycling_recipes
-
-    def item_recycling_recipe(self, item: Item) -> Recipe:
-        for recipe in self.producer_recipes_by_material[item]:
-            if recipe.is_recycling:
-                return recipe
-        raise ValueError(f"{item.name} has no recorded recycling recipe.")
-
-    # "Overrides" of the parsed game data values
-    items: Mapping[str, Item]
-    recipes: Mapping[str, Recipe]
-
-    @property
-    def fluids(self) -> Mapping[str, Fluid]:
-        return self.game_data.fluids
-
-    @property
-    def materials(self) -> Mapping[str, Material]:
-        return {**self.items, **self.fluids}
-
-    @property
-    def crafters(self) -> Mapping[str, Qualified[Crafter]]:
-        return self.crafters_by_quality[self.run_config.entity_quality]
-
-    @property
-    def miners(self) -> Mapping[str, Qualified[Miner]]:
-        return self.miners_by_quality[self.run_config.entity_quality]
-
-    @property
-    def machines(self) -> Mapping[str, QualifiedMachine]:
-        return {**self.crafters, **self.miners}
-
-    @property
-    def modules(self) -> Mapping[str, Qualified[Module]]:
-        return self.modules_by_quality[self.run_config.entity_quality]
-
-    @property
-    def beacon(self) -> Qualified[Beacon]:
-        return self.beacons_by_quality[self.run_config.entity_quality]["beacon"]
-
-    @property
-    def resources(self) -> Mapping[str, Resource]:
-        return self.game_data.resources
-
-    @property
-    def qualities(self) -> Mapping[str, Quality]:
-        return self.game_data.qualities
-
-    @property
-    def surfaces(self) -> Mapping[str, Surface]:
-        return self.game_data.surfaces

@@ -30,7 +30,6 @@ def calculate_distribution_effectivity(
     """
     return (
         get_qualified_beacon_distribution_effectivity(beacon)
-        * num_beacons
         * beacon.entity.diminishing_returns_profile[num_beacons - 1]
         if num_beacons > 0
         else 0.0
