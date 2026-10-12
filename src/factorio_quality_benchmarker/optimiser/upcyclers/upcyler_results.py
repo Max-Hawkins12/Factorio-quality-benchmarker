@@ -474,46 +474,6 @@ def _calcualte_input_utilisation(state: GraphState) -> GraphState:
     return state
 
 
-def _first_recipe_utilisation(
-    configurations: Mapping[Qualified[Recipe], RecipeConfiguration],
-    recipes: tuple[Recipe, ...],
-    qualities: Mapping[str, Quality],
-) -> float:
-    if len(recipes) == 1:
-        return 1.0
-
-    first_recipe = recipes[0]
-    second_recipe = recipes[1]
-
-    shared_materials = set(first_recipe.product_items) & set(
-        second_recipe.ingredient_items
-    )
-
-    if not shared_materials:
-        return 1.0
-
-    utilisations = []
-
-    for quality in qualities.values():
-        first_configuration = configurations.get(Qualified(first_recipe, quality))
-        second_configuration = configurations.get(Qualified(second_recipe, quality))
-
-        if first_configuration is None or second_configuration is None:
-            continue
-
-        for material in shared_materials:
-            output = first_configuration.metrics.output_per_second[material][quality]
-
-            if output == 0:
-                continue
-
-            input_ = second_configuration.metrics.input_per_second[material][quality]
-
-            utilisations.append(input_ / output)
-
-    return max(utilisations, default=1.0)
-
-
 def _initial_state_for_system(
     graph: RecipeGraph,
     configuration: GraphConfiguration,
